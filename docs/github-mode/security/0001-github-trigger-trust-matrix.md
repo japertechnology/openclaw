@@ -92,6 +92,6 @@ The matrix applies to planned Phase 3 workflows:
 
 ## Approval signoff
 
-- Security maintainer: Peter Steinberger (`@steipete`) — Approved 2026-02-16
+- Security maintainer: Eric Mourant (`@japer`) — Approved 2026-02-16
 - GitHub mode maintainer: Eric Mourant (`@japer`) — Approved 2026-02-16
-- Runtime maintainer reviewer: Peter Steinberger (`@steipete`) — Approved 2026-02-16
+- Runtime maintainer reviewer: Eric Mourant (`@japer`) — Approved 2026-02-16
