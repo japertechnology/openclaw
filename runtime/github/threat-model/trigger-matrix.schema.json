@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.ai/schemas/github-mode/trigger-matrix.schema.json",
+  "title": "GitHub mode trigger matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "securityGoals", "contexts", "abuseCases"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "securityGoals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "contexts": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "trigger",
+          "variant",
+          "trustLevel",
+          "privilegedExecutionAllowed",
+          "branchMutationPolicy",
+          "requiredControls"
+        ],
+        "properties": {
+          "trigger": {
+            "type": "string"
+          },
+          "variant": {
+            "type": "string"
+          },
+          "trustLevel": {
+            "type": "string"
+          },
+          "privilegedExecutionAllowed": {
+            "type": "boolean"
+          },
+          "branchMutationPolicy": {
+            "type": "string",
+            "enum": ["none", "pr_only"]
+          },
+          "requiredControls": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "abuseCases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "preventiveControls", "detectiveControls"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "preventiveControls": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "detectiveControls": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

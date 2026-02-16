@@ -1,0 +1,80 @@
+{
+  "$schema": "./trigger-matrix.schema.json",
+  "version": "1.0.0",
+  "securityGoals": [
+    "no_privileged_execution_in_untrusted_contexts",
+    "privileged_branch_mutation_requires_pr_flow"
+  ],
+  "contexts": [
+    {
+      "trigger": "pull_request",
+      "variant": "fork",
+      "trustLevel": "untrusted",
+      "privilegedExecutionAllowed": false,
+      "branchMutationPolicy": "none",
+      "requiredControls": ["token_read_only", "no_secrets", "trust_gate"]
+    },
+    {
+      "trigger": "pull_request",
+      "variant": "internal",
+      "trustLevel": "semi_trusted",
+      "privilegedExecutionAllowed": false,
+      "branchMutationPolicy": "pr_only",
+      "requiredControls": ["minimal_permissions", "required_checks", "codeowners_review"]
+    },
+    {
+      "trigger": "push",
+      "variant": "protected_branch",
+      "trustLevel": "trusted",
+      "privilegedExecutionAllowed": true,
+      "branchMutationPolicy": "pr_only",
+      "requiredControls": ["protected_branch", "required_checks", "codeowners_review"]
+    },
+    {
+      "trigger": "schedule",
+      "variant": "default",
+      "trustLevel": "trusted_automation",
+      "privilegedExecutionAllowed": true,
+      "branchMutationPolicy": "pr_only",
+      "requiredControls": ["environment_reviewers", "attestation_required", "audit_artifacts"]
+    },
+    {
+      "trigger": "workflow_dispatch",
+      "variant": "default",
+      "trustLevel": "trusted_operator",
+      "privilegedExecutionAllowed": true,
+      "branchMutationPolicy": "pr_only",
+      "requiredControls": ["caller_allowlist", "environment_reviewers", "audit_artifacts"]
+    }
+  ],
+  "abuseCases": [
+    {
+      "id": "fork_pr_secret_exfiltration",
+      "description": "Untrusted fork PR attempts to read or print secrets.",
+      "preventiveControls": [
+        "pull_request_not_pull_request_target",
+        "no_secrets",
+        "token_read_only"
+      ],
+      "detectiveControls": ["trust_context_summary", "security_lint_report"]
+    },
+    {
+      "id": "direct_mutation_of_protected_branch",
+      "description": "Workflow writes directly to protected branch bypassing PR flow.",
+      "preventiveControls": ["branch_protection_enforced", "workflow_write_restrictions"],
+      "detectiveControls": ["audit_log_review", "policy_validation_report"]
+    },
+    {
+      "id": "unauthorized_manual_dispatch",
+      "description": "Unauthorized actor triggers privileged workflow_dispatch path.",
+      "preventiveControls": ["caller_allowlist", "environment_reviewer_gate"],
+      "detectiveControls": ["denied_dispatch_artifact", "actor_audit_log"]
+    },
+    {
+      "id": "scheduled_job_overprivileged_token",
+      "description": "Scheduled job has broad permissions and can mutate state unexpectedly.",
+      "preventiveControls": ["explicit_permissions", "sha_pinned_actions"],
+      "detectiveControls": ["permission_lint_report", "workflow_summary_permissions"]
+    }
+  ]
+}
