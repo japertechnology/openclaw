@@ -74,6 +74,6 @@ The following are prohibited and must fail review:
 
 ## Approval signoff
 
-- Runtime maintainer: Peter Steinberger (`@steipete`) — Approved
+- Runtime maintainer: Eric Mourant (`@japer`) — Approved
 - GitHub mode maintainer: Eric Mourant (`@japer`) — Approved
 - Approval date: `2026-02-16`
