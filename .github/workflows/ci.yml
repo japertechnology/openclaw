@@ -138,6 +138,19 @@ jobs:
           echo "github_mode_active=${github_mode_active}" >> "$GITHUB_OUTPUT"
           echo "run_installed_runtime_baseline=${run_installed_runtime_baseline}" >> "$GITHUB_OUTPUT"
 
+  github-mode-threat-model:
+    needs: [docs-scope]
+    if: needs.docs-scope.outputs.docs_only != 'true' && hashFiles('.GITHUB-MODE-ACTIVE.*') != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Validate GitHub mode threat model
+        run: node scripts/validate-github-mode-threat-model.mjs
+
   installed-runtime-regression-baseline:
     needs: [docs-scope, changed-scope, code-size, check-lint]
     if: needs.docs-scope.outputs.docs_only != 'true' && needs.changed-scope.outputs.github_mode_active == 'true' && (github.event_name == 'push' || needs.changed-scope.outputs.run_installed_runtime_baseline == 'true')
