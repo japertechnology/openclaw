@@ -276,8 +276,34 @@ Required behavior:
 
 - trust-aware command authorization
 - policy-gated adapter invocation
+- required state adapter pipeline (snapshot hydrate/validate/run/persist/record)
 - provenance metadata embedded in outputs (source command, commit SHA, run id, policy version)
 - no direct writes to protected branches
+
+State adapter pipeline acceptance criteria:
+
+1. Download snapshot at workflow start.
+2. Validate version/schema compatibility.
+3. Run agent.
+4. Upload snapshot/checkpoint atomically.
+5. Record run metadata and snapshot ID.
+
+Candidate storage targets and selection criteria:
+
+| Storage target                                  | Latency profile                                      | Cost profile                                    | Access control profile                                                     |
+| ----------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------- |
+| GitHub Actions artifacts                        | Low in-run retrieval in same repository workflows    | Included quota + overage for retention growth   | GitHub repo permissions + workflow-scoped access; good default for MVP     |
+| GitHub Releases assets                          | Medium retrieval; optimized for versioned publishing | Low/medium depending on release retention       | Repository release permissions; stronger change visibility than artifacts  |
+| Cloud object storage via OIDC (S3/GCS/Azure)    | Low/medium depending on region placement             | Pay-per-request + storage tiers; highly tunable | Fine-grained IAM via OIDC federation; strongest policy isolation controls  |
+| Managed KV/database metadata index + blob store | Low lookup for metadata, medium for blob fetch       | Higher operational cost but predictable scaling | Service-level RBAC + row/object policy; good for multi-tenant coordination |
+
+Selection criteria:
+
+- Pick the lowest-latency option that keeps end-to-end command flow within SLO for snapshot hydrate + finalize.
+- Minimize total cost at expected checkpoint frequency and retention window (hot + warm tiers).
+- Require least-privilege access control, auditable writes, and environment-scoped credentials.
+- Prefer options that support atomic write semantics or transactional indirection (upload then pointer swap).
+- Ensure lifecycle controls support TTL, legal hold overrides, and reproducible incident forensics.
 
 ### Exit criteria
 
@@ -428,6 +454,7 @@ All must be true before broad rollout:
 - **M2:** Phase 2 complete (security foundation)
 - **M3:** Phase 3 complete (validation/policy/eval/cost/template drift workflows)
 - **M4:** Phase 4 complete (command + agent-run + bot PR)
+- **M4.1 (required):** State adapter pipeline complete with acceptance criteria satisfied and storage target selected by latency/cost/access-control review
 - **M5:** Phase 5 complete (promotion + attestation + drift/incident)
 - **M6:** Phase 6 complete (multi-entity bootstrap/collaboration)
 - **M7:** Phase 7 complete (observability + compliance + governance handoff)
