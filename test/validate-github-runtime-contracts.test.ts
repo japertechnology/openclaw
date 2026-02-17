@@ -249,19 +249,16 @@ describe("collaboration-policy validation", () => {
     expect(result.stdout).toContain("schema validation failed");
   });
 
-  it("fails when collaboration-policy.json defaultAction is not deny", () => {
-    // This tests the explicit deny-by-default business rule check, separate from schema.
-    // The schema also enforces enum: ["deny"], so this tests the validator logic layer.
-    const nonDenyPolicy = {
+  it("passes when collaboration-policy.json defaultAction is deny", () => {
+    const validDenyPolicy = {
       schemaVersion: "1.0",
       policyVersion: "v1.0.0",
       defaultAction: "deny",
       allowedRoutes: [],
     };
-    // Valid deny policy should pass
     const result = withTempFile(
       "runtime/github/collaboration-policy.json",
-      JSON.stringify(nonDenyPolicy, null, 2),
+      JSON.stringify(validDenyPolicy, null, 2),
       runValidator,
     );
     expect(result.exitCode).toBe(0);
