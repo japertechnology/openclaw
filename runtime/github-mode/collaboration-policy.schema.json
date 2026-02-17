@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://openclaw.ai/schemas/runtime/github/collaboration-policy.schema.json",
+  "$id": "https://openclaw.ai/schemas/runtime/github-mode/collaboration-policy.schema.json",
   "title": "GitHub Mode Collaboration Policy",
   "description": "Deny-by-default collaboration policy governing cross-entity exchanges in GitHub mode.",
   "type": "object",

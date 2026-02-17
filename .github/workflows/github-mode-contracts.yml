@@ -2,14 +2,14 @@ name: GitHub Mode Contracts
 on:
   pull_request:
     paths:
-      - "runtime/github/**"
+      - "runtime/github-mode/**"
       - "docs/github-mode/**"
       - "scripts/github-mode/**"
       - "test/github-mode/**"
   push:
     branches: [main]
     paths:
-      - "runtime/github/**"
+      - "runtime/github-mode/**"
       - "docs/github-mode/**"
       - "scripts/github-mode/**"
       - "test/github-mode/**"

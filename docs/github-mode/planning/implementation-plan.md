@@ -178,7 +178,7 @@ Phase 1 is authorized to proceed only while this evidence remains valid and appr
 
 ### Deliverables
 
-Create `runtime/github/` core contracts and schemas:
+Create `runtime/github-mode/` core contracts and schemas:
 
 - `manifest.schema.json`
 - `runtime-manifest.json`

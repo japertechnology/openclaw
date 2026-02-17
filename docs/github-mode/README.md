@@ -47,7 +47,7 @@ When describing local mode risk in this docs area, use **risk-focused, non-dismi
 
 ## Runtime Contracts
 
-Runtime contract artifacts live in [`runtime/github/`](../../runtime/github/README.md) and are validated by `pnpm contracts:github:validate`.
+Runtime contract artifacts live in [`runtime/github-mode/`](../../runtime/github-mode/README.md) and are validated by `pnpm contracts:github:validate`.
 
 ## Extension Architecture
 
@@ -55,7 +55,7 @@ When GitHub Mode requires TypeScript runtime code, it must follow the [extension
 
 This is a hard boundary, not a preference:
 
-- [ADR 0001](adr/0001-runtime-boundary-and-ownership.md) assigns `src/**` ownership to installed runtime flows and assigns GitHub Mode ownership to `.github/**` orchestration plus `runtime/github/**` contracts.
+- [ADR 0001](adr/0001-runtime-boundary-and-ownership.md) assigns `src/**` ownership to installed runtime flows and assigns GitHub Mode ownership to `.github/**` orchestration plus `runtime/github-mode/**` contracts.
 - ADR 0001 explicitly prohibits GitHub Mode workflows/actions from importing installed runtime internals from `src/**`.
 - Existing extensions are the reference implementation for this boundary: new GitHub Mode runtime behavior should mirror extension packaging and dependency isolation instead of creating new `src/**` coupling.
 
@@ -72,7 +72,7 @@ This runs automatically in the [`github-mode-contracts`](../../.github/workflows
 **Owned paths** (safe to add or modify):
 
 - `docs/github-mode/**`
-- `runtime/github/**`
+- `runtime/github-mode/**`
 - `.github/workflows/github-mode-*`
 - `scripts/github-mode/**`
 - `test/github-mode/**`
@@ -85,7 +85,7 @@ These docs are designed to withstand continuous OpenClaw core evolution by follo
 
 1. **No `src/` import coupling.** GitHub Mode docs reference `src/` paths only descriptively (in analysis snapshots). No doc tooling, validation, or navigation depends on `src/` internal structure. When `src/` paths change, update the analysis snapshots but nothing else breaks.
 
-2. **Contract-first validation.** Runtime contracts in `runtime/github/` are the only machine-validated artifacts. The validation script (`scripts/github-mode/validate-github-runtime-contracts.ts`) checks contract structure, not doc prose. This means core refactors do not break doc validation.
+2. **Contract-first validation.** Runtime contracts in `runtime/github-mode/` are the only machine-validated artifacts. The validation script (`scripts/github-mode/validate-github-runtime-contracts.ts`) checks contract structure, not doc prose. This means core refactors do not break doc validation.
 
 3. **Analysis snapshots are explicitly dated.** `analysis/directories.md` and `analysis/libraries.md` are point-in-time snapshots with staleness notes. Regenerate them when the codebase structure or dependency set changes materially.
 

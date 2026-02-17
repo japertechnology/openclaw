@@ -7,7 +7,7 @@
  *
  * Owned paths (safe to add/modify):
  *   - docs/github-mode/**
- *   - runtime/github/**
+ *   - runtime/github-mode/**
  *   - .github/workflows/github-mode-*
  *   - scripts/github-mode/**
  *   - test/github-mode/**
@@ -20,7 +20,7 @@ import process from "node:process";
 
 export const GITHUB_MODE_OWNED_PATTERNS = [
   /^docs\/github-mode\//,
-  /^runtime\/github\//,
+  /^runtime\/github-mode\//,
   /^\.github\/workflows\/github-mode-/,
   /^scripts\/github-mode\//,
   /^test\/github-mode\//,
@@ -129,7 +129,7 @@ function main(): void {
       "modifications to GitHub-Mode-owned paths are allowed.\n" +
       "\nOwned paths:\n" +
       "  - docs/github-mode/**\n" +
-      "  - runtime/github/**\n" +
+      "  - runtime/github-mode/**\n" +
       "  - .github/workflows/github-mode-*\n" +
       "  - scripts/github-mode/**\n" +
       "  - test/github-mode/**\n" +

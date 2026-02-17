@@ -25,7 +25,7 @@ Without strict boundaries, features can couple across surfaces and create regres
 - GitHub mode owns:
   - `.github/workflows/**` GitHub native orchestration
   - `.github/actions/**` reusable workflow action logic
-  - `runtime/github/**` contracts and policy metadata for GitHub mode
+  - `runtime/github-mode/**` contracts and policy metadata for GitHub mode
 - Shared ownership (contract only):
   - machine readable schemas and validators used to verify boundaries
   - docs under `docs/github-mode/**`
@@ -34,7 +34,7 @@ Without strict boundaries, features can couple across surfaces and create regres
 
 GitHub mode may depend only on modules that are explicitly boundary safe:
 
-- Contract artifacts in `runtime/github/**`
+- Contract artifacts in `runtime/github-mode/**`
 - Pure utility packages with no runtime side effects and no installed runtime service dependencies
 - Shared validation libraries that do not import `src/**` runtime implementations
 
@@ -49,7 +49,7 @@ The following are prohibited and must fail review:
 
 ### Guardrails
 
-- Boundary checks must run in CI for changes touching `.github/**`, `runtime/github/**`, or `src/**`.
+- Boundary checks must run in CI for changes touching `.github/**`, `runtime/github-mode/**`, or `src/**`.
 - Reviews for boundary files require CODEOWNERS from both installed runtime and GitHub mode maintainers.
 
 ## Consequences

@@ -40,7 +40,7 @@ MVVVP does not replace those documents; it defines the threshold where GitHub Mo
 
 ### 3.1 Contract and parity discipline (must be enforced)
 
-The `runtime/github/` contract set remains mandatory and validated:
+The `runtime/github-mode/` contract set remains mandatory and validated:
 
 - `runtime-manifest.json`
 - `adapter-contracts.json`

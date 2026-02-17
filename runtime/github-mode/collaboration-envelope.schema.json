@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://openclaw.ai/schemas/runtime/github/collaboration-envelope.schema.json",
+  "$id": "https://openclaw.ai/schemas/runtime/github-mode/collaboration-envelope.schema.json",
   "title": "GitHub Mode Collaboration Envelope",
   "description": "Schema for cross-entity collaboration message envelopes in GitHub mode.",
   "type": "object",

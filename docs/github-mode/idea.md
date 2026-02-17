@@ -114,7 +114,7 @@ GitHub Mode treats repository contracts as operational APIs:
 - `agents/` for profile/tool scope
 - `datasets/` and `eval/` for quality and regression measurement
 - `attestations/` for promotion evidence
-- `runtime/github/` for mode-specific manifests and policy contracts
+- `runtime/github-mode/` for mode-specific manifests and policy contracts
 
 When these contracts are versioned, reviewed, and validated in CI, changes to behavior become explicit, governable, and auditable.
 

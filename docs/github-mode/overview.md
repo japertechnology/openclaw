@@ -67,7 +67,7 @@ OpenClaw executes from repo state in GitHub Actions/Environments:
 
 ## 3) Functional Coverage Model
 
-Every installed feature is classified in `runtime/github/parity-matrix.json` as one of:
+Every installed feature is classified in `runtime/github-mode/parity-matrix.json` as one of:
 
 - `native`: runs unchanged in GitHub mode
 - `adapter`: same semantics via a GitHub-safe adapter
@@ -254,9 +254,9 @@ GitHub mode uses repository-native contracts as control surfaces:
 - `eval/`
 - `attestations/`
 - `docs/ai/`
-- `runtime/github/` (GitHub mode contracts)
+- `runtime/github-mode/` (GitHub mode contracts)
 
-### 5.1 Required `runtime/github/` artifacts
+### 5.1 Required `runtime/github-mode/` artifacts
 
 - `runtime-manifest.json`
 - `adapter-contracts.json`
@@ -275,9 +275,9 @@ GitHub mode must support creating **multiple OpenClaw entities** in one user/org
 
 Each entity repo must define (Phase 6 deliverables; not yet implemented):
 
-- `runtime/github/entity-manifest.json`
-- `runtime/github/collaboration-policy.json`
-- `runtime/github/remote-entities.json`
+- `runtime/github-mode/entity-manifest.json`
+- `runtime/github-mode/collaboration-policy.json`
+- `runtime/github-mode/remote-entities.json`
 
 ### 6.1 Bootstrap baseline
 

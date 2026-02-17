@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://openclaw.ai/schemas/runtime/github/entity-manifest.schema.json",
+  "$id": "https://openclaw.ai/schemas/runtime/github-mode/entity-manifest.schema.json",
   "title": "GitHub Mode Entity Manifest",
   "description": "Defines an OpenClaw entity for multi-entity collaboration in GitHub mode.",
   "type": "object",

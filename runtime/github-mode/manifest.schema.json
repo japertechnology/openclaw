@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://openclaw.ai/schemas/runtime/github/manifest.schema.json",
+  "$id": "https://openclaw.ai/schemas/runtime/github-mode/manifest.schema.json",
   "title": "GitHub Runtime Manifest",
   "type": "object",
   "additionalProperties": false,

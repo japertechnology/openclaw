@@ -66,7 +66,7 @@ Some actions are more about accountable authority than automation speed (for exa
 
 ## Recommended operating pattern
 
-For each command family in `runtime/github/command-policy.json`, assign one of:
+For each command family in `runtime/github-mode/command-policy.json`, assign one of:
 
 - `github-native`: safe and effective to execute in GitHub Mode.
 - `github-gated`: executable only with trust/environment gates and required approvals.

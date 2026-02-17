@@ -12,9 +12,9 @@ describe("isGithubModeOwned", () => {
     expect(isGithubModeOwned("docs/github-mode/adr/0001-foo.md")).toBe(true);
   });
 
-  it("accepts runtime/github paths", () => {
-    expect(isGithubModeOwned("runtime/github/runtime-manifest.json")).toBe(true);
-    expect(isGithubModeOwned("runtime/github/parity-matrix.json")).toBe(true);
+  it("accepts runtime/github-mode paths", () => {
+    expect(isGithubModeOwned("runtime/github-mode/runtime-manifest.json")).toBe(true);
+    expect(isGithubModeOwned("runtime/github-mode/parity-matrix.json")).toBe(true);
   });
 
   it("accepts github-mode workflow files", () => {
@@ -63,7 +63,7 @@ describe("findViolations", () => {
   it("allows modifications to github-mode-owned paths", () => {
     const entries: DiffEntry[] = [
       { status: "M", path: "docs/github-mode/README.md" },
-      { status: "M", path: "runtime/github/parity-matrix.json" },
+      { status: "M", path: "runtime/github-mode/parity-matrix.json" },
       { status: "M", path: "scripts/github-mode/validate-github-runtime-contracts.ts" },
     ];
     expect(findViolations(entries)).toEqual([]);
@@ -87,7 +87,7 @@ describe("findViolations", () => {
       { status: "M", path: "package.json" },
       { status: "M", path: ".github/workflows/ci.yml" },
       { status: "D", path: "src/removed.ts" },
-      { status: "A", path: "runtime/github/new-contract.json" },
+      { status: "A", path: "runtime/github-mode/new-contract.json" },
     ];
     const violations = findViolations(entries);
     expect(violations).toHaveLength(3);

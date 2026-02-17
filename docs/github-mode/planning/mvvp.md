@@ -39,7 +39,7 @@ If a capability does not improve one of these jobs or clarify long-term directio
 
 ### 3.1 Contracts and policy baseline
 
-Required `runtime/github/` contracts:
+Required `runtime/github-mode/` contracts:
 
 - `runtime-manifest.json`
 - `adapter-contracts.json`

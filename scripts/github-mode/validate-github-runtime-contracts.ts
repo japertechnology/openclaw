@@ -14,15 +14,15 @@ const ROOT = process.cwd();
 
 const requiredContracts: ContractCheck[] = [
   {
-    file: "runtime/github/runtime-manifest.json",
+    file: "runtime/github-mode/runtime-manifest.json",
     requiredKeys: ["schemaVersion", "manifestVersion", "components"],
   },
   {
-    file: "runtime/github/adapter-contracts.json",
+    file: "runtime/github-mode/adapter-contracts.json",
     requiredKeys: ["schemaVersion", "contractsVersion", "adapters"],
   },
   {
-    file: "runtime/github/command-policy.json",
+    file: "runtime/github-mode/command-policy.json",
     requiredKeys: [
       "schemaVersion",
       "policyVersion",
@@ -32,15 +32,15 @@ const requiredContracts: ContractCheck[] = [
     ],
   },
   {
-    file: "runtime/github/trust-levels.json",
+    file: "runtime/github-mode/trust-levels.json",
     requiredKeys: ["schemaVersion", "trustVersion", "levels"],
   },
   {
-    file: "runtime/github/parity-matrix.json",
+    file: "runtime/github-mode/parity-matrix.json",
     requiredKeys: ["schemaVersion", "matrixVersion", "mappings"],
   },
   {
-    file: "runtime/github/workspace-convergence-map.json",
+    file: "runtime/github-mode/workspace-convergence-map.json",
     requiredKeys: [
       "schemaVersion",
       "convergenceVersion",
@@ -49,11 +49,11 @@ const requiredContracts: ContractCheck[] = [
     ],
   },
   {
-    file: "runtime/github/entity-manifest.json",
+    file: "runtime/github-mode/entity-manifest.json",
     requiredKeys: ["schemaVersion", "entityId", "owner", "trustTier"],
   },
   {
-    file: "runtime/github/collaboration-policy.json",
+    file: "runtime/github-mode/collaboration-policy.json",
     requiredKeys: ["schemaVersion", "policyVersion", "defaultAction", "allowedRoutes"],
   },
 ];
@@ -73,8 +73,8 @@ function assertRequiredKeys(filePath: string, data: JsonObject, keys: string[]):
 }
 
 function validateManifestSchema(): void {
-  const schemaPath = "runtime/github/manifest.schema.json";
-  const manifestPath = "runtime/github/runtime-manifest.json";
+  const schemaPath = "runtime/github-mode/manifest.schema.json";
+  const manifestPath = "runtime/github-mode/runtime-manifest.json";
   const schema = readJson(schemaPath);
   const manifest = readJson(manifestPath);
 
@@ -90,8 +90,8 @@ function validateManifestSchema(): void {
 }
 
 function validateEntityManifestSchema(): void {
-  const schemaPath = "runtime/github/entity-manifest.schema.json";
-  const instancePath = "runtime/github/entity-manifest.json";
+  const schemaPath = "runtime/github-mode/entity-manifest.schema.json";
+  const instancePath = "runtime/github-mode/entity-manifest.json";
   const schema = readJson(schemaPath);
   const instance = readJson(instancePath);
 
@@ -107,8 +107,8 @@ function validateEntityManifestSchema(): void {
 }
 
 function validateCollaborationPolicySchema(): void {
-  const schemaPath = "runtime/github/collaboration-policy.schema.json";
-  const instancePath = "runtime/github/collaboration-policy.json";
+  const schemaPath = "runtime/github-mode/collaboration-policy.schema.json";
+  const instancePath = "runtime/github-mode/collaboration-policy.json";
   const schema = readJson(schemaPath);
   const instance = readJson(instancePath);
 
@@ -124,7 +124,7 @@ function validateCollaborationPolicySchema(): void {
 }
 
 function validateCollaborationEnvelopeSchema(): void {
-  const schemaPath = "runtime/github/collaboration-envelope.schema.json";
+  const schemaPath = "runtime/github-mode/collaboration-envelope.schema.json";
   const schema = readJson(schemaPath);
 
   // Compile-only check: validates the schema is well-formed.
@@ -140,7 +140,7 @@ function validateCollaborationEnvelopeSchema(): void {
 const VALID_PARITY_VALUES = ["native", "adapter", "emulated", "installed-only"] as const;
 
 function validateParityMatrix(): void {
-  const parityPath = "runtime/github/parity-matrix.json";
+  const parityPath = "runtime/github-mode/parity-matrix.json";
   const parity = readJson(parityPath);
   const mappings = parity.mappings;
 
@@ -177,7 +177,7 @@ function validateParityMatrix(): void {
 }
 
 function validateConvergenceMap(): void {
-  const convergencePath = "runtime/github/workspace-convergence-map.json";
+  const convergencePath = "runtime/github-mode/workspace-convergence-map.json";
   const convergence = readJson(convergencePath);
 
   const acceptanceCriteria = convergence.acceptanceCriteria;
@@ -203,7 +203,7 @@ function validateConvergenceMap(): void {
 }
 
 function validateCollaborationPolicyDenyDefault(): void {
-  const policyPath = "runtime/github/collaboration-policy.json";
+  const policyPath = "runtime/github-mode/collaboration-policy.json";
   const policy = readJson(policyPath);
 
   if (policy.defaultAction !== "deny") {
