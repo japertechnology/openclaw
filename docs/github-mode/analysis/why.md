@@ -34,7 +34,7 @@ GitHub offers a "secure-by-construction" environment that a standalone foundatio
 
 The most innovative argument for this transition lies in the technical roadmap known as "GitHub Mode." This proposal envisions GitHub not just as a storage locker for code, but as a **Runtime Plane** for collaborative agent operations. Local mode remains the quickest loop for personal development; GitHub mode extends that capability into shared repositories where multiple humans and multiple agents can coordinate safely.
 
-According to the project’s internal analysis (`docs/github-mode/the-idea.md`), OpenClaw is already architected to separate orchestration from execution. By formalizing GitHub as the stewardship environment, the project can operationalize:
+According to the project’s internal analysis (`docs/github-mode/idea.md`), OpenClaw is already architected to separate orchestration from execution. By formalizing GitHub as the stewardship environment, the project can operationalize:
 
 - **Continuous Intelligence:** Agents can run directly from repository triggers (Issues, PRs, Comments) using GitHub Actions as the compute layer. This eliminates the "works on my machine" friction that currently plagues the community.
 - **Auditable Agency:** Every action taken by the AI is committed to the log, creating a tamper-evident audit trail. This transforms the agent from a "black box" into a compliant enterprise tool.

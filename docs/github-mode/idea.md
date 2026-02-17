@@ -1,7 +1,5 @@
 # OpenClaw GitHub Mode: The Idea
 
-> This document is retained for compatibility. The current canonical version is [docs/github-mode/idea.md](idea.md), which clarifies capability parity targets and intentional interaction non-parity.
-
 OpenClaw GitHub Mode is the proposal that GitHub should act as a **first-class runtime plane** for OpenClaw, not just a CI wrapper around source code.
 
 The intent is simple and strict:
@@ -28,16 +26,44 @@ This reframes CI/CD: not just build/test automation, but an environment where op
 
 ---
 
-## 2) Product thesis: one experience, two hosts
+## 2) Product thesis: one capability model, two interaction loops
 
-The core thesis is **experience convergence**.
+The core thesis is **capability convergence with interaction divergence**.
 
-OpenClaw should feel consistent whether it runs:
+OpenClaw should provide the same task-level outcomes across both hosts whenever trust and host constraints allow:
 
-1. on a user-controlled installed runtime (always-on channels, device integrations, long-lived sessions), or
+1. on a user-controlled installed runtime (always-on channels, device integrations, long-lived sessions), and
 2. in GitHub-hosted execution (checks, commands, evals, promotions, attestations).
 
-Users should not relearn OpenClaw per surface. The vocabulary, policy visibility, diagnostics, and trust semantics should map cleanly across both planes.
+Users should not relearn what OpenClaw can do per surface. They should, however, expect different pacing and UX mechanics depending on host.
+
+### 2.1 Capability parity target
+
+Parity target means **task parity**, not frame-by-frame UX parity.
+
+At a minimum, both planes should be able to execute and evidence:
+
+- policy/routing validation
+- trusted command execution
+- eval and regression checks
+- artifact/report generation
+- approval-gated promotion workflows
+- incident/drift capture with reproducible traces
+
+### 2.2 Non-parity by design: latency and UX mechanics
+
+Interaction style differs by host and should remain explicit in docs and product language.
+
+| Dimension            | Local synchronous loop (installed runtime)                  | GitHub asynchronous loop (GitHub Mode)                  |
+| -------------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
+| Primary interaction  | conversational, turn-by-turn                                | command/event-driven, run-by-run                        |
+| Feedback timing      | immediate streaming + inline follow-up                      | delayed by queueing, runner startup, job execution      |
+| User control surface | terminal/app/channel session                                | issue/PR comments, checks, summaries, artifacts         |
+| State continuity     | long-lived local session context                            | workflow-scoped context plus committed artifacts        |
+| Best fit             | fast iteration, exploratory debugging, device-coupled tasks | governed automation, reviewable changes, team approvals |
+| UX expectation       | tight loop and low interaction latency                      | auditable loop with higher end-to-end latency           |
+
+The goal is not to hide this difference. The goal is to make it predictable while preserving capability coverage.
 
 ---
 
@@ -126,6 +152,6 @@ GitHub Mode succeeds when teams can say:
 - "Policy, routing, and eval drift are caught before release."
 - "Promotions are approval-gated and evidence-backed by default."
 - "Incidents auto-capture enough context to shorten recovery time."
-- "Installed and GitHub surfaces feel like one OpenClaw, not two products."
+- "Installed and GitHub surfaces have comparable capability coverage with clearly different interaction loops."
 
 That is the idea: **OpenClaw operated as a continuously verified intelligence system, with GitHub as a full runtime plane and the installed runtime as its durable local counterpart.**

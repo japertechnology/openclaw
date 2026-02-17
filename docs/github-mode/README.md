@@ -5,7 +5,7 @@ GitHub Mode extends OpenClaw into repository workflows, running assistant behavi
 ## Architecture
 
 - [Overview](overview.md) — product and architecture spec
-- [The Idea](the-idea.md) — core thesis and design principles
+- [The Idea](idea.md) — core thesis, parity target, and interaction model boundaries
 
 ## Planning
 

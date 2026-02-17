@@ -79,6 +79,7 @@ Every installed feature is classified in `runtime/github/parity-matrix.json` as 
 1. Maximize `native + adapter` for high-value paths.
 2. Use `emulated` for deterministic replay where persistence/device constraints exist.
 3. Keep `installed-only` narrow, documented, and owner-assigned.
+4. Define parity at the task outcome level, not as identical latency or interaction mechanics.
 
 ### 3.2 Initial high-value parity priorities
 
@@ -87,6 +88,19 @@ Every installed feature is classified in `runtime/github/parity-matrix.json` as 
 3. eval/regression and cost envelopes
 4. command-to-PR automation lifecycle
 5. promotion/attestation/incident governance
+
+### 3.3 Interaction model boundaries (intentional non-parity)
+
+GitHub mode targets capability parity for approved task classes, but it does not target UX/latency parity with the installed runtime.
+
+| Dimension            | Local synchronous loop (installed runtime)                  | GitHub asynchronous loop (GitHub Mode)                  |
+| -------------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
+| Primary interaction  | conversational, turn-by-turn                                | command/event-driven, run-by-run                        |
+| Feedback timing      | immediate streaming + inline follow-up                      | delayed by queueing, runner startup, job execution      |
+| User control surface | terminal/app/channel session                                | issue/PR comments, checks, summaries, artifacts         |
+| State continuity     | long-lived local session context                            | workflow-scoped context plus committed artifacts        |
+| Best fit             | fast iteration, exploratory debugging, device-coupled tasks | governed automation, reviewable changes, team approvals |
+| UX expectation       | tight loop and low interaction latency                      | auditable loop with higher end-to-end latency           |
 
 ---
 
