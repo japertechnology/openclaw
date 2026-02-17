@@ -1,246 +1,263 @@
 # OpenClaw GitHub Mode Implementation Plan
 
-This plan operationalizes `docs/github-mode/overview.md` into phased execution with clear deliverables, gates, and rollback safety.
+## Purpose
+
+This plan turns the GitHub Mode vision ([idea.md](../idea.md), [overview.md](../overview.md)) into phased, executable work with clear deliverables, dependency gates, risk controls, and maturity checkpoints.
+
+It is the single execution-level reference. For tactical task breakdowns, see [implementation-tasks.md](implementation-tasks.md). For product maturity definitions, see [mvp.md](mvp.md), [mvvp.md](mvvp.md), and [mvvvp.md](mvvvp.md).
 
 ---
 
-## 1) Program Objectives
+## 1) Why This Plan Exists
 
-1. Deliver a high-functionality GitHub Runtime Plane without regressing installed OpenClaw runtime behavior.
-2. Reuse core orchestration/agent/tool-policy paths before introducing adapters.
+OpenClaw's core thesis is **capability convergence with interaction divergence** — the same task-level outcomes across two runtime planes, each optimized for different interaction loops.
+
+| Plane | Optimized for | Interaction model |
+| --- | --- | --- |
+| Installed runtime (local) | Fast iteration, device-coupled tasks, personal flow | Synchronous, conversational, low-latency |
+| GitHub runtime (new) | Team collaboration, governed automation, auditability | Asynchronous, event-driven, evidence-backed |
+
+GitHub Mode is not a migration away from local. It is a **multiplayer expansion**: agents can hand off work across time zones, reviewer-agent and implementer-agent loops run in the same PR, and async maintenance jobs execute while humans are offline. The installed runtime remains the authority for local, persistent, device-coupled behavior.
+
+This plan delivers that expansion safely, without regressing the installed experience.
+
+### Companion documents
+
+| Document | Role |
+| --- | --- |
+| [idea.md](../idea.md) | Core thesis, parity targets, intentional non-parity |
+| [overview.md](../overview.md) | Product and architecture spec with UX contracts |
+| [mvp.md](mvp.md) | Minimum viable product scope and exit criteria |
+| [mvvp.md](mvvp.md) | Minimum viable vision product — proves direction |
+| [mvvvp.md](mvvvp.md) | Minimum viable valuable product — compounding value |
+| [implementation-tasks.md](implementation-tasks.md) | Tactical task breakdown per phase |
+| [task-0-analysis.md](task-0-analysis.md) | Phase 0 impact analysis |
+| [ADR index](../adr/README.md) | Architecture decision records |
+| [Security index](../security/README.md) | Threat model and quarantine pipeline |
+| [Non-goals](../analysis/non-goals.md) | Task classes excluded from GitHub Mode |
+
+---
+
+## 2) Program Objectives
+
+1. Deliver a high-functionality GitHub Runtime Plane without regressing installed runtime behavior.
+2. Reuse core orchestration, agent, and tool-policy paths before introducing adapters ([ADR 0001](../adr/0001-runtime-boundary-and-ownership.md)).
 3. Enforce security through standard GitHub controls (Secrets, Environments, branch protections, approvals, least privilege, OIDC, SHA-pinned actions).
-4. Establish measurable functional parity using a maintained parity matrix.
+4. Establish measurable functional parity using a maintained parity matrix with explicit interaction-model boundaries.
 5. Enable safe multi-entity template bootstrap and policy-governed cross-entity collaboration.
+6. Design for asynchronous interaction with legible progress, not hidden latency ([overview.md §3.3–3.4](../overview.md)).
 
 ---
 
-## 2) Non-Negotiable Guardrails
+## 3) Non-Negotiable Guardrails
 
-- Installed runtime behavior must remain unchanged unless explicitly approved by maintainers.
-- GitHub mode must never require custom in-repo secret vaulting.
-- No privileged workflow execution from untrusted actors/contexts.
-- All third-party actions must be pinned to full commit SHA.
-- All privileged branch mutations must occur via PR workflow, never direct writes to protected branches.
+These hold across every phase and are enforced in CI, review, and runtime:
 
----
-
-## 2.1) GitHub Actions Runtime Model: Stateless Ephemeral Workers
-
-GitHub-mode workflows must be designed as **stateless, ephemeral workers**. Every job runs in a fresh environment and local disk state is disposable after the run ends. Treat the runner filesystem as temporary scratch space only.
-
-### Externalize before run start
-
-Before any workflow run starts, all state needed for deterministic execution must already exist in durable systems outside the runner:
-
-- **Memory/context state** (agent memory, durable conversation/project context, routing/policy state) must live in managed stores or repository-tracked artifacts.
-- **Artifacts and evidence history** (prior reports, summaries, attestations, review evidence) must be persisted in GitHub artifacts/releases/issues/PR metadata or approved external stores.
-- **Checkpoints/resume state** (long-running process checkpoints, evaluation baselines, replay markers) must be checkpointed to external storage with stable identifiers.
-- **Caches** (dependency caches, model/data caches, build outputs intended for reuse) must be provisioned through explicit cache backends (for example, GitHub cache/artifacts/registry), never implicit local disk reuse.
-
-### Persistence anti-assumptions
-
-Implementations must not rely on any of the following between workflow runs:
-
-- Files written to local disk in a previous run.
-- Local databases, temp directories, or process state from prior jobs/runs.
-- Runner identity affinity (same host, same VM, same workspace path).
-- Unpublished logs or transient job outputs that were not exported as durable artifacts.
-
-### Design implications for this plan
-
-- Any phase deliverable that requires continuity across runs must define its **external state location**, retention window, and recovery behavior.
-- Validation and promotion gates must consume only repository content plus explicitly fetched durable state.
-- Incident/debug workflows must always emit reproducible evidence bundles so run-to-run forensics never depends on runner-local residue.
-
-### Persistent Memory Design
-
-GitHub-mode requires a durable persistent-memory layer so useful agent context survives runner teardown. The runner filesystem is never a source of truth.
-
-#### System of record
-
-- **Primary system of record:** managed object storage for checkpoint/event blobs and transcripts.
-- **Index/query system of record:** managed database for metadata, lookup, and conflict coordination.
-- **Optional projection stores:** vector/search indexes may be built as derived views, but they are rebuildable and never authoritative.
-
-#### Read/write timing
-
-- **Run start (hydrate):** load the latest committed memory snapshot plus unapplied deltas for the target scope (`entity`, `repo`, `branch`, `thread`, or `run lineage`).
-- **Periodic checkpoints (heartbeat):** persist incremental deltas at deterministic boundaries (for example: command completion, tool batch completion, or fixed wall-clock interval) with monotonic sequence IDs.
-- **Run end (finalize):** attempt a final commit that compacts deltas into a new snapshot and records final run status/evidence references.
-- **Crash-safe fallback:** if a run exits unexpectedly, previously persisted checkpoints must be replayable without runner-local recovery.
-
-#### Consistency model and conflict handling
-
-- **Consistency target:** read-your-writes within a run scope; eventual consistency across concurrent runs.
-- **Versioning:** each write carries `baseVersion` and `newVersion` (or equivalent compare-and-swap token).
-- **Conflict policy:** reject stale writes on version mismatch; retry by rehydrating latest state and replaying deterministic pending delta logic.
-- **Merge policy:** append-only event log for auditable history, plus periodic snapshot compaction; never silently last-write-wins on structured state.
-- **Idempotency:** all writes include idempotency keys (`runId` + `stepId` + `sequence`) so retries cannot duplicate logical events.
-
-#### Failure-mode matrix (implementation contract)
-
-Every storage/checkpoint path in GitHub-mode runtime must implement the following behaviors before Phase 1 is considered complete.
-
-| Failure mode                      | Detection                                                                                                                    | User-visible error                                                       | Retry policy                                                                                                              | Rollback/recovery path                                                                                                                                                         |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Storage unavailable               | Any checkpoint hydrate/finalize storage probe returns network timeout, auth error, or backend 5xx.                           | `Persistence backend unavailable; state checkpointing paused.`           | Exponential backoff (`jittered`) with bounded attempts per phase; stop at terminal `failed` once budget is consumed.      | Keep latest committed `MemorySnapshot`/`RunCheckpoint` pointer unchanged; rerun hydrates from last committed version and replays idempotent deltas only.                       |
-| Snapshot schema mismatch          | `schemaVersion` unsupported or deserialization/validation rejects hydrated snapshot payload.                                 | `Stored checkpoint format is incompatible with this runtime version.`    | No automatic payload retry. Retry only after schema migrator or runtime compatibility update lands.                       | Write migration-required incident marker in `RunJournal`, preserve original blob immutable, and resume from newly migrated snapshot reference.                                 |
-| Scan failures                     | `skill-package-scan`, `lockfile-provenance`, or `policy-eval` gate returns `FAIL` or `INDETERMINATE` after timeout.          | `Preflight scan blocked execution before any agent mutation.`            | One retry permitted for transient scanner infrastructure failures; policy denials are non-retryable without input change. | Fail closed before execution phase; operator remediates policy/inputs and starts new run from hydration boundary.                                                              |
-| Runner timeout/preemption         | Job receives cancellation/preemption signal or exceeds watchdog timeout before finalize checkpoint commit.                   | `Runner preempted/timed out; resumable from last durable checkpoint.`    | Auto-resume once when same trust tier + policy hash + commit scope still match; otherwise require explicit rerun.         | New workflow run loads latest `RunCheckpoint` and resumes deterministic remaining steps using `sequence` and idempotency keys.                                                 |
-| Partial upload/corrupt checkpoint | Uploaded checkpoint fails checksum/length verification, CAS pointer update fails, or read-after-write integrity check fails. | `Checkpoint finalize failed integrity checks; state promotion canceled.` | Retry upload to new object key using same idempotency key, bounded by finalize retry limit.                               | Preserve previous snapshot pointer, tombstone invalid object key, emit integrity-failure evidence, and re-finalize from in-memory delta buffer or rerun from prior checkpoint. |
-
-#### Retention and TTL policy
-
-- **Hot memory window:** keep frequently-read snapshots/checkpoints for a short operational window (for example, 7-30 days) for fast resume.
-- **Warm audit window:** keep append-only event history and run metadata for governance/forensics (for example, 90-365 days).
-- **Expiration handling:** TTL expiry must be explicit, policy-driven, and logged in an auditable tombstone record.
-- **Legal/compliance overrides:** retention holds supersede TTL deletion when required.
-
-#### Minimal persistent data model (survives runner teardown)
-
-Implementers must persist at least the following records outside the runner:
-
-| Record           | Required fields (minimum)                                                                                              | Purpose                                                    |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `MemorySnapshot` | `snapshotId`, `scopeKey`, `version`, `createdAt`, `stateBlobRef`, `schemaVersion`                                      | Latest compacted memory image used for run hydration.      |
-| `MemoryDelta`    | `deltaId`, `scopeKey`, `baseVersion`, `newVersion`, `sequence`, `idempotencyKey`, `patchBlobRef`, `createdAt`, `runId` | Ordered incremental updates between snapshots.             |
-| `RunCheckpoint`  | `checkpointId`, `runId`, `scopeKey`, `snapshotId`, `lastDeltaSequence`, `status`, `createdAt`                          | Resume marker for in-progress or interrupted runs.         |
-| `RunJournal`     | `runId`, `entityId`, `workflowRef`, `commitSha`, `startedAt`, `endedAt`, `outcome`, `artifactRefs`                     | Audit trail tying memory evolution to GitHub run evidence. |
-
-Anything not persisted in this model (or a strict superset) is treated as ephemeral and must be assumed lost after runner teardown.
+1. **Installed runtime non-regression.** Behavior remains unchanged unless explicitly approved by maintainers. Enforced by [ADR 0002](../adr/0002-installed-runtime-non-regression-guardrails.md) and smoke baselines.
+2. **No custom secret vaulting.** GitHub mode uses only GitHub Secrets and Environment Secrets.
+3. **Least-privilege by default.** No privileged workflow execution from untrusted actors or contexts. Trigger trust levels defined in [Security 0001](../security/0001-github-trigger-trust-matrix.md).
+4. **SHA-pinned actions.** All third-party actions pinned to full commit SHA.
+5. **PR-mediated mutation only.** All privileged branch mutations occur via PR workflow; never direct writes to protected branches.
+6. **Extension boundary.** GitHub Mode TypeScript runtime code lives in `extensions/github/`, never in `src/`. GitHub Mode workflows must not import `src/**` internals ([ADR 0001](../adr/0001-runtime-boundary-and-ownership.md)).
+7. **Upstream sync safety.** All changes must be purely additive to owned paths so the fork can cleanly pull upstream OpenClaw upgrades.
+8. **Vetted skill supply chain.** Only skills passing the quarantine pipeline ([Security 0002](../security/0002-skills-quarantine-pipeline.md)) can run in trusted GitHub Mode workflows.
 
 ---
 
-## 3) Workstreams
+## 4) Architectural Constraints
 
-- **WS-A: Runtime contracts and parity**
-- **WS-B: GitHub security foundation**
-- **WS-C: Validation/policy/eval/cost workflows**
-- **WS-D: Command runtime and bot PR loop**
-- **WS-E: Promotion, attestation, and incident operations**
-- **WS-F: Multi-entity template and collaboration**
-- **WS-G: Observability, compliance, and governance**
+### 4.1 Stateless ephemeral workers
+
+GitHub Actions runners are stateless and ephemeral. Every job starts fresh; local disk is temporary scratch space. All durable state must be externalized.
+
+**Must be externalized before run start:**
+
+- Memory and context state (agent memory, routing/policy state) — managed stores or repository-tracked artifacts.
+- Artifacts and evidence history (reports, attestations, summaries) — GitHub artifacts/releases/issues or approved external stores.
+- Checkpoints and resume markers — external storage with stable identifiers.
+- Caches (dependency, model, build) — explicit cache backends (GitHub cache/artifacts/registry).
+
+**Must not be assumed between runs:**
+
+- Local disk files from prior runs.
+- Local databases, temp directories, or process state.
+- Runner identity affinity (same host/VM/path).
+- Unpublished logs or transient outputs not exported as durable artifacts.
+
+**Design rule:** Every phase deliverable requiring cross-run continuity must define its external state location, retention window, and recovery behavior.
+
+### 4.2 Persistent memory design
+
+Agent context must survive runner teardown. The persistent memory layer is defined in detail in [implementation-tasks.md Task 4.7](implementation-tasks.md) and summarized here.
+
+**System of record:**
+
+- Primary: managed object storage for checkpoint/event blobs.
+- Index: managed database for metadata, lookup, and coordination.
+- Projection stores (vector/search) are derived views, never authoritative.
+
+**Lifecycle:** hydrate at run start → periodic checkpoints at deterministic boundaries → finalize at run end → crash-safe fallback from persisted checkpoints.
+
+**Consistency:** read-your-writes within a run; eventual consistency across concurrent runs. Compare-and-swap versioning. Append-only event log with snapshot compaction. Idempotency keys on all writes (`runId` + `stepId` + `sequence`).
+
+**Minimal data model:**
+
+| Record | Purpose |
+| --- | --- |
+| `MemorySnapshot` | Latest compacted memory image for run hydration |
+| `MemoryDelta` | Ordered incremental updates between snapshots |
+| `RunCheckpoint` | Resume marker for in-progress or interrupted runs |
+| `RunJournal` | Audit trail tying memory evolution to run evidence |
+
+**Retention:** hot window (7–30 days) for fast resume, warm window (90–365 days) for governance/forensics, explicit TTL expiration with auditable tombstones, legal hold overrides.
+
+### 4.3 Failure-mode contract
+
+Every storage and checkpoint path must implement deterministic failure handling. Full failure-mode matrix with detection, user-visible errors, retry policies, and recovery paths is specified in [implementation-tasks.md Task 4.8](implementation-tasks.md) and [overview.md §4.3](../overview.md).
+
+Summary of required failure modes:
+
+| Failure | Response |
+| --- | --- |
+| Storage unavailable | Exponential backoff; preserve last committed snapshot; rehydrate on retry |
+| Snapshot schema mismatch | No automatic retry; preserve original; require migration |
+| Scan failures | One retry for transient errors; policy denials are non-retryable; fail closed |
+| Runner timeout/preemption | Auto-resume when context unchanged; replay from last checkpoint |
+| Partial upload/corrupt checkpoint | Retry with idempotency key; tombstone corrupt objects; preserve previous pointer |
 
 ---
 
-## 4) Phase-by-Phase Plan
+## 5) Workstreams and Ownership
 
-### Phase 0 - Baseline and design locks
+Each workstream represents a coherent area of responsibility. Tasks in [implementation-tasks.md](implementation-tasks.md) are tagged by workstream.
 
-### Deliverables
-
-- ADR(s) for installed vs GitHub runtime boundaries.
-- Installed runtime regression baseline definition and smoke checks.
-- GitHub runtime threat model (trusted/untrusted trigger matrix, abuse cases, mapped controls).
-
-### Task 0 acceptance lock (must all be true before Phase 1)
-
-- **Task 0.1 - Runtime Boundary ADR Package**
-  - ADR set is approved by maintainers.
-  - Boundaries define ownership, allowed shared modules, and prohibited coupling patterns.
-  - Backout trigger (`runtime coupling detected`) is documented and linked in review workflow.
-- **Task 0.2 - Installed Runtime Regression Baseline**
-  - Baseline smoke checks run in CI and are green on mainline.
-  - Baseline failures block merges for GitHub-mode-touching changes.
-- **Task 0.3 - GitHub Threat Model + Trigger Matrix**
-  - Matrix covers fork PR, internal PR, push, schedule, and manual dispatch.
-  - Every abuse case maps to at least one preventive or detective control.
-  - Threat model explicitly forbids privileged execution in untrusted contexts and privileged branch mutation outside PR flow.
-
-### Task 0 acceptance evidence snapshot
-
-Status: ✅ Locked and satisfied (2026-02-16).
-
-- ✅ **Task 0.1 evidence captured**
-  - ADR package approved in `docs/github-mode/adr/0001-runtime-boundary-and-ownership.md` and `docs/github-mode/adr/0002-installed-runtime-non-regression-guardrails.md`.
-  - ADR index records gate status in `docs/github-mode/adr/README.md`.
-- ✅ **Task 0.2 evidence captured**
-  - Installed-runtime non-regression policy and backout trigger (`runtime coupling detected`) documented in `docs/github-mode/adr/0002-installed-runtime-non-regression-guardrails.md`.
-  - CI baseline hooks live in existing install smoke workflows (`.github/workflows/install-smoke.yml` and `.github/workflows/sandbox-common-smoke.yml`) and provide the installed-runtime smoke baseline foundation referenced by Task 0.
-- ✅ **Task 0.3 evidence captured**
-  - Trigger trust matrix and abuse/control mapping approved in `docs/github-mode/security/0001-github-trigger-trust-matrix.md`.
-  - Security index records gate status in `docs/github-mode/security/README.md`.
-
-Phase 1 is authorized to proceed only while this evidence remains valid and approvals remain current.
-
-### Exit criteria
-
-- Maintainers approve ADR + threat model.
-- Baseline checks are runnable and green in CI.
-
-### Backout strategy
-
-- If parity work causes runtime coupling, revert to boundary ADR and block merge.
+| Workstream | Scope | Phase coverage |
+| --- | --- | --- |
+| **WS-A** Runtime contracts and parity | Contract schemas, parity matrix, convergence map, validators | Phases 0–1 |
+| **WS-B** GitHub security foundation | Secrets, environments, permissions, OIDC, security lint, skill quarantine | Phases 0, 2, 3, 4, 6, 7 |
+| **WS-C** Validation, policy, eval, cost | PR checks, policy/route simulation, eval/cost gates, drift detection | Phases 3–4 |
+| **WS-D** Command runtime and bot PR loop | Command workflows, agent runs, bot PRs, UX checkpoints, state adapters | Phase 4 |
+| **WS-E** Promotion, attestation, incident ops | Promotion pipelines, attestation, drift/incident automation, fault containment | Phases 5–6 |
+| **WS-F** Multi-entity template and collaboration | Entity bootstrap, template validators, collaboration dispatch/receive | Phases 3, 6 |
+| **WS-G** Observability, compliance, governance | Artifact standards, metrics, playbooks, compliance automation, handoff | Phases 1, 4, 7 |
 
 ---
 
-### Phase 1 - Contract scaffolding and parity framework
+## 6) Phase Dependency Graph
 
-### Deliverables
+Phases must be executed in dependency order. Parallel execution is possible where noted.
 
-Create `runtime/github-mode/` core contracts and schemas:
+```
+Phase 0 (Baseline + Design Locks) ✅ Complete
+    │
+    ▼
+Phase 1 (Contract Scaffolding) ✅ Complete
+    │
+    ├──────────────────────┐
+    ▼                      ▼
+Phase 2 (Security)    Phase 3 (Validation Workflows)
+    │                      │        [can run in parallel]
+    └──────┬───────────────┘
+           ▼
+    Phase 4 (Command Runtime + Bot PR)
+           │
+           ▼
+    Phase 5 (Promotion + Attestation)
+           │
+           ▼
+    Phase 6 (Multi-Entity Collaboration)
+           │
+           ▼
+    Phase 7 (Observability + Handoff)
+```
 
-- `manifest.schema.json`
-- `runtime-manifest.json`
-- `adapter-contracts.json`
-- `command-policy.json`
-- `trust-levels.json`
-- `entity-manifest.schema.json`
-- `collaboration-policy.schema.json`
-- `collaboration-envelope.schema.json`
-- `workspace-convergence-map.json`
-- `parity-matrix.json`
+**Key dependency rules:**
 
-Add validators:
+- Phase 1 before Phases 2 and 3 (contracts must exist before security lint and validation workflows consume them).
+- Phases 2 and 3 can execute in parallel (security foundation and validation workflows are independent).
+- Phase 4 requires both Phase 2 and Phase 3 (command runtime needs security gates and validation infrastructure).
+- Phases 5–7 are sequential (promotion needs commands; collaboration needs promotion; observability wraps everything).
 
-- schema validation for all runtime contracts
-- parity matrix validator requiring owners + rationale for `installed-only`
-- convergence map validator that fails on unmapped high-value installed workflows
+---
 
-### Exit criteria
+## 7) Phase-by-Phase Plan
 
-- Contract validation check is mandatory in CI.
+### Phase 0 — Baseline and design locks
+
+**Status:** ✅ Complete (2026-02-16). See [task-0-analysis.md](task-0-analysis.md) for impact analysis.
+
+**Deliverables completed:**
+
+- Runtime boundary ADRs ([ADR 0001](../adr/0001-runtime-boundary-and-ownership.md), [ADR 0002](../adr/0002-installed-runtime-non-regression-guardrails.md))
+- Installed runtime regression baseline via existing smoke workflows
+- GitHub trigger trust matrix and threat model ([Security 0001](../security/0001-github-trigger-trust-matrix.md))
+
+<details>
+<summary>Phase 0 acceptance evidence</summary>
+
+- ✅ **Task 0.1** — ADR package approved. Boundaries define ownership, shared modules, prohibited coupling. Backout trigger documented.
+- ✅ **Task 0.2** — Non-regression policy and smoke baseline in `.github/workflows/install-smoke.yml` and `.github/workflows/sandbox-common-smoke.yml`.
+- ✅ **Task 0.3** — Trigger trust matrix covers fork PR, internal PR, push, schedule, dispatch. All abuse cases mapped to controls.
+
+Phase 1 proceeds only while this evidence remains valid.
+</details>
+
+---
+
+### Phase 1 — Contract scaffolding and parity framework
+
+**Status:** ✅ Complete. See [implementation-tasks.md Tasks 1.1–1.4](implementation-tasks.md) for evidence.
+
+**Deliverables completed:**
+
+- All `runtime/github-mode/` contract artifacts (manifest, adapters, command policy, trust levels, parity matrix, convergence map, entity/collaboration schemas)
+- Schema validators via `pnpm contracts:github:validate`
+- Parity and convergence validators
+- Contract versioning and compatibility policy
+
+**Exit criteria satisfied:**
+
+- Contract validation is mandatory in CI.
 - Parity report artifact generated per PR for changed subsystems.
 
-### Backout strategy
-
-- Contract schema changes are versioned; incompatible changes require migration notes and compatibility validator updates.
-
 ---
 
-### Phase 2 - Security foundation (GitHub-native)
+### Phase 2 — Security foundation (GitHub-native)
 
-### Deliverables
+**Status:** Not started. **Depends on:** Phase 1 ✅.
 
-- Secret inventory and rotation policy document.
-- Environments: `github-mode-dev`, `github-mode-staging`, `github-mode-prod` with required reviewers and branch/tag restrictions.
-- Explicit least-privilege `permissions:` in every GitHub-mode workflow/job.
-- OIDC integration for cloud access where applicable.
-- Lint check that fails on:
-  - unpinned third-party actions
-  - over-broad workflow permissions
-  - secrets exposed in untrusted triggers
+**Deliverables:**
 
-### Exit criteria
+1. Secret inventory and rotation policy document with ownership and review cadence.
+2. GitHub Environments: `github-mode-dev`, `github-mode-staging`, `github-mode-prod` with required reviewers and branch/tag restrictions.
+3. Explicit least-privilege `permissions:` at workflow/job level for all GitHub-mode pipelines.
+4. OIDC integration for cloud access where applicable.
+5. Security lint that fails on unpinned third-party actions, over-broad permissions, and secrets exposed in untrusted triggers.
+6. Skills quarantine pipeline ([Security 0002](../security/0002-skills-quarantine-pipeline.md)) with intake, static scan, policy evaluation, two-party approval, trusted registry, and emergency revocation.
+
+**Exit criteria:**
 
 - Security lint passes across all GitHub-mode workflows.
 - No secrets accessible in fork PR contexts (verified by tests/simulation).
 - Environment approvals enforce promotion paths.
+- Skills quarantine pipeline enforces deny-by-default for untrusted skill sources.
 
-### Backout strategy
+**Backout:** Any security control regression blocks release; revert offending workflow changes.
 
-- Any security control regression blocks release; revert offending workflow changes.
+**Risk:** Quarantine pipeline friction may slow skill adoption. Mitigate by automating scan gates and keeping the approval loop fast.
 
 ---
 
-### Phase 3 - Core validation, simulation, eval, and cost workflows
+### Phase 3 — Core validation, simulation, eval, and cost workflows
 
-### Deliverables
+**Status:** Not started. **Depends on:** Phase 1 ✅. **Can run in parallel with:** Phase 2.
 
-Implement:
+**Deliverables:**
+
+Implement these workflows with deterministic artifacts and markdown summaries:
 
 - `github-mode-build.yml`
-- `github-mode-check.yml`
+- `github-mode-check.yml` (required PR check)
 - `github-mode-test.yml`
 - `github-mode-policy.yml`
 - `github-mode-route-sim.yml`
@@ -248,217 +265,202 @@ Implement:
 - `github-mode-cost.yml`
 - `github-mode-sync-templates.yml`
 
-Required behavior:
+Required behaviors:
 
-- deterministic artifacts + markdown summaries
-- untrusted-safe behavior for fork PRs
-- policy/route drift detection
-- threshold gates for eval/cost
-- template drift detection with migration guidance or PR output
+- Untrusted-safe execution for fork PRs (no secret access).
+- Policy and route drift detection with remediation pointers.
+- Eval and cost threshold gates that block promotion workflows on failure.
+- Template drift detection with migration guidance.
 
-### Exit criteria
+**Exit criteria:**
 
-- Required checks gating merges are active.
+- Required checks gate merges.
 - Failing policy/eval/cost thresholds block promotion workflows.
 
-### Backout strategy
+**Backout:** Downgrade flaky workflows from required to informational temporarily; open reliability incident.
 
-- If flakiness exceeds tolerance, downgrade workflow from required to informational temporarily and open reliability incident.
+**Risk:** Flakiness in drift detection. Mitigate with deterministic fixtures and quarantine for unstable checks.
 
 ---
 
-### Phase 4 - Command runtime and bot PR loop
+### Phase 4 — Command runtime and bot PR loop
 
-### Deliverables
+**Status:** Not started. **Depends on:** Phase 2 + Phase 3.
 
-Implement:
+This is the largest and most complex phase. It delivers the core collaborative value: trusted commands from GitHub surfaces produce bot PRs with full provenance.
 
-- `github-mode-command.yml`
-- `github-mode-agent-run.yml`
-- `github-mode-bot-pr.yml`
+**Deliverables:**
 
-Command support baseline:
+1. **Command and agent workflows:** `github-mode-command.yml`, `github-mode-agent-run.yml`, `github-mode-bot-pr.yml`.
+2. **MVP command set:** `explain`, `refactor`, `test`, `diagram`.
+3. **Trust-aware authorization:** command authorization checked against trust levels before any adapter invocation.
+4. **Pre-agent security gates** (fail-closed, deterministic order):
+   - Skill/package scan → lockfile/provenance checks → policy evaluation.
+   - Each gate emits `gate`, `result`, `reason`, `evidence` to summary and artifact.
+5. **State adapter pipeline:** hydrate snapshot → validate schema → run agent → upload snapshot atomically → record run metadata. Storage target selected by latency/cost/access-control evaluation (see [implementation-tasks.md Task 4.7](implementation-tasks.md)).
+6. **Provenance metadata:** source command, commit SHA, run id, policy version embedded in every output.
+7. **Protected branch controls:** all mutations via bot branch + PR; never direct writes.
+8. **UX progress checkpoints** ([overview.md §3.3–3.4](../overview.md)):
+   - 6-checkpoint lifecycle: Provisioning → Runner startup → Hydration → Scanning → Execution → Upload/finalize.
+   - User-facing states: `queued`, `provisioning`, `running`, `waiting_on_input`, `completed`, `failed`.
+   - CLI progress labels via `src/cli/progress.ts` and tabular status via `src/terminal/table.ts`.
+   - Completion handoff: outcome statement, evidence bundle, operator action, ownership continuity.
+   - Fallback when telemetry is unavailable: show last confirmed checkpoint, mark unknown, emit degraded-telemetry note.
+9. **Failure-mode contract** for all checkpointed runs (see §4.3 above).
 
-- `explain`
-- `refactor`
-- `test`
-- `diagram`
-
-Required behavior:
-
-- trust-aware command authorization
-- policy-gated adapter invocation
-- blocking pre-agent gates for skill/package scan, lockfile/provenance checks, and policy evaluation
-- required state adapter pipeline (snapshot hydrate/validate/run/persist/record)
-- provenance metadata embedded in outputs (source command, commit SHA, run id, policy version)
-- no direct writes to protected branches
-
-Gate semantics for `github-mode-command.yml` and `github-mode-agent-run.yml`:
-
-- fail-closed execution: gate failures (or missing/indeterminate gate verdicts) stop workflow before any agent step
-- deterministic gate ordering: skill/package scan → lockfile/provenance checks → policy evaluation
-- minimal pass/fail reporting emitted to markdown summary and machine-readable artifact:
-
-```text
-gate=<skill-package-scan|lockfile-provenance|policy-eval>
-result=<PASS|FAIL>
-reason=<short machine-parseable reason>
-evidence=<artifact-or-log-reference>
-```
-
-State adapter pipeline acceptance criteria:
-
-1. Download snapshot at workflow start.
-2. Validate version/schema compatibility.
-3. Run agent.
-4. Upload snapshot/checkpoint atomically.
-5. Record run metadata and snapshot ID.
-
-Candidate storage targets and selection criteria:
-
-| Storage target                                  | Latency profile                                      | Cost profile                                    | Access control profile                                                     |
-| ----------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------- |
-| GitHub Actions artifacts                        | Low in-run retrieval in same repository workflows    | Included quota + overage for retention growth   | GitHub repo permissions + workflow-scoped access; good default for MVP     |
-| GitHub Releases assets                          | Medium retrieval; optimized for versioned publishing | Low/medium depending on release retention       | Repository release permissions; stronger change visibility than artifacts  |
-| Cloud object storage via OIDC (S3/GCS/Azure)    | Low/medium depending on region placement             | Pay-per-request + storage tiers; highly tunable | Fine-grained IAM via OIDC federation; strongest policy isolation controls  |
-| Managed KV/database metadata index + blob store | Low lookup for metadata, medium for blob fetch       | Higher operational cost but predictable scaling | Service-level RBAC + row/object policy; good for multi-tenant coordination |
-
-Selection criteria:
-
-- Pick the lowest-latency option that keeps end-to-end command flow within SLO for snapshot hydrate + finalize.
-- Minimize total cost at expected checkpoint frequency and retention window (hot + warm tiers).
-- Require least-privilege access control, auditable writes, and environment-scoped credentials.
-- Prefer options that support atomic write semantics or transactional indirection (upload then pointer swap).
-- Ensure lifecycle controls support TTL, legal hold overrides, and reproducible incident forensics.
-
-### Exit criteria
+**Exit criteria:**
 
 - Trusted users can trigger command-to-PR flow end-to-end.
 - Agent execution cannot run unless all three pre-agent gates pass.
 - Untrusted users cannot invoke privileged adapters or secret-backed paths.
+- UX checkpoints render correctly in CLI and GitHub surfaces.
 
-### Backout strategy
+**Backout:** Disable privileged command handlers; keep read-only explain flows.
 
-- If command abuse is detected, disable privileged command handlers and keep read-only explain flows.
+**Risk:** State adapter complexity may delay delivery. Mitigate by starting with GitHub Actions artifacts as MVP storage and upgrading to cloud object storage in a follow-on.
 
 ---
 
-### Phase 5 - Promotion, attestation, and incident operations
+### Phase 5 — Promotion, attestation, and incident operations
 
-### Deliverables
+**Status:** Not started. **Depends on:** Phase 4.
 
-Implement:
+**Deliverables:**
 
-- `github-mode-promote-dev.yml`
-- `github-mode-promote-staging.yml`
-- `github-mode-promote-prod.yml`
-- `github-mode-drift.yml`
-- `github-mode-incident.yml`
+1. **Promotion workflows:** `github-mode-promote-dev.yml`, `github-mode-promote-staging.yml`, `github-mode-promote-prod.yml`.
+2. **Attestation generation and verification** with required fields: commit/environment, policy/routing/agent revisions, model ids + dataset hashes, eval/cost results, approvers + UTC timestamp, artifact/run references.
+3. **Drift and incident automation:** `github-mode-drift.yml`, `github-mode-incident.yml` with evidence-linked issue creation.
+4. **Promotion failure controls:** auto-block on attestation failure, auto-create incident issue, attach rollback/runbook links.
 
-Add attestation generation + verification with required fields:
-
-- commit/environment
-- policy/routing/agent revisions
-- model ids + dataset hashes
-- eval/cost results
-- approvers + UTC timestamp
-- artifact/run references
-
-### Exit criteria
+**Exit criteria:**
 
 - Promotions require green gates + environment approval + valid attestation.
 - Drift and incident workflows create evidence-linked issues automatically.
 
-### Backout strategy
-
-- If attestation verification fails, promotion remains blocked and incident issue is auto-created.
+**Backout:** Attestation verification failure blocks promotion and auto-creates incident.
 
 ---
 
-### Phase 6 - Multi-entity bootstrap and collaboration
+### Phase 6 — Multi-entity bootstrap and collaboration
 
-### Deliverables
+**Status:** Not started. **Depends on:** Phase 5.
 
-Implement:
+**Deliverables:**
 
-- `github-mode-bootstrap-entity.yml`
-- `github-mode-collab-dispatch.yml`
-- `github-mode-collab-receive.yml`
+1. **Entity bootstrap:** `github-mode-bootstrap-entity.yml` for template-based entity creation with idempotent re-runs.
+2. **Entity baseline validator** covering labels, issue forms, PR templates, CODEOWNERS, environment placeholders, branch protection expectations.
+3. **Collaboration workflows:** `github-mode-collab-dispatch.yml`, `github-mode-collab-receive.yml`.
+4. **Deny-by-default policy:** collaboration routes enforced; envelope validation (source/target entity, intent, correlation id, run id, policy version, TTL).
+5. **Fault containment:** toggle to disable dispatch while keeping receive validation in monitor-only mode.
 
-Add entity template baseline validator for:
-
-- labels
-- issue forms
-- PR templates
-- CODEOWNERS
-- environment placeholders
-- branch protection expectations
-
-Collaboration requirements:
-
-- enforce collaboration policy routes (deny-by-default)
-- validate envelope fields (source/target entity, intent, correlation id, run id, policy version, ttl)
-- audit traces via artifacts + workflow summaries
-
-### Exit criteria
+**Exit criteria:**
 
 - Two template-generated entities can collaborate on allowlisted intents.
 - Blocked/untrusted intents are rejected with auditable evidence.
 
-### Backout strategy
-
-- On repeated collaboration failures or abuse, disable dispatch permissions and leave receive validation in monitor-only mode.
+**Backout:** Disable dispatch permissions; leave receive validation in monitor-only mode.
 
 ---
 
-### Phase 7 - Observability, compliance, and program handoff
+### Phase 7 — Observability, compliance, and program handoff
 
-### Deliverables
+**Status:** Not started. **Depends on:** Phase 6.
 
-- Standardized artifact schemas and summary format.
-- Metrics pipeline for:
-  - parity coverage trend
-  - workflow reliability/flakiness
-  - bot PR throughput + acceptance
-  - collaboration success/failure + latency
-  - policy/security violation rates
-  - promotion lead/rollback time
-- Operational playbooks:
-  - secret/API key rotation
-  - emergency revocation
-  - compromised token response
-  - attestation audit + rollback
+**Deliverables:**
 
-### Exit criteria
+1. **Artifact and summary standards:** schemas and format validated across all workflows.
+2. **Metrics pipeline** covering all dimensions from [mvvp.md §4](mvvp.md) and [mvvvp.md §5](mvvvp.md):
+   - Adoption: PR coverage, trusted command usage.
+   - Effectiveness: bot PR acceptance rate, command-to-PR lead time, pre-merge catches.
+   - Safety: blocked privileged attempts, secret/policy incident counts (target: zero).
+   - Reliability: workflow success rate, flake-driven reruns, duration percentiles.
+   - Operability: manual interventions, mean time to recover, stale parity entries.
+   - Parity: matrix freshness, coverage trends, installed-only item count.
+   - Collaboration: success/failure rates and latency.
+   - Promotion: lead time and rollback time.
+3. **Operational playbooks:** secret rotation, emergency revocation, compromised token response, attestation audit + rollback.
+4. **Compliance automation:** continuous enforcement of security acceptance checklist controls.
+5. **Program handoff:** milestone evidence rollup (M1–M7), owner assignment, runbook handoff, maintainer sign-off.
 
-- Dashboards/reports available to maintainers.
-- Governance playbooks reviewed and linked in docs.
+**Exit criteria:**
 
-### Backout strategy
+- Dashboards/reports available to maintainers with weekly rollup cadence.
+- Governance playbooks reviewed, linked, and executable without tribal knowledge.
+- Compliance checks run continuously; violations block promotion.
 
-- If telemetry quality is low, keep gating on hard checks while metrics instrumentation is repaired.
+**Backout:** Keep gating on hard checks while metrics instrumentation is repaired.
 
 ---
 
-## 5) Test and Verification Strategy
+## 8) Milestones and Maturity Gates
+
+### Milestone map
+
+| Milestone | Phases | What it proves |
+| --- | --- | --- |
+| **M1** | 0 + 1 | Contracts, parity framework, threat model, and baseline are locked |
+| **M2** | 2 | Security foundation is enforced across all GitHub-mode workflows |
+| **M3** | 3 | Validation, policy, eval, and cost workflows gate merges |
+| **M4** | 4 | Command-to-bot-PR flow works end-to-end with trust gates |
+| **M4.1** | 4 (sub) | State adapter pipeline satisfies acceptance criteria; storage target selected |
+| **M5** | 5 | Promotions are approval-gated with verified attestations |
+| **M6** | 6 | Multi-entity bootstrap and governed collaboration work |
+| **M7** | 7 | Observability, compliance, and governance are operational |
+
+### Product maturity progression
+
+Maturity stages gate scope expansion. Each stage has explicit exit criteria in its planning document.
+
+| Stage | Exit criteria document | Minimum sustained window | Key gate |
+| --- | --- | --- | --- |
+| **MVP** | [mvp.md §7](mvp.md) | — | Required PR check + trusted command-to-bot-PR + untrusted denial + parity artifact |
+| **MVVP** | [mvvp.md §5](mvvp.md) | 2 continuous weeks | MVP criteria hold + vision metrics show repeat usage and alignment |
+| **MVVVP** | [mvvvp.md §6](mvvvp.md) | 4 continuous weeks | MVVP criteria hold + operability targets + compounding value + zero safety incidents |
+
+**Rule:** Do not advance beyond MVP scope until MVP exit criteria hold. Likewise for MVVP → MVVVP.
+
+### MVP fast path from current state
+
+With Phases 0–1 complete, the fastest path to MVP is a constrained execution slice across Phases 2–4. See [mvp.md §10](mvp.md) for the detailed next steps.
+
+---
+
+## 9) Risk Register
+
+| ID | Risk | Likelihood | Impact | Mitigation | Phase |
+| --- | --- | --- | --- | --- | --- |
+| R1 | Runtime coupling between `src/` and GitHub Mode | Medium | High | ADR 0001 boundary checks in CI; extension architecture enforcement | All |
+| R2 | Installed runtime regression from GitHub Mode changes | Medium | Critical | ADR 0002 smoke baseline; merge-blocking checks | All |
+| R3 | Malicious skills in trusted workflows (ClawHavoc vector) | Medium | Critical | Skills quarantine pipeline; deny-by-default; static scan gates | 2, 4 |
+| R4 | State adapter complexity delays Phase 4 | High | Medium | Start with GitHub Actions artifacts as MVP storage; defer cloud storage | 4 |
+| R5 | Workflow flakiness erodes trust | Medium | Medium | Deterministic fixtures; quarantine unstable checks; reliability metrics | 3, 7 |
+| R6 | Latency expectations mismatched (UX perceived as broken) | High | Medium | Explicit async UX contract; progress checkpoints; CLI status rendering | 4 |
+| R7 | Security lint false positives slow development | Low | Low | Exception process with expiry and maintainer approval | 2 |
+| R8 | Multi-entity collaboration abuse | Low | High | Deny-by-default routing; fault containment toggle; dispatch disable | 6 |
+| R9 | Persistent memory schema drift across versions | Medium | Medium | Schema versioning; migration-required incident markers; compatibility validators | 4, 5 |
+
+---
+
+## 10) Test and Verification Strategy
 
 Each phase must include:
 
-- unit tests for new parser/validator/policy logic
-- integration tests for workflow decision boundaries
-- replay tests for emulated adapters where applicable
-- regression checks proving installed runtime behavior remains unchanged
+- Unit tests for new parser, validator, and policy logic.
+- Integration tests for workflow decision boundaries.
+- Replay tests for emulated adapters where applicable.
+- Regression checks proving installed runtime behavior remains unchanged.
 
-Minimum pre-merge gate for GitHub-mode codepaths:
+**Minimum pre-merge gate for GitHub-mode codepaths:**
 
-1. contracts/parity validation
-2. security lint (permissions, pinning, trigger safety)
-3. policy/route checks
-4. eval + cost threshold checks (for impacted subsystems)
+1. Contracts and parity validation (`pnpm contracts:github:validate`).
+2. Security lint (permissions, pinning, trigger safety).
+3. Upstream sync guard (`scripts/github-mode/check-upstream-additions-only.ts`).
+4. Policy and route checks.
+5. Eval and cost threshold checks (for impacted subsystems).
 
 ---
 
-## 6) Security Acceptance Checklist
+## 11) Security Acceptance Checklist
 
 All must be true before broad rollout:
 
@@ -466,36 +468,27 @@ All must be true before broad rollout:
 2. Fork PR workflows have zero secret access.
 3. Privileged workflows require trusted actor and/or environment approval.
 4. Third-party actions are SHA-pinned.
-5. `GITHUB_TOKEN` permissions are explicit and minimal.
+5. `GITHUB_TOKEN` permissions are explicit and minimal per workflow/job.
 6. OIDC replaces static cloud credentials where possible.
 7. Bots cannot write directly to protected branches.
 8. Promotion requires successful checks and valid attestation.
 9. Logs/artifacts are scrubbed for secret leakage risk.
-10. Compliance checks enforce these controls continuously.
+10. Skills pass quarantine pipeline before running in trusted workflows.
+11. Compliance checks enforce these controls continuously.
 
 ---
 
-## 7) Milestones
+## 12) Definition of Done
 
-- **M1:** Phase 0-1 complete (contracts + parity + threat model + baseline checks)
-- **M2:** Phase 2 complete (security foundation)
-- **M3:** Phase 3 complete (validation/policy/eval/cost/template drift workflows)
-- **M4:** Phase 4 complete (command + agent-run + bot PR)
-- **M4.1 (required):** State adapter pipeline complete with acceptance criteria satisfied and storage target selected by latency/cost/access-control review
-- **M5:** Phase 5 complete (promotion + attestation + drift/incident)
-- **M6:** Phase 6 complete (multi-entity bootstrap/collaboration)
-- **M7:** Phase 7 complete (observability + compliance + governance handoff)
-
----
-
-## 8) Definition of Done
-
-GitHub mode implementation is complete when:
+GitHub Mode implementation is complete when:
 
 1. Installed runtime remains behaviorally stable under regression checks.
-2. High-value OpenClaw orchestration/policy/eval paths run in GitHub mode using shared core modules.
-3. Security controls are fully GitHub-native and continuously enforced.
+2. High-value OpenClaw orchestration, policy, and eval paths run in GitHub Mode using shared core modules via the extension boundary.
+3. Security controls are fully GitHub-native, continuously enforced, and include supply-chain vetting.
 4. Command-to-PR automation is policy-governed, auditable, and safe by default.
 5. Promotions are approval-gated with verified attestations.
-6. Parity matrix is maintained and improving over time.
+6. Parity matrix is maintained and improving over time, with explicit interaction-model boundaries documented.
 7. Template-generated entities can collaborate through validated, deny-by-default GitHub-native channels.
+8. UX progress checkpoints make asynchronous run state legible in both CLI and GitHub surfaces.
+9. Metrics pipeline reports adoption, effectiveness, safety, reliability, and operability weekly.
+10. MVVVP exit criteria ([mvvvp.md §6](mvvvp.md)) are sustained for 4 continuous weeks.
