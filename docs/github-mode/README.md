@@ -64,7 +64,7 @@ This is a hard boundary, not a preference:
 GitHub Mode changes must be purely additive to ensure the fork can cleanly pull upstream OpenClaw upgrades. The `check-upstream-additions-only` script enforces this:
 
 ```bash
-node --import tsx scripts/check-upstream-additions-only.ts
+node --import tsx scripts/github-mode/check-upstream-additions-only.ts
 ```
 
 This runs automatically in the [`github-mode-contracts`](../../.github/workflows/github-mode-contracts.yml) CI workflow for PRs touching GitHub Mode paths.
@@ -74,10 +74,8 @@ This runs automatically in the [`github-mode-contracts`](../../.github/workflows
 - `docs/github-mode/**`
 - `runtime/github/**`
 - `.github/workflows/github-mode-*`
-- `scripts/validate-github-runtime-contracts.ts`
-- `scripts/check-upstream-additions-only.ts`
-- `test/check-upstream-additions-only.test.ts`
-- `test/validate-github-runtime-contracts.test.ts`
+- `scripts/github-mode/**`
+- `test/github-mode/**`
 
 Everything else is upstream-owned. Modifications to upstream files will fail the guard.
 
@@ -87,7 +85,7 @@ These docs are designed to withstand continuous OpenClaw core evolution by follo
 
 1. **No `src/` import coupling.** GitHub Mode docs reference `src/` paths only descriptively (in analysis snapshots). No doc tooling, validation, or navigation depends on `src/` internal structure. When `src/` paths change, update the analysis snapshots but nothing else breaks.
 
-2. **Contract-first validation.** Runtime contracts in `runtime/github/` are the only machine-validated artifacts. The validation script (`scripts/validate-github-runtime-contracts.ts`) checks contract structure, not doc prose. This means core refactors do not break doc validation.
+2. **Contract-first validation.** Runtime contracts in `runtime/github/` are the only machine-validated artifacts. The validation script (`scripts/github-mode/validate-github-runtime-contracts.ts`) checks contract structure, not doc prose. This means core refactors do not break doc validation.
 
 3. **Analysis snapshots are explicitly dated.** `analysis/directories.md` and `analysis/libraries.md` are point-in-time snapshots with staleness notes. Regenerate them when the codebase structure or dependency set changes materially.
 

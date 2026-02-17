@@ -9,10 +9,8 @@
  *   - docs/github-mode/**
  *   - runtime/github/**
  *   - .github/workflows/github-mode-*
- *   - scripts/validate-github-runtime-contracts.ts
- *   - scripts/check-upstream-additions-only.ts
- *   - test/check-upstream-additions-only.test.ts
- *   - test/validate-github-runtime-contracts.test.ts
+ *   - scripts/github-mode/**
+ *   - test/github-mode/**
  *
  * Everything else is upstream-owned and must not be modified.
  */
@@ -24,10 +22,8 @@ export const GITHUB_MODE_OWNED_PATTERNS = [
   /^docs\/github-mode\//,
   /^runtime\/github\//,
   /^\.github\/workflows\/github-mode-/,
-  /^scripts\/validate-github-runtime-contracts\.ts$/,
-  /^scripts\/check-upstream-additions-only\.ts$/,
-  /^test\/check-upstream-additions-only\.test\.ts$/,
-  /^test\/validate-github-runtime-contracts\.test\.ts$/,
+  /^scripts\/github-mode\//,
+  /^test\/github-mode\//,
 ];
 
 export function isGithubModeOwned(filePath: string): boolean {
@@ -135,10 +131,8 @@ function main(): void {
       "  - docs/github-mode/**\n" +
       "  - runtime/github/**\n" +
       "  - .github/workflows/github-mode-*\n" +
-      "  - scripts/validate-github-runtime-contracts.ts\n" +
-      "  - scripts/check-upstream-additions-only.ts\n" +
-      "  - test/check-upstream-additions-only.test.ts\n" +
-      "  - test/validate-github-runtime-contracts.test.ts\n" +
+      "  - scripts/github-mode/**\n" +
+      "  - test/github-mode/**\n" +
       "\nTo fix: move your changes into GitHub-Mode-owned paths or\n" +
       "use the extension system (extensions/) for runtime additions.",
   );

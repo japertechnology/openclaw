@@ -162,7 +162,7 @@ function validateParityMatrix(): void {
 
     if (!VALID_PARITY_VALUES.includes(row.parity as (typeof VALID_PARITY_VALUES)[number])) {
       throw new Error(
-        `${parityPath}: mappings[${index}] has invalid parity value \`${row.parity}\` (must be one of: ${VALID_PARITY_VALUES.join(", ")})`,
+        `${parityPath}: mappings[${index}] has invalid parity value \`${String(row.parity)}\` (must be one of: ${VALID_PARITY_VALUES.join(", ")})`,
       );
     }
 

@@ -4,7 +4,7 @@ import {
   findViolations,
   isGithubModeOwned,
   parseDiffEntries,
-} from "../scripts/check-upstream-additions-only.js";
+} from "../../scripts/github-mode/check-upstream-additions-only.js";
 
 describe("isGithubModeOwned", () => {
   it("accepts docs/github-mode paths", () => {
@@ -23,13 +23,17 @@ describe("isGithubModeOwned", () => {
   });
 
   it("accepts owned scripts", () => {
-    expect(isGithubModeOwned("scripts/validate-github-runtime-contracts.ts")).toBe(true);
-    expect(isGithubModeOwned("scripts/check-upstream-additions-only.ts")).toBe(true);
+    expect(isGithubModeOwned("scripts/github-mode/validate-github-runtime-contracts.ts")).toBe(
+      true,
+    );
+    expect(isGithubModeOwned("scripts/github-mode/check-upstream-additions-only.ts")).toBe(true);
   });
 
   it("accepts owned test files", () => {
-    expect(isGithubModeOwned("test/check-upstream-additions-only.test.ts")).toBe(true);
-    expect(isGithubModeOwned("test/validate-github-runtime-contracts.test.ts")).toBe(true);
+    expect(isGithubModeOwned("test/github-mode/check-upstream-additions-only.test.ts")).toBe(true);
+    expect(isGithubModeOwned("test/github-mode/validate-github-runtime-contracts.test.ts")).toBe(
+      true,
+    );
   });
 
   it("rejects upstream files", () => {
@@ -60,7 +64,7 @@ describe("findViolations", () => {
     const entries: DiffEntry[] = [
       { status: "M", path: "docs/github-mode/README.md" },
       { status: "M", path: "runtime/github/parity-matrix.json" },
-      { status: "M", path: "scripts/validate-github-runtime-contracts.ts" },
+      { status: "M", path: "scripts/github-mode/validate-github-runtime-contracts.ts" },
     ];
     expect(findViolations(entries)).toEqual([]);
   });

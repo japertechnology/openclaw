@@ -4,19 +4,15 @@ on:
     paths:
       - "runtime/github/**"
       - "docs/github-mode/**"
-      - "scripts/validate-github-runtime-contracts.ts"
-      - "scripts/check-upstream-additions-only.ts"
-      - "test/check-upstream-additions-only.test.ts"
-      - "test/validate-github-runtime-contracts.test.ts"
+      - "scripts/github-mode/**"
+      - "test/github-mode/**"
   push:
     branches: [main]
     paths:
       - "runtime/github/**"
       - "docs/github-mode/**"
-      - "scripts/validate-github-runtime-contracts.ts"
-      - "scripts/check-upstream-additions-only.ts"
-      - "test/check-upstream-additions-only.test.ts"
-      - "test/validate-github-runtime-contracts.test.ts"
+      - "scripts/github-mode/**"
+      - "test/github-mode/**"
 
 permissions:
   contents: read
@@ -36,4 +32,4 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node-env
-      - run: node --import tsx scripts/check-upstream-additions-only.ts
+      - run: node --import tsx scripts/github-mode/check-upstream-additions-only.ts

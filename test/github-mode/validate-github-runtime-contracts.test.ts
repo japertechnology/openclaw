@@ -1,10 +1,10 @@
 import { execSync } from "node:child_process";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const ROOT = process.cwd();
-const SCRIPT = "scripts/validate-github-runtime-contracts.ts";
+const SCRIPT = "scripts/github-mode/validate-github-runtime-contracts.ts";
 
 function runValidator(): { stdout: string; exitCode: number } {
   try {

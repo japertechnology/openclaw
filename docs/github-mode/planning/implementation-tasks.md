@@ -104,7 +104,7 @@ Status: ✅ Complete.
 - Collaboration policy contract: [`runtime/github/collaboration-policy.schema.json`](../../../runtime/github/collaboration-policy.schema.json), [`runtime/github/collaboration-policy.json`](../../../runtime/github/collaboration-policy.json)
 - Collaboration envelope contract: [`runtime/github/collaboration-envelope.schema.json`](../../../runtime/github/collaboration-envelope.schema.json)
 - Consumption guide: [`runtime/github/README.md`](../../../runtime/github/README.md)
-- Validation hook: [`scripts/validate-github-runtime-contracts.ts`](../../../scripts/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
+- Validation hook: [`scripts/github-mode/validate-github-runtime-contracts.ts`](../../../scripts/github-mode/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
 
 **Acceptance Criteria:**
 
