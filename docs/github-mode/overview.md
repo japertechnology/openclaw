@@ -115,6 +115,47 @@ GitHub mode UX should behave like a visible asynchronous queue, not a hanging te
 
 The product requirement is not to eliminate delay, but to make delay legible with explicit state transitions and timestamps.
 
+#### Required progress checkpoints
+
+GitHub mode remote runs must report the same checkpoint lifecycle so operators can correlate workflow runs, comments, and local CLI status output.
+
+Always emit checkpoints in this order:
+
+1. **Provisioning:** resolve trust level, runner target, credentials, and workflow prerequisites.
+2. **Runner startup:** allocate/start the runner and launch the job environment.
+3. **Hydration:** fetch checkout + checkpoint context and load run inputs/contracts.
+4. **Scanning:** run preflight probes (policy gates, capability checks, route/permission checks).
+5. **Execution:** execute the requested command/task automation.
+6. **Upload/finalize:** persist artifacts/checkpoints, emit final status, and publish handoff output.
+
+If a checkpoint is intentionally not needed, emit it with `skipped` so timelines stay phase-aligned.
+
+#### Checkpoint mapping to CLI + status surfaces
+
+Use existing terminal primitives for local operator visibility:
+
+- progress/spinner rendering: `src/cli/progress.ts`
+- tabular status rendering: `src/terminal/table.ts`
+
+| Checkpoint      | Live progress label (operator CLI)    | `openclaw status --all` expectation                                | `openclaw status --deep` expectation                                            |
+| --------------- | ------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Provisioning    | `Provisioning GitHub run…`            | Show trigger source, trust context, and queue/provisioning reason. | Include remote reachability or queue constraints before deep probes.            |
+| Runner startup  | `Starting GitHub runner…`             | Show runner allocation/startup state and elapsed timing.           | Include job/runner probe evidence when available.                               |
+| Hydration       | `Hydrating workflow context…`         | Show checkout/config/checkpoint readiness and contract load state. | Include hydration probe details for fetch/auth/contract load failures.          |
+| Scanning        | `Scanning policy and capabilities…`   | Show gate outcomes and actionable warnings before execution.       | Include failing probe identifiers, timeout class, and first actionable blocker. |
+| Execution       | `Executing GitHub task…`              | Show active phase or last confirmed active phase.                  | Include deep probe deltas tied to execution failures or runtime constraints.    |
+| Upload/finalize | `Uploading artifacts and finalizing…` | Show terminal outcome with artifact/handoff availability.          | Include final probe state plus completion-time regressions if detected.         |
+
+#### Fallback when telemetry is unavailable
+
+When telemetry is delayed, partial, or unavailable:
+
+1. Preserve deterministic checkpoint ordering and continue showing the **last confirmed checkpoint**.
+2. Mark unresolved state as `unknown` (never infer completion from silence).
+3. Add an explicit degraded-telemetry note to `status --all`.
+4. Include timeout/failure probe details in `status --deep` to explain visibility gaps.
+5. On terminal transition, emit a best-effort end state (`completed`, `failed`, or `unknown`) so automation can stop waiting.
+
 #### User-facing state model
 
 | State              | What it means for the user                                                     | CLI surface (local operator view)                                                                   | GitHub surface (issue/PR/checks)                                                                    |
