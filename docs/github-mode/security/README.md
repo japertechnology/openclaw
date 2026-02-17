@@ -5,6 +5,7 @@ This directory contains the baseline threat modeling artifacts for GitHub mode r
 ## Documents
 
 - [GitHub trigger trust matrix and threat model](0001-github-trigger-trust-matrix.md)
+- [Skills quarantine pipeline for trusted runs](0002-skills-quarantine-pipeline.md)
 
 ## Scope
 

@@ -26,6 +26,7 @@ GitHub Mode extends OpenClaw into repository workflows, running assistant behavi
 
 - [Security Index](security/README.md)
 - [Trigger Trust Matrix](security/0001-github-trigger-trust-matrix.md)
+- [Skills Quarantine Pipeline](security/0002-skills-quarantine-pipeline.md)
 
 ## Analysis
 
