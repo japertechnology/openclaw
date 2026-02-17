@@ -16,6 +16,33 @@ Define trusted and untrusted trigger boundaries, enumerate abuse cases, and map 
 3. Secrets are never exposed to fork pull request execution.
 4. All privilege elevation requires explicit environment approval gates.
 
+## Threat model boundaries
+
+### Host and platform isolation guarantees
+
+These guarantees come from GitHub-hosted runner and repository platform controls. The workflow design assumes these controls are present and treats any reduction as a blocking security regression.
+
+- GitHub-hosted runners provide ephemeral execution hosts per job, limiting persistence across jobs and reducing cross-run contamination.
+- Fork pull requests execute without repository/environment secrets.
+- `GITHUB_TOKEN` defaults are explicitly bounded by workflow `permissions`; writes are denied unless declared.
+- Environment protection rules (required reviewers, scoped secrets) gate privileged steps.
+- Protected branch rules enforce reviewed PR merge flow for branch mutation.
+
+### In-sandbox malicious logic risks
+
+Even with platform isolation, untrusted or compromised logic can still execute _inside_ the workflow sandbox and abuse granted capabilities.
+
+- Untrusted PR code can execute data-exfiltration attempts through logs, artifacts, network calls, or covert encoding.
+- Workflow logic changes can widen token scopes or add unexpected write pathways.
+- Third-party dependencies (actions, npm packages, scripts) can run attacker-controlled payloads at runtime.
+- Semi-trusted maintainers can intentionally or accidentally introduce policy drift that weakens future runs.
+
+Mitigation strategy for these in-sandbox risks:
+
+1. Keep runtime privileges minimal by trigger trust level.
+2. Gate privileged operations behind environment approvals and policy checks.
+3. Continuously detect drift (permissions, trigger patterns, dependency pinning, artifact leakage).
+
 ## Trigger trust matrix
 
 | Trigger                             | Context trust level          | Typical actor                          | Secrets allowed                 | Privileged actions allowed               | Required branch mutation path                  |
@@ -53,6 +80,15 @@ The matrix applies to planned Phase 3 workflows:
 | TM-08 | Workflow artifacts leak sensitive policy/eval outputs                                  | All triggers                                      | Redaction policy for logs/artifacts, no secret material in summaries, retention limits                                 | Artifact scanning for tokens/secrets, DLP-style check on uploaded artifacts                                                        |
 | TM-09 | Route/policy drift silently weakens controls                                           | `push`, `pull_request`, `schedule`                | Mandatory policy and route drift checks as required checks before merge/promotion                                      | Drift report artifacts and summary annotations, fail-on-drift enforcement                                                          |
 | TM-10 | Insider attempts to change workflow trigger from PR-gated to push-only privileged path | Internal `pull_request`, `push`                   | Workflow guardrail validator enforces approved trigger patterns, required security maintainer review                   | Trigger matrix conformance check in CI, review bot flags forbidden trigger mutations                                               |
+
+## Attacker pathways in workflow runtime and required mitigations
+
+| Pathway                   | Runtime risk pattern                                                                                                       | Required mitigations                                                                                                                                                                     |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Token misuse              | Workflow/job obtains write-capable token and uses it outside intended scope (branch writes, issue spam, release mutation). | Explicit per-job `permissions`; deny defaults; environment approval gates for write scopes; protected branch PR-only mutation path; periodic permission drift checks.                    |
+| Data exfiltration         | Malicious logic emits secrets/sensitive outputs via logs, artifacts, cache keys, or outbound network requests.             | No secrets for fork PR; redact logs and summaries; artifact retention limits; secret scanning on artifacts/logs; separate trusted vs untrusted jobs with hard skip conditions.           |
+| Dependency abuse          | Compromised action/package/script executes during CI and inherits runner/network/token context.                            | Pin third-party actions to commit SHA; maintain allowlist for action sources; lock dependency inputs where feasible; scheduled dependency integrity scans and fail-closed policy checks. |
+| Trigger/context confusion | Logic bug misclassifies trust level and runs privileged steps for untrusted contexts.                                      | Centralized trigger trust matrix; reusable guardrail condition helpers; conformance tests simulating fork/internal/trusted triggers; audit alerts on unexpected environment access.      |
 
 ## Control baseline by trigger
 

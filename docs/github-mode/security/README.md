@@ -11,6 +11,7 @@ This directory contains the baseline threat modeling artifacts for GitHub mode r
 These artifacts define:
 
 - trusted versus untrusted trigger contexts
+- threat model boundaries separating host/platform isolation guarantees from in-sandbox malicious logic risks
 - abuse cases for planned GitHub mode workflows
 - preventive and detective controls required before rollout phases can proceed
 
