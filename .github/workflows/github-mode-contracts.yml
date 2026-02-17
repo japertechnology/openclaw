@@ -6,6 +6,8 @@ on:
       - "docs/github-mode/**"
       - "scripts/validate-github-runtime-contracts.ts"
       - "scripts/check-upstream-additions-only.ts"
+      - "test/check-upstream-additions-only.test.ts"
+      - "test/validate-github-runtime-contracts.test.ts"
   push:
     branches: [main]
     paths:
@@ -13,6 +15,8 @@ on:
       - "docs/github-mode/**"
       - "scripts/validate-github-runtime-contracts.ts"
       - "scripts/check-upstream-additions-only.ts"
+      - "test/check-upstream-additions-only.test.ts"
+      - "test/validate-github-runtime-contracts.test.ts"
 
 permissions:
   contents: read

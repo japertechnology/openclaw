@@ -81,6 +81,8 @@ function validateManifestSchema(): void {
   }
 }
 
+const VALID_PARITY_VALUES = ["native", "adapter", "emulated", "installed-only"] as const;
+
 function validateParityMatrix(): void {
   const parityPath = "runtime/github/parity-matrix.json";
   const parity = readJson(parityPath);
@@ -100,6 +102,12 @@ function validateParityMatrix(): void {
       if (!(required in row)) {
         throw new Error(`${parityPath}: mappings[${index}] missing required key \`${required}\``);
       }
+    }
+
+    if (!VALID_PARITY_VALUES.includes(row.parity as (typeof VALID_PARITY_VALUES)[number])) {
+      throw new Error(
+        `${parityPath}: mappings[${index}] has invalid parity value \`${row.parity}\` (must be one of: ${VALID_PARITY_VALUES.join(", ")})`,
+      );
     }
 
     if (row.parity === "installed-only") {
