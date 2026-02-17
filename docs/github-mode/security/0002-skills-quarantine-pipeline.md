@@ -75,6 +75,58 @@ Trusted GitHub mode workflows must:
 
 Result: only vetted skills are available to production GitHub mode runs.
 
+## Skill provenance policy for GitHub mode
+
+The following policy is mandatory for every skill loaded by trusted GitHub mode workflows.
+
+### Policy controls
+
+1. **Signed and pinned skill packages**
+   - Skills must be installed from immutable package coordinates (digest/SHA pin).
+   - Trusted skills must carry a valid signature from an approved signing identity.
+   - Signature verification failures are treated as hard policy violations.
+
+2. **Source provenance checks**
+   - Every skill version must map to a declared source (repository + commit SHA, or release artifact digest).
+   - Runtime metadata must match the intake record exactly (no source drift).
+   - Missing or mismatched provenance metadata blocks startup.
+
+3. **Dependency provenance requirements**
+   - Skill dependencies must be resolved from approved registries and mirrored/pinned sources.
+   - Dependency graph provenance (SBOM + attestation) must be available for policy review.
+   - Dependencies with unknown provenance or disallowed source lineage force deny.
+
+4. **Deny by default for untrusted sources**
+   - Unknown registries, unsigned artifacts, and unapproved source owners are untrusted by default.
+   - No runtime fallback to "best effort" installation is allowed in trusted workflows.
+   - Policy decision defaults to deny unless all provenance checks pass.
+
+## Workflow startup enforcement mapping
+
+Trusted workflow startup must enforce provenance policy at explicit runtime checkpoints:
+
+1. **Pre-resolution gate (before dependency install/fetch)**
+   - Read required skill manifest from workflow inputs.
+   - Reject any skill source not present in the trusted registry.
+   - Enforce deny-by-default before any artifact download begins.
+
+2. **Artifact verification gate (after fetch, before unpack/load)**
+   - Verify immutable pin (digest/SHA) for every skill package.
+   - Validate required package signatures against approved signing identities.
+   - Confirm source provenance tuple (source URL + revision/digest) matches registry metadata.
+
+3. **Dependency graph gate (after lock resolution, before execution sandbox boot)**
+   - Validate dependency provenance attestations and SBOM presence.
+   - Block dependencies lacking approved provenance lineage.
+   - Persist resolved dependency digests into startup evidence.
+
+4. **Runtime activation gate (immediately before skill execution)**
+   - Re-check allowlist membership for the final loaded skill digest.
+   - Abort if approval state is missing, expired, revoked, or downgraded.
+   - Emit startup attestation with skill digest, signer identity, source provenance, and dependency evidence references.
+
+Failing any gate must stop workflow startup with a policy error. Startup cannot continue in degraded mode when provenance validation fails.
+
 ## Approval authority
 
 Approvals for `approved_trusted` require **two-party authorization**:
