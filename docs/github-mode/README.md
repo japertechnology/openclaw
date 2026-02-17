@@ -35,6 +35,14 @@ GitHub Mode extends OpenClaw into repository workflows, running assistant behavi
 - [Libraries](analysis/libraries.md) — external dependency inventory
 - [Directories](analysis/directories.md) — codebase directory map
 
+## Writing Style for GitHub Mode Docs
+
+When describing local mode risk in this docs area, use **risk-focused, non-dismissive** language:
+
+- State concrete risk classes and operating constraints (for example: secrets exposure, weak isolation, missing governance controls).
+- Avoid ridicule, absolutist labels, or language that dismisses existing users and workflows.
+- Prefer comparative framing: local mode is appropriate for some contexts, while GitHub mode is designed for stronger control, auditability, and team governance.
+
 ## Runtime Contracts
 
 Runtime contract artifacts live in [`runtime/github/`](../../runtime/github/README.md) and are validated by `pnpm contracts:github:validate`.
