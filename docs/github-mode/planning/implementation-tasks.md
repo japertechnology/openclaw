@@ -80,6 +80,42 @@ When defining or implementing tasks in Phases 1–7, include where durable state
 
 ---
 
+## Cross-cutting Runtime Constraint — Extension Architecture Boundary
+
+GitHub Mode TypeScript runtime code must follow the extension pattern by implementing code in `extensions/github/` rather than embedding code in `src/`. See `docs/github-mode/README.md` and ADR 0001 for the full boundary rationale.
+
+- GitHub Mode workflows/actions must not import installed runtime internals from `src/**`.
+- New GitHub Mode runtime behavior should mirror extension packaging and dependency isolation.
+- Violation of this boundary triggers the ADR 0001 backout process.
+
+---
+
+## Cross-cutting Runtime Constraint — Upstream Sync Guard
+
+GitHub Mode changes must be purely additive so the fork can cleanly pull upstream OpenClaw upgrades. The `check-upstream-additions-only` script (`scripts/github-mode/check-upstream-additions-only.ts`) enforces this in CI.
+
+**Owned paths** (safe to add or modify): `docs/github-mode/**`, `runtime/github-mode/**`, `.github/workflows/github-mode-*`, `scripts/github-mode/**`, `test/github-mode/**`.
+
+Everything else is upstream-owned. Modifications to upstream files will fail the guard.
+
+---
+
+## Cross-cutting Scope Constraint — Non-Goals Reference
+
+Task classes that should stay outside GitHub Mode are defined in `docs/github-mode/analysis/non-goals.md`. All task and workflow designs must respect these boundaries:
+
+1. Real-time conversational loops and live operator steering.
+2. Device-coupled operations requiring local hardware/IPC.
+3. Privileged external side effects without human checkpoints.
+4. Secrets regimes exceeding repository trust boundaries.
+5. Long-lived mutable runtime state with strict continuity requirements.
+6. Untrusted-trigger pathways with high-impact tools.
+7. Organization governance actions requiring accountability identity.
+
+When scoping commands or adapters, classify each as `github-native`, `github-gated`, `handoff-required`, or `installed-only` per the operating pattern in `non-goals.md`.
+
+---
+
 ## Phase 1 — Contract Scaffolding and Parity Framework
 
 Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist and `pnpm contracts:github:validate` passes).
@@ -241,6 +277,28 @@ Status: ✅ Complete.
 
 ---
 
+### Task 2.6 — Skills Quarantine Pipeline
+
+**Workstream:** WS-B
+
+**Scope:** Implement the skills quarantine and vetting pipeline defined in `docs/github-mode/security/0002-skills-quarantine-pipeline.md` for trusted GitHub Mode workflows. This covers intake, static scan, policy evaluation, approval/publish to trusted registry, production enforcement, and emergency revocation.
+
+**Acceptance Criteria:**
+
+- Quarantine registry exists for skill submissions with `pending_scan` state.
+- Static scan gate runs integrity, malware, license, provenance, and dependency risk checks with immutable evidence artifacts.
+- Policy evaluation classifies skills as `approved_limited`, `approved_trusted`, or `rejected_policy`.
+- Two-party approval authority enforced (security approver + runtime owner approver, distinct people, no self-approval).
+- Trusted registry enforces allowlist keyed by immutable skill digest/SHA.
+- Production trusted workflows fail closed when approval metadata is missing or revoked.
+- Workflow startup enforcement implements all four gates: pre-resolution, artifact verification, dependency graph, and runtime activation.
+- Emergency revocation path exists with immediate effect: revokes digest, removes from allowlist, invalidates caches, broadcasts incident notice, and opens tracking issue.
+- Skill provenance policy enforced: signed/pinned packages, source provenance checks, dependency provenance requirements, deny-by-default for untrusted sources.
+
+**Security Check:** Must enforce “only vetted skills can run in trusted GitHub mode workflows” and “deny by default for untrusted sources.”
+
+---
+
 ## Phase 3 — Validation, Simulation, Eval, and Cost Workflows
 
 ### Task 3.1 — Core CI Workflow Set Implementation
@@ -398,6 +456,62 @@ Status: ✅ Complete.
 
 ---
 
+### Task 4.6 — UX Progress Checkpoint Contract
+
+**Workstream:** WS-D
+
+**Scope:** Implement the 6-checkpoint lifecycle and user-facing state model defined in `docs/github-mode/overview.md` §3.3–3.4 for all GitHub Mode remote runs. Checkpoints: Provisioning → Runner startup → Hydration → Scanning → Execution → Upload/finalize.
+
+**Acceptance Criteria:**
+
+- All six checkpoints are emitted in order for every GitHub Mode remote run; skipped checkpoints emit `skipped` state.
+- User-facing state model implemented: `queued`, `provisioning`, `running`, `waiting_on_input`, `completed`, `failed`.
+- CLI progress labels mapped to checkpoints using `src/cli/progress.ts` spinner/progress primitives.
+- `openclaw status --all` shows trigger source, trust context, gate outcomes, active phase, and terminal outcome per the checkpoint mapping table in overview.md.
+- `openclaw status --deep` includes probe evidence, failing identifiers, timeout class, and completion-time regressions per the checkpoint mapping table.
+- Status notification pattern follows state-change-driven updates (not per-log-line), includes run id, current state, elapsed time, and next expected transition.
+- Single-thread progress updates preferred (comment edits or one canonical status thread, not noisy comment spam).
+- Completion handoff pattern includes: outcome statement, evidence bundle, operator action, and ownership continuity.
+- Fallback behavior when telemetry is unavailable: preserve checkpoint ordering, show last confirmed checkpoint, mark unresolved state as `unknown`, add degraded-telemetry note to `status --all`, emit best-effort end state.
+
+---
+
+### Task 4.7 — Persistent Memory and State Adapter Pipeline
+
+**Workstream:** WS-D
+
+**Scope:** Implement the durable persistent-memory layer defined in `docs/github-mode/planning/implementation-plan.md` §2.1 so agent context survives runner teardown. Runner filesystem is never a source of truth.
+
+**Acceptance Criteria:**
+
+- System of record defined: primary object storage for checkpoint/event blobs, index/query database for metadata and coordination, optional projection stores as derived views.
+- Read/write lifecycle implemented: hydrate at run start (latest snapshot + unapplied deltas), periodic checkpoints at deterministic boundaries with monotonic sequence IDs, finalize at run end (compact deltas into snapshot, record status/evidence), crash-safe fallback from previously persisted checkpoints.
+- Consistency model enforced: read-your-writes within run scope, eventual consistency across concurrent runs, `baseVersion`/`newVersion` compare-and-swap on writes, reject stale writes on version mismatch, append-only event log with periodic snapshot compaction (no silent last-write-wins).
+- Idempotency: all writes include idempotency keys (`runId` + `stepId` + `sequence`).
+- Minimal persistent data model implemented: `MemorySnapshot`, `MemoryDelta`, `RunCheckpoint`, `RunJournal` with all required fields per the implementation plan.
+- Retention/TTL policy defined: hot window for fast resume, warm audit window for governance/forensics, explicit policy-driven expiration with auditable tombstone records, legal/compliance hold overrides.
+- Storage target selected using the latency/cost/access-control criteria in the implementation plan (GitHub Actions artifacts, GitHub Releases assets, cloud object storage via OIDC, or managed KV/database).
+
+---
+
+### Task 4.8 — Failure-Mode Contract Implementation
+
+**Workstream:** WS-D
+
+**Scope:** Implement the failure-mode contract defined in `docs/github-mode/overview.md` §4.3 and `docs/github-mode/planning/implementation-plan.md` §2.1 for all checkpointed GitHub runs.
+
+**Acceptance Criteria:**
+
+- Storage unavailable: detected by hydrate/finalize probe failure; exponential backoff with bounded retries; last committed snapshot/checkpoint preserved as source of truth; rehydrate from previous version on retry.
+- Snapshot schema mismatch: detected by `schemaVersion` validation failure; no automatic retry; original snapshot preserved immutably; migration-required incident marker in `RunJournal`; resume only from migrated snapshot.
+- Scan failures: detected by preflight gate FAIL/INDETERMINATE; one retry for transient errors, no retry for policy denials; fail closed before execution with zero side effects.
+- Runner timeout/preemption: detected by cancellation/eviction/watchdog signal; auto-resume only when trust/policy context unchanged and retry budget remains; new run hydrates latest `RunCheckpoint` and replays deterministic remaining steps.
+- Partial upload/corrupt checkpoint: detected by checksum/size/CAS/read-back failure; retry upload with same idempotency key; previous snapshot pointer preserved; corrupt objects tombstoned.
+- Each failure mode produces a user-visible error message per the specification.
+- All failure-mode behaviors are tested with explicit negative test cases.
+
+---
+
 ## Phase 5 — Promotion, Attestation, and Incident Operations
 
 ### Task 5.1 — Promotion Pipeline Implementation
@@ -552,13 +666,26 @@ Status: ✅ Complete.
 
 **Workstream:** WS-G
 
-**Scope:** Build metrics/reporting for parity trend, reliability/flakiness, bot PR throughput/acceptance, collaboration outcomes/latency, policy/security violations, promotion lead/rollback time.
+**Scope:** Build metrics/reporting covering all dimensions from `docs/github-mode/planning/implementation-plan.md` §4 Phase 7, `docs/github-mode/planning/mvvp.md` §4, and `docs/github-mode/planning/mvvvp.md` §5.
+
+Required metric categories (union of plan, MVVP, and MVVVP requirements):
+
+- **Adoption:** PR coverage by GitHub Mode checks, trusted command usage by repository/cohort.
+- **Effectiveness:** bot PR acceptance/merge rate, median command-to-PR lead time, pre-merge issues caught by policy/routing checks.
+- **Safety:** blocked privileged attempts (with actor/context class), secret leakage incidents (target: zero), policy bypass incidents (target: zero).
+- **Reliability:** workflow success rate by class, flake-driven rerun rate, median and p95 workflow duration.
+- **Operability (MVVVP):** manual intervention count per week, mean time to recover from workflow breakage, stale parity entry count and trend direction.
+- **Parity:** parity matrix freshness, parity score trends, count of `installed-only` items and trend.
+- **Collaboration:** collaboration success/failure rates and latency.
+- **Promotion:** promotion lead time and rollback time.
 
 **Acceptance Criteria:**
 
 - Dashboards or reports available to maintainers.
-- Metrics cover all listed dimensions.
+- Metrics cover all listed categories with weekly rollup cadence.
 - Data freshness/SLOs defined and monitored.
+- MVVP metrics emitted by the time MVVP exit criteria are evaluated (see `mvvp.md` §5).
+- MVVVP operability metrics emitted by the time MVVVP exit criteria are evaluated (see `mvvvp.md` §6).
 
 ---
 
@@ -615,3 +742,23 @@ Status: ✅ Complete.
 - Subtasks for workflow files/tests/docs
 
 Label stories by **workstream (WS-A…WS-G)** and **milestone (M1…M7)** for dependency tracking.
+
+### MVP Rollout Phases (from `docs/github-mode/planning/mvp.md` §8)
+
+Rollout is staged to manage risk:
+
+- **Phase A (internal-only):** Enable workflows on default branch with maintainer-only command triggers. Measure reliability/flakiness and harden summaries/artifacts.
+- **Phase B (limited trusted users):** Expand trusted command users. Keep privileged adapters scoped and audited.
+- **Phase C (default-on required checks):** Enforce PR checks as required branch protection status checks. Keep command workflow guardrails unchanged unless explicitly reviewed.
+
+**Rollback policy:** If abuse or reliability regressions occur, disable mutation-capable command paths and retain read-only validation checks.
+
+### Maturity Progression (MVP → MVVP → MVVVP)
+
+Each maturity stage has explicit exit criteria defined in its planning document:
+
+- **MVP exit criteria:** `docs/github-mode/planning/mvp.md` §7 — required PR check, trusted command-to-bot-PR, untrusted denial, parity artifact, installed runtime unchanged.
+- **MVVP exit criteria:** `docs/github-mode/planning/mvvp.md` §5 — MVP criteria sustained for 2 weeks plus vision metrics showing repeat usage and alignment.
+- **MVVVP exit criteria:** `docs/github-mode/planning/mvvvp.md` §6 — MVVP criteria sustained for 4 weeks plus operability targets, compounding value, and zero safety incidents.
+
+Scope expansion is gated by maturity: do not advance beyond MVP scope until MVP exit criteria hold, and likewise for MVVP → MVVVP.
