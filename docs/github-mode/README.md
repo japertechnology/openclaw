@@ -66,6 +66,8 @@ This runs automatically in the [`github-mode-contracts`](../../.github/workflows
 - `.github/workflows/github-mode-*`
 - `scripts/validate-github-runtime-contracts.ts`
 - `scripts/check-upstream-additions-only.ts`
+- `test/check-upstream-additions-only.test.ts`
+- `test/validate-github-runtime-contracts.test.ts`
 
 Everything else is upstream-owned. Modifications to upstream files will fail the guard.
 

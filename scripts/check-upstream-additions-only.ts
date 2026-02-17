@@ -11,6 +11,8 @@
  *   - .github/workflows/github-mode-*
  *   - scripts/validate-github-runtime-contracts.ts
  *   - scripts/check-upstream-additions-only.ts
+ *   - test/check-upstream-additions-only.test.ts
+ *   - test/validate-github-runtime-contracts.test.ts
  *
  * Everything else is upstream-owned and must not be modified.
  */
@@ -24,13 +26,36 @@ export const GITHUB_MODE_OWNED_PATTERNS = [
   /^\.github\/workflows\/github-mode-/,
   /^scripts\/validate-github-runtime-contracts\.ts$/,
   /^scripts\/check-upstream-additions-only\.ts$/,
+  /^test\/check-upstream-additions-only\.test\.ts$/,
+  /^test\/validate-github-runtime-contracts\.test\.ts$/,
 ];
 
 export function isGithubModeOwned(filePath: string): boolean {
   return GITHUB_MODE_OWNED_PATTERNS.some((pattern) => pattern.test(filePath));
 }
 
-type DiffEntry = { status: string; path: string };
+export type DiffEntry = { status: string; path: string };
+
+export function parseDiffEntries(diffOutput: string): DiffEntry[] {
+  const entries: DiffEntry[] = [];
+  for (const line of diffOutput.split("\n")) {
+    const parts = line.split("\t");
+    if (parts.length < 2) {
+      continue;
+    }
+    const status = parts[0].trim();
+    if (status.startsWith("R") || status.startsWith("C")) {
+      // Renames (R100) and copies (C100) have two paths: old\tnew
+      entries.push({ status, path: parts[1].trim() });
+      if (parts.length >= 3) {
+        entries.push({ status, path: parts[2].trim() });
+      }
+    } else {
+      entries.push({ status, path: parts[1].trim() });
+    }
+  }
+  return entries;
+}
 
 export function findViolations(entries: DiffEntry[]): string[] {
   const violations: string[] = [];
@@ -83,16 +108,7 @@ function getModifiedUpstreamFiles(): string[] {
     return [];
   }
 
-  const entries: DiffEntry[] = [];
-  for (const line of diffOutput.split("\n")) {
-    const parts = line.split("\t");
-    if (parts.length < 2) {
-      continue;
-    }
-    entries.push({ status: parts[0].trim(), path: parts[1].trim() });
-  }
-
-  return findViolations(entries);
+  return findViolations(parseDiffEntries(diffOutput));
 }
 
 function main(): void {
@@ -121,6 +137,8 @@ function main(): void {
       "  - .github/workflows/github-mode-*\n" +
       "  - scripts/validate-github-runtime-contracts.ts\n" +
       "  - scripts/check-upstream-additions-only.ts\n" +
+      "  - test/check-upstream-additions-only.test.ts\n" +
+      "  - test/validate-github-runtime-contracts.test.ts\n" +
       "\nTo fix: move your changes into GitHub-Mode-owned paths or\n" +
       "use the extension system (extensions/) for runtime additions.",
   );
