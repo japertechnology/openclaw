@@ -4,8 +4,8 @@ This directory contains architecture decisions that lock runtime boundaries for 
 
 ## ADR index
 
-- [ADR 0001 Runtime boundary and ownership](/github-mode/adr/0001-runtime-boundary-and-ownership)
-- [ADR 0002 Installed runtime non regression guardrails](/github-mode/adr/0002-installed-runtime-non-regression-guardrails)
+- [ADR 0001 Runtime boundary and ownership](0001-runtime-boundary-and-ownership.md)
+- [ADR 0002 Installed runtime non regression guardrails](0002-installed-runtime-non-regression-guardrails.md)
 
 ## Review and approval
 
