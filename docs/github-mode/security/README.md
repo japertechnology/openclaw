@@ -4,7 +4,7 @@ This directory contains the baseline threat modeling artifacts for GitHub mode r
 
 ## Documents
 
-- [GitHub trigger trust matrix and threat model](/github-mode/security/0001-github-trigger-trust-matrix)
+- [GitHub trigger trust matrix and threat model](0001-github-trigger-trust-matrix.md)
 
 ## Scope
 

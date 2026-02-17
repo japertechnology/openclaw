@@ -68,14 +68,14 @@ Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist an
 
 **Task 1 contract dependencies (implemented):**
 
-- Manifest contract: [`runtime/github/manifest.schema.json`](runtime/github/manifest.schema.json), [`runtime/github/runtime-manifest.json`](runtime/github/runtime-manifest.json)
-- Adapter contract: [`runtime/github/adapter-contracts.json`](runtime/github/adapter-contracts.json)
-- Policy contract: [`runtime/github/command-policy.json`](runtime/github/command-policy.json)
-- Trust contract: [`runtime/github/trust-levels.json`](runtime/github/trust-levels.json)
-- Parity contract: [`runtime/github/parity-matrix.json`](runtime/github/parity-matrix.json)
-- Convergence contract: [`runtime/github/workspace-convergence-map.json`](runtime/github/workspace-convergence-map.json)
-- Consumption guide: [`runtime/github/README.md`](runtime/github/README.md)
-- Validation hook: [`scripts/validate-github-runtime-contracts.ts`](scripts/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
+- Manifest contract: [`runtime/github/manifest.schema.json`](../../../runtime/github/manifest.schema.json), [`runtime/github/runtime-manifest.json`](../../../runtime/github/runtime-manifest.json)
+- Adapter contract: [`runtime/github/adapter-contracts.json`](../../../runtime/github/adapter-contracts.json)
+- Policy contract: [`runtime/github/command-policy.json`](../../../runtime/github/command-policy.json)
+- Trust contract: [`runtime/github/trust-levels.json`](../../../runtime/github/trust-levels.json)
+- Parity contract: [`runtime/github/parity-matrix.json`](../../../runtime/github/parity-matrix.json)
+- Convergence contract: [`runtime/github/workspace-convergence-map.json`](../../../runtime/github/workspace-convergence-map.json)
+- Consumption guide: [`runtime/github/README.md`](../../../runtime/github/README.md)
+- Validation hook: [`scripts/validate-github-runtime-contracts.ts`](../../../scripts/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
 
 **Acceptance Criteria:**
 

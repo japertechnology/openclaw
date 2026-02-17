@@ -1,6 +1,8 @@
 # Directory Listing
 
-Generated from the current workspace tree. Excludes `.git` and `node_modules`.
+Generated on 2026-02-15 from the current workspace tree. Excludes `.git` and `node_modules`.
+
+> **Staleness note:** This listing is a point-in-time snapshot. Regenerate when directory structure changes materially.
 
 | Folder                                                                     | Purpose                                                                           | Contents                                                                                                                                                                                                        |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

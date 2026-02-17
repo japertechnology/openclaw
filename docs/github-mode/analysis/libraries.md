@@ -2,6 +2,8 @@
 
 Generated on 2026-02-15 from manifest files. This lists direct external dependencies; internal package opennipper is intentionally excluded.
 
+> **Staleness note:** This listing is a point-in-time snapshot. Regenerate when dependencies change materially.
+
 ## Node.js Workspace Dependencies
 
 | Library                                      | Version(s)             | Declared In                                                            | Purpose                                                               |

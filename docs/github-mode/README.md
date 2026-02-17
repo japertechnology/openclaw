@@ -48,3 +48,19 @@ This is a hard boundary, not a preference:
 - [ADR 0001](adr/0001-runtime-boundary-and-ownership.md) assigns `src/**` ownership to installed runtime flows and assigns GitHub Mode ownership to `.github/**` orchestration plus `runtime/github/**` contracts.
 - ADR 0001 explicitly prohibits GitHub Mode workflows/actions from importing installed runtime internals from `src/**`.
 - Existing extensions are the reference implementation for this boundary: new GitHub Mode runtime behavior should mirror extension packaging and dependency isolation instead of creating new `src/**` coupling.
+
+## Maintenance During Ongoing Development
+
+These docs are designed to withstand continuous OpenClaw core evolution by following three isolation principles:
+
+1. **No `src/` import coupling.** GitHub Mode docs reference `src/` paths only descriptively (in analysis snapshots). No doc tooling, validation, or navigation depends on `src/` internal structure. When `src/` paths change, update the analysis snapshots but nothing else breaks.
+
+2. **Contract-first validation.** Runtime contracts in `runtime/github/` are the only machine-validated artifacts. The validation script (`scripts/validate-github-runtime-contracts.ts`) checks contract structure, not doc prose. This means core refactors do not break doc validation.
+
+3. **Analysis snapshots are explicitly dated.** `analysis/directories.md` and `analysis/libraries.md` are point-in-time snapshots with staleness notes. Regenerate them when the codebase structure or dependency set changes materially.
+
+When touching these docs during core development:
+
+- Keep internal links relative (not root-relative) so they resolve on GitHub without Mintlify navigation.
+- Do not add `src/` imports or runtime dependencies to validation scripts.
+- Update analysis snapshots only when relevant structure changes; do not block unrelated PRs on snapshot freshness.
