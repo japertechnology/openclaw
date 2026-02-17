@@ -102,6 +102,46 @@ GitHub mode targets capability parity for approved task classes, but it does not
 | Best fit             | fast iteration, exploratory debugging, device-coupled tasks | governed automation, reviewable changes, team approvals |
 | UX expectation       | tight loop and low interaction latency                      | auditable loop with higher end-to-end latency           |
 
+### 3.4 UX contract for asynchronous GitHub runs
+
+GitHub mode UX should behave like a visible asynchronous queue, not a hanging terminal session.
+
+#### Expected delay profile
+
+- **Queueing delay:** usually short, but may spike during org-wide CI load or constrained runner capacity.
+- **Provisioning delay:** runner startup and checkout add fixed overhead before assistant logic starts.
+- **Execution delay:** task complexity (tests, policy checks, artifact generation, PR updates) determines run duration.
+- **Human-gated delay:** runs that request clarification or approvals can pause indefinitely until input arrives.
+
+The product requirement is not to eliminate delay, but to make delay legible with explicit state transitions and timestamps.
+
+#### User-facing state model
+
+| State              | What it means for the user                                                     | CLI surface (local operator view)                                                                   | GitHub surface (issue/PR/checks)                                                                    |
+| ------------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `queued`           | Request accepted, waiting for runner slot or prior workflow completion         | Show an active wait line/spinner with queue reason and elapsed time                                 | Post an acknowledgement comment and show pending check/status                                       |
+| `provisioning`     | Runner starting, repository/checkpoint hydration, baseline setup in progress   | Update status text to provisioning phases (runner start, checkout, hydrate) with elapsed timer      | Check/status remains in-progress; optional progress comment edit with current provisioning step     |
+| `running`          | Assistant logic is actively executing tools/policies/tasks                     | Stream coarse phase updates (planning, edits, validation, packaging) and keep elapsed timer visible | In-progress check with step summary in job logs and workflow summary artifact                       |
+| `waiting_on_input` | Automation is blocked on human decision, clarification, or privileged approval | Mark run as paused and print exactly what input is needed plus how to resume                        | Comment requesting input, apply waiting label/status marker, and stop further execution until reply |
+| `completed`        | Run finished successfully with final outputs ready for review/merge/handoff    | Print final summary with outcome, changed files/artifacts, and next command hints                   | Final success check plus completion comment linking PR/artifacts/attestations                       |
+| `failed`           | Run terminated with an error or policy block that requires intervention        | Print failure class, first actionable error, and rerun/resume guidance                              | Failed check with concise failure summary and links to failing step/log section                     |
+
+#### Status notification pattern
+
+- Emit notifications on **state change**, not on every log line.
+- Include **run id**, **current state**, **elapsed time**, and **next expected transition** when known.
+- Prefer **single-thread progress updates** (comment edits or one canonical status thread) over noisy comment spam.
+- Keep state wording stable across CLI and GitHub so users can map local and remote views without translation.
+
+#### Completion handoff pattern
+
+When a run reaches `completed` or `failed`, handoff must be explicit:
+
+1. **Outcome statement:** one-line final state with timestamp.
+2. **Evidence bundle:** links to workflow run, logs, artifacts, and produced PR/commit if any.
+3. **Operator action:** clear next step (`review PR`, `approve`, `provide input`, `retry with command ...`).
+4. **Ownership continuity:** identify who/what should act next (requester, reviewer, release owner, or automation).
+
 ---
 
 ## 4) Architecture
