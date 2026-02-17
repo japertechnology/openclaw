@@ -11,23 +11,32 @@ This directory contains Task 1 contract artifacts used by GitHub mode planning a
 - `trust-levels.json`: trust tier definitions and privilege boundaries.
 - `parity-matrix.json`: expected parity mapping between installed runtime and GitHub mode.
 - `workspace-convergence-map.json`: acceptance criteria and reconciliation signals.
+- `entity-manifest.schema.json`: schema for entity manifest (multi-entity collaboration).
+- `entity-manifest.json`: entity identity, ownership, trust tier, and capabilities.
+- `collaboration-policy.schema.json`: schema for collaboration policy (deny-by-default routing).
+- `collaboration-policy.json`: allowed collaboration routes and trust requirements.
+- `collaboration-envelope.schema.json`: schema for cross-entity collaboration message envelopes.
 
 ## Task 1 consumption contract
 
 Task 1 implementations must treat these files as required inputs:
 
 1. Load and validate `runtime-manifest.json` against `manifest.schema.json`.
-2. Parse and enforce required fields in `command-policy.json`:
+2. Load and validate `entity-manifest.json` against `entity-manifest.schema.json`.
+3. Load and validate `collaboration-policy.json` against `collaboration-policy.schema.json`.
+4. Validate `collaboration-envelope.schema.json` compiles as a valid JSON Schema.
+5. Parse and enforce required fields in `command-policy.json`:
    - `policyVersion`
    - `enforcementMode`
    - `allowedActions`
    - `constraints`
-3. Parse `parity-matrix.json` and enforce:
+6. Parse `parity-matrix.json` and enforce:
    - every mapping has `workflow`, `installedRuntime`, `githubMode`, and `parity`
    - `installed-only` parity rows include both `owner` and `rationale`
-4. Parse `workspace-convergence-map.json` and enforce:
+7. Parse `workspace-convergence-map.json` and enforce:
    - non-empty `acceptanceCriteria`
    - at least one `reconciliationSignals[]` entry with `required: true`
+8. Verify `collaboration-policy.json` has `defaultAction: "deny"` (deny-by-default).
 
 ### Failure behavior
 
@@ -35,6 +44,19 @@ Task 1 must fail fast when any required file is missing or malformed.
 
 - Local validation failure: non-zero exit from `pnpm contracts:github:validate`.
 - CI validation failure: the `github-mode-contracts` workflow fails and blocks merge.
+
+## Contract versioning and compatibility
+
+All contract files include a `schemaVersion` field. When making changes:
+
+- **Compatible changes** (adding optional fields, adding new mappings): bump the minor version of the contract's version field (e.g., `matrixVersion` from `v1.0.0` to `v1.1.0`).
+- **Incompatible changes** (removing fields, changing required fields, renaming keys): bump the major version, add migration notes below, and update the contract validator.
+
+### Migration notes
+
+Record any incompatible schema changes here with the date and description:
+
+- _(none yet)_
 
 ## Validation command
 

@@ -48,6 +48,14 @@ const requiredContracts: ContractCheck[] = [
       "reconciliationSignals",
     ],
   },
+  {
+    file: "runtime/github/entity-manifest.json",
+    requiredKeys: ["schemaVersion", "entityId", "owner", "trustTier"],
+  },
+  {
+    file: "runtime/github/collaboration-policy.json",
+    requiredKeys: ["schemaVersion", "policyVersion", "defaultAction", "allowedRoutes"],
+  },
 ];
 
 function readJson(filePath: string): JsonObject {
@@ -78,6 +86,54 @@ function validateManifestSchema(): void {
       ?.map((error) => `${error.instancePath || "/"} ${error.message}`)
       .join("; ");
     throw new Error(`${manifestPath}: schema validation failed (${errors ?? "unknown error"})`);
+  }
+}
+
+function validateEntityManifestSchema(): void {
+  const schemaPath = "runtime/github/entity-manifest.schema.json";
+  const instancePath = "runtime/github/entity-manifest.json";
+  const schema = readJson(schemaPath);
+  const instance = readJson(instancePath);
+
+  const ajv = new Ajv({ allErrors: true, strict: true });
+  const validate = ajv.compile(schema);
+  const valid = validate(instance);
+  if (!valid) {
+    const errors = validate.errors
+      ?.map((error) => `${error.instancePath || "/"} ${error.message}`)
+      .join("; ");
+    throw new Error(`${instancePath}: schema validation failed (${errors ?? "unknown error"})`);
+  }
+}
+
+function validateCollaborationPolicySchema(): void {
+  const schemaPath = "runtime/github/collaboration-policy.schema.json";
+  const instancePath = "runtime/github/collaboration-policy.json";
+  const schema = readJson(schemaPath);
+  const instance = readJson(instancePath);
+
+  const ajv = new Ajv({ allErrors: true, strict: true });
+  const validate = ajv.compile(schema);
+  const valid = validate(instance);
+  if (!valid) {
+    const errors = validate.errors
+      ?.map((error) => `${error.instancePath || "/"} ${error.message}`)
+      .join("; ");
+    throw new Error(`${instancePath}: schema validation failed (${errors ?? "unknown error"})`);
+  }
+}
+
+function validateCollaborationEnvelopeSchema(): void {
+  const schemaPath = "runtime/github/collaboration-envelope.schema.json";
+  const schema = readJson(schemaPath);
+
+  // Compile-only check: validates the schema is well-formed.
+  // Use strict: false because the envelope schema uses format keywords
+  // (uuid, date-time) that require ajv-formats at runtime validation time.
+  const ajv = new Ajv({ allErrors: true, strict: false, logger: false });
+  const validate = ajv.compile(schema);
+  if (!validate) {
+    throw new Error(`${schemaPath}: schema compilation failed`);
   }
 }
 
@@ -146,6 +202,17 @@ function validateConvergenceMap(): void {
   }
 }
 
+function validateCollaborationPolicyDenyDefault(): void {
+  const policyPath = "runtime/github/collaboration-policy.json";
+  const policy = readJson(policyPath);
+
+  if (policy.defaultAction !== "deny") {
+    throw new Error(
+      `${policyPath}: defaultAction must be "deny" (deny-by-default collaboration policy)`,
+    );
+  }
+}
+
 function validateTaskReadinessMarker(): void {
   const tasksPath = "docs/github-mode/planning/implementation-tasks.md";
   const tasksDoc = readFileSync(path.join(ROOT, tasksPath), "utf8");
@@ -163,6 +230,10 @@ function main(): void {
   }
 
   validateManifestSchema();
+  validateEntityManifestSchema();
+  validateCollaborationPolicySchema();
+  validateCollaborationEnvelopeSchema();
+  validateCollaborationPolicyDenyDefault();
   validateParityMatrix();
   validateConvergenceMap();
   validateTaskReadinessMarker();

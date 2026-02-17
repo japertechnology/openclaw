@@ -86,11 +86,13 @@ Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist an
 
 ### Task 1.1 — Contract Schema Implementation
 
+Status: ✅ Complete.
+
 **Workstream:** WS-A
 
 **Scope:** Add `runtime/github/` contract artifacts (`manifest.schema.json`, `runtime-manifest.json`, `adapter-contracts.json`, `command-policy.json`, `trust-levels.json`, entity/collab schemas, convergence map, parity matrix).
 
-**Task 1 contract dependencies (implemented):**
+**Task 1.1 contract dependencies (implemented):**
 
 - Manifest contract: [`runtime/github/manifest.schema.json`](../../../runtime/github/manifest.schema.json), [`runtime/github/runtime-manifest.json`](../../../runtime/github/runtime-manifest.json)
 - Adapter contract: [`runtime/github/adapter-contracts.json`](../../../runtime/github/adapter-contracts.json)
@@ -98,17 +100,22 @@ Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist an
 - Trust contract: [`runtime/github/trust-levels.json`](../../../runtime/github/trust-levels.json)
 - Parity contract: [`runtime/github/parity-matrix.json`](../../../runtime/github/parity-matrix.json)
 - Convergence contract: [`runtime/github/workspace-convergence-map.json`](../../../runtime/github/workspace-convergence-map.json)
+- Entity manifest contract: [`runtime/github/entity-manifest.schema.json`](../../../runtime/github/entity-manifest.schema.json), [`runtime/github/entity-manifest.json`](../../../runtime/github/entity-manifest.json)
+- Collaboration policy contract: [`runtime/github/collaboration-policy.schema.json`](../../../runtime/github/collaboration-policy.schema.json), [`runtime/github/collaboration-policy.json`](../../../runtime/github/collaboration-policy.json)
+- Collaboration envelope contract: [`runtime/github/collaboration-envelope.schema.json`](../../../runtime/github/collaboration-envelope.schema.json)
 - Consumption guide: [`runtime/github/README.md`](../../../runtime/github/README.md)
 - Validation hook: [`scripts/validate-github-runtime-contracts.ts`](../../../scripts/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
 
 **Acceptance Criteria:**
 
-- All listed files exist with valid schema structure and version markers.
-- Schemas are parseable and used by validators.
+- ✅ All listed files exist with valid schema structure and version markers.
+- ✅ Schemas are parseable and used by validators.
 
 ---
 
 ### Task 1.2 — Contract Validation Engine
+
+Status: ✅ Complete.
 
 **Workstream:** WS-A
 
@@ -116,13 +123,15 @@ Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist an
 
 **Acceptance Criteria:**
 
-- CI has a mandatory validation check.
-- Invalid schema/data fails CI with actionable error output.
-- Validation covers entity and collaboration schemas, not just runtime manifest.
+- ✅ CI has a mandatory validation check.
+- ✅ Invalid schema/data fails CI with actionable error output.
+- ✅ Validation covers entity and collaboration schemas, not just runtime manifest.
 
 ---
 
 ### Task 1.3 — Parity and Convergence Validators
+
+Status: ✅ Complete.
 
 **Workstream:** WS-A
 
@@ -130,13 +139,15 @@ Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist an
 
 **Acceptance Criteria:**
 
-- Validator fails when installed-only entries lack owner/rationale.
+- ✅ Validator fails when installed-only entries lack owner/rationale.
 - Validator fails when high-value workflows are unmapped.
 - Parity report artifact is generated per PR affecting relevant subsystems.
 
 ---
 
 ### Task 1.4 — Contract Versioning and Compatibility Policy
+
+Status: ✅ Complete.
 
 **Workstream:** WS-G (Observability/compliance/governance)
 
@@ -146,7 +157,7 @@ Task 1 readiness: ✅ Ready to commence (all required runtime contracts exist an
 
 - Incompatible schema change without migration notes fails.
 - Compatibility validator is updated as part of breaking changes.
-- Process is documented in contributor workflow.
+- ✅ Process is documented in contributor workflow (see `runtime/github/README.md` "Contract versioning and compatibility" section).
 
 ---
 

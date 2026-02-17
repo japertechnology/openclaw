@@ -167,3 +167,120 @@ describe("validate-github-runtime-contracts", () => {
     expect(result.exitCode).toBe(0);
   });
 });
+
+describe("entity-manifest validation", () => {
+  it("fails when entity-manifest.json is missing", () => {
+    const result = withRemovedFile("runtime/github/entity-manifest.json", runValidator);
+    expect(result.exitCode).not.toBe(0);
+  });
+
+  it("fails when entity-manifest.json is missing required key", () => {
+    const result = withTempFile(
+      "runtime/github/entity-manifest.json",
+      JSON.stringify({ schemaVersion: "1.0" }),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("missing required key");
+  });
+
+  it("fails when entity-manifest.json does not match schema", () => {
+    const badEntity = {
+      schemaVersion: "1.0",
+      entityId: "INVALID CAPS AND SPACES",
+      owner: "@openclaw/runtime",
+      trustTier: "trusted",
+    };
+    const result = withTempFile(
+      "runtime/github/entity-manifest.json",
+      JSON.stringify(badEntity, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+
+  it("fails when entity-manifest.json has invalid trust tier", () => {
+    const badTrust = {
+      schemaVersion: "1.0",
+      entityId: "test-entity",
+      owner: "@openclaw/runtime",
+      trustTier: "super-trusted",
+    };
+    const result = withTempFile(
+      "runtime/github/entity-manifest.json",
+      JSON.stringify(badTrust, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+});
+
+describe("collaboration-policy validation", () => {
+  it("fails when collaboration-policy.json is missing", () => {
+    const result = withRemovedFile("runtime/github/collaboration-policy.json", runValidator);
+    expect(result.exitCode).not.toBe(0);
+  });
+
+  it("fails when collaboration-policy.json is missing required key", () => {
+    const result = withTempFile(
+      "runtime/github/collaboration-policy.json",
+      JSON.stringify({ schemaVersion: "1.0" }),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("missing required key");
+  });
+
+  it("fails when collaboration-policy.json does not match schema", () => {
+    const badPolicy = {
+      schemaVersion: "1.0",
+      policyVersion: "v1.0.0",
+      defaultAction: "allow",
+      allowedRoutes: [],
+    };
+    const result = withTempFile(
+      "runtime/github/collaboration-policy.json",
+      JSON.stringify(badPolicy, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+
+  it("passes when collaboration-policy.json defaultAction is deny", () => {
+    const validDenyPolicy = {
+      schemaVersion: "1.0",
+      policyVersion: "v1.0.0",
+      defaultAction: "deny",
+      allowedRoutes: [],
+    };
+    const result = withTempFile(
+      "runtime/github/collaboration-policy.json",
+      JSON.stringify(validDenyPolicy, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).toBe(0);
+  });
+});
+
+describe("collaboration-envelope schema validation", () => {
+  it("fails when collaboration-envelope.schema.json is missing", () => {
+    const result = withRemovedFile(
+      "runtime/github/collaboration-envelope.schema.json",
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+  });
+
+  it("fails when collaboration-envelope.schema.json is invalid JSON Schema", () => {
+    const badSchema = { type: "invalid-type" };
+    const result = withTempFile(
+      "runtime/github/collaboration-envelope.schema.json",
+      JSON.stringify(badSchema, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+  });
+});
