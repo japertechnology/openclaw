@@ -1,0 +1,35 @@
+name: GitHub Mode Contracts
+on:
+  pull_request:
+    paths:
+      - "runtime/github/**"
+      - "docs/github-mode/**"
+      - "scripts/validate-github-runtime-contracts.ts"
+      - "scripts/check-upstream-additions-only.ts"
+  push:
+    branches: [main]
+    paths:
+      - "runtime/github/**"
+      - "docs/github-mode/**"
+      - "scripts/validate-github-runtime-contracts.ts"
+      - "scripts/check-upstream-additions-only.ts"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-env
+      - run: pnpm contracts:github:validate
+
+  check-additions-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node-env
+      - run: node --import tsx scripts/check-upstream-additions-only.ts

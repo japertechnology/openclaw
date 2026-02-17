@@ -49,6 +49,26 @@ This is a hard boundary, not a preference:
 - ADR 0001 explicitly prohibits GitHub Mode workflows/actions from importing installed runtime internals from `src/**`.
 - Existing extensions are the reference implementation for this boundary: new GitHub Mode runtime behavior should mirror extension packaging and dependency isolation instead of creating new `src/**` coupling.
 
+## Upstream Sync Guard
+
+GitHub Mode changes must be purely additive to ensure the fork can cleanly pull upstream OpenClaw upgrades. The `check-upstream-additions-only` script enforces this:
+
+```bash
+node --import tsx scripts/check-upstream-additions-only.ts
+```
+
+This runs automatically in the [`github-mode-contracts`](../../.github/workflows/github-mode-contracts.yml) CI workflow for PRs touching GitHub Mode paths.
+
+**Owned paths** (safe to add or modify):
+
+- `docs/github-mode/**`
+- `runtime/github/**`
+- `.github/workflows/github-mode-*`
+- `scripts/validate-github-runtime-contracts.ts`
+- `scripts/check-upstream-additions-only.ts`
+
+Everything else is upstream-owned. Modifications to upstream files will fail the guard.
+
 ## Maintenance During Ongoing Development
 
 These docs are designed to withstand continuous OpenClaw core evolution by following three isolation principles:

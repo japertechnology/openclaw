@@ -34,7 +34,7 @@ Task 1 implementations must treat these files as required inputs:
 Task 1 must fail fast when any required file is missing or malformed.
 
 - Local validation failure: non-zero exit from `pnpm contracts:github:validate`.
-- CI validation failure: required `check` workflow fails and blocks merge.
+- CI validation failure: the `github-mode-contracts` workflow fails and blocks merge.
 
 ## Validation command
 
