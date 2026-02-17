@@ -2,7 +2,7 @@
 
 This document defines the **minimum viable valuable product (MVVVP)** for OpenClaw GitHub Mode.
 
-It is the next bar above `.GITHUB-MODE-MVVP.md`: not only useful and safe, but predictably compounding value with low operational friction.
+It is the next bar above `docs/github-mode/planning/mvvp.md`: not only useful and safe, but predictably compounding value with low operational friction.
 
 Terminology note: MVVVP is an informal practitioner term (no single canonical originator). In this repo, it means the minimum slice that is both viable and clearly valuable to users and maintainers.
 
@@ -27,8 +27,8 @@ MVVVP asks: “does this already deliver durable, perceivable value with low ope
 
 This file is derived from the current GitHub Mode doc set:
 
-- strategy and architecture in `.GITHUB-MODE.md`,
-- rollout constraints in `.GITHUB-MODE-MVP.md` and `.GITHUB-MODE-MVVP.md`,
+- strategy and architecture in `docs/github-mode/overview.md`,
+- rollout constraints in `docs/github-mode/planning/mvp.md` and `docs/github-mode/planning/mvvp.md`,
 - analysis references (`WHY`, `MAGIC`, `LIBRARIES`, `DIRECTORIES`, `WWWWWH`),
 - implementation sequencing (`IMPLEMENTATION-PLAN`, `IMPLEMENTATION-TASKS`).
 

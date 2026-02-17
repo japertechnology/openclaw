@@ -139,7 +139,7 @@ function validateConvergenceMap(): void {
 }
 
 function validateTaskReadinessMarker(): void {
-  const tasksPath = ".GITHUB-MODE-IMPLEMENTATION-TASKS.md";
+  const tasksPath = "docs/github-mode/planning/implementation-tasks.md";
   const tasksDoc = readFileSync(path.join(ROOT, tasksPath), "utf8");
   const marker = "Task 1 readiness: ✅ Ready to commence";
 

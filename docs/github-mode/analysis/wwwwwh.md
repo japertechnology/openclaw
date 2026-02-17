@@ -12,17 +12,17 @@ Based on the proposal to transition OpenClaw to a GitHub-native foundation, here
 **The Home:** The project's center of gravity is moving from scattered local machines and the "ClawHub" marketplace to a centralized **Foundation Stewardship on GitHub**.
 **The Runtime:**
 
-* **Current State:** 100,000+ insecure local instances (Docker containers, Raspberry Pis, Mac Minis) often exposing "God Mode" access to the public web.
-* **Future State:** A hybrid model where high-stakes reasoning runs in the **GitHub Cloud** (secured by Microsoft/GitHub infrastructure), while execution happens on authenticated local nodes only when strictly necessary.
+- **Current State:** 100,000+ insecure local instances (Docker containers, Raspberry Pis, Mac Minis) often exposing "God Mode" access to the public web.
+- **Future State:** A hybrid model where high-stakes reasoning runs in the **GitHub Cloud** (secured by Microsoft/GitHub infrastructure), while execution happens on authenticated local nodes only when strictly necessary.
 
 ### **WHEN**
 
 **The Catalyst:** The transition was triggered on **February 15, 2026**, when founder Peter Steinberger announced his departure to join OpenAI.
 **The Timeline:**
 
-* **Inception:** First commit November 25, 2025.
-* **Viral Peak:** Reached 100,000 stars in ~2 days (Jan 29-30, 2026), the fastest in history.
-* **Implementation:** The "GitHub Mode" roadmap is divided into 7 Phases (M1–M7), moving from "Parity Checks" (M1) to full "Governance Handoff" (M7). The immediate goal is to stabilize the ecosystem before the "Agentic Era" fully matures in late 2026.
+- **Inception:** First commit November 25, 2025.
+- **Viral Peak:** Reached 100,000 stars in ~2 days (Jan 29-30, 2026), the fastest in history.
+- **Implementation:** The "GitHub Mode" roadmap is divided into 7 Phases (M1–M7), moving from "Parity Checks" (M1) to full "Governance Handoff" (M7). The immediate goal is to stabilize the ecosystem before the "Agentic Era" fully matures in late 2026.
 
 ### **WHY**
 
@@ -34,15 +34,15 @@ Based on the proposal to transition OpenClaw to a GitHub-native foundation, here
 
 **Social Capital:**
 
-* **196,000+ GitHub Stars:** More interest than React, Linux, or Kubernetes generated in years, gathered in just 3 months.
-* **600+ Contributors:** A massive volunteer workforce that needs direction to avoid chaos.
+- **196,000+ GitHub Stars:** More interest than React, Linux, or Kubernetes generated in years, gathered in just 3 months.
+- **600+ Contributors:** A massive volunteer workforce that needs direction to avoid chaos.
 
 **Financial Implications:**
 
-* **Software Cost:** Free and Open Source (MIT License).
-* **Hardware Cost:** Running a secure local instance currently requires dedicated hardware like a Raspberry Pi 5 (~€140) or Mac Mini (~€1,200), or a cloud VPS.
-* **Ecosystem Value:** The "ClawHub" skill market is flooded with activity, but also malware; the cost of *inaction* is the potential collapse of this value due to a massive security breach.
+- **Software Cost:** Free and Open Source (MIT License).
+- **Hardware Cost:** Running a secure local instance currently requires dedicated hardware like a Raspberry Pi 5 (~€140) or Mac Mini (~€1,200), or a cloud VPS.
+- **Ecosystem Value:** The "ClawHub" skill market is flooded with activity, but also malware; the cost of _inaction_ is the potential collapse of this value due to a massive security breach.
 
 **Effort:**
 
-* **The Roadmap:** A rigorous **7-Milestone Plan** is required to refactor the codebase from a "local hack" to a "repository runtime," requiring significant engineering hours to build adapters for GitHub Actions, OIDC authentication, and Attestation logging.
+- **The Roadmap:** A rigorous **7-Milestone Plan** is required to refactor the codebase from a "local hack" to a "repository runtime," requiring significant engineering hours to build adapters for GitHub Actions, OIDC authentication, and Attestation logging.

@@ -4,7 +4,7 @@ This document defines the **minimum viable implementation** of GitHub Mode for O
 
 Terminology note: in product practice, **MVP** means **Minimum Viable Product**. The term is widely credited to Frank Robinson and later popularized through Eric Ries and the Lean Startup model.
 
-It intentionally narrows scope from `.GITHUB-MODE.md` and `.GITHUB-MODE-IMPLEMENTATION-PLAN.md` so we can ship a secure, useful first version quickly while preserving the current installed runtime.
+It intentionally narrows scope from `docs/github-mode/overview.md` and `docs/github-mode/planning/implementation-plan.md` so we can ship a secure, useful first version quickly while preserving the current installed runtime.
 
 ---
 

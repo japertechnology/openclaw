@@ -4,7 +4,7 @@ Below is a tactical execution breakdown for **Phases 0–7**, with each task map
 
 ## Phase 0 — Baseline and Design Locks
 
-Phase 0 status: ✅ Complete (Task 0.1, 0.2, 0.3 accepted on 2026-02-16; see `.GITHUB-MODE-IMPLEMENTATION-PLAN.md` evidence snapshot and `.GITHUB-MODE-TASK-0-ANALYSIS.md`).
+Phase 0 status: ✅ Complete (Task 0.1, 0.2, 0.3 accepted on 2026-02-16; see `docs/github-mode/planning/implementation-plan.md` evidence snapshot and `docs/github-mode/planning/task-0-analysis.md`).
 
 ### Task 0.1 — Runtime Boundary ADR Package
 

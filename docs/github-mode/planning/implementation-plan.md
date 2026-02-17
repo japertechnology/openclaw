@@ -1,6 +1,6 @@
 # OpenClaw GitHub Mode Implementation Plan
 
-This plan operationalizes `.GITHUB-MODE.md` into phased execution with clear deliverables, gates, and rollback safety.
+This plan operationalizes `docs/github-mode/overview.md` into phased execution with clear deliverables, gates, and rollback safety.
 
 ---
 

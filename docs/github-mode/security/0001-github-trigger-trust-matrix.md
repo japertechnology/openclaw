@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-02-16
 - Owners: GitHub mode maintainers, security maintainers
-- Task mapping: Phase 0 Task 0.3 in `.GITHUB-MODE-IMPLEMENTATION-TASKS.md`
+- Task mapping: Phase 0 Task 0.3 in `docs/github-mode/planning/implementation-tasks.md`
 
 ## Purpose
 

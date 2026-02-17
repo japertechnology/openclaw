@@ -4,7 +4,7 @@
 
 This document defines a **high-fidelity GitHub Runtime Plane** for OpenClaw that can run substantial assistant behavior from repository commits and workflows, while preserving the existing installed/runtime experience on user devices.
 
-It is a product and architecture spec, not an implementation checklist (that lives in `.GITHUB-MODE-IMPLEMENTATION-PLAN.md`).
+It is a product and architecture spec, not an implementation checklist (that lives in `docs/github-mode/planning/implementation-plan.md`).
 
 ---
 

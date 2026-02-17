@@ -13,27 +13,27 @@ However, this viral success has outpaced the project’s operational maturity. A
 
 The core value proposition of OpenClaw is its model agnosticism. It currently orchestrates models from Anthropic, OpenAI, Minimax, and local LLMs via Ollama. Steinberger’s move to OpenAI creates an inherent conflict of interest. An OpenClaw steered by an OpenAI executive may subtly deprioritize support for Claude or Gemini, effectively turning the open-source standard into a proprietary on-ramp.
 
-GitHub, while owned by Microsoft, operates as the *de facto* neutral ground for open-source collaboration. By establishing a "Foundation Stewardship" on GitHub—governed by a multi-stakeholder board rather than a single "benevolent dictator"—OpenClaw guarantees its neutrality. This stewardship ensures that the "Brain" (reasoning engine) remains decoupled from the "Hands" (execution tools), allowing the agent to swap brains based on user preference rather than corporate strategy.
+GitHub, while owned by Microsoft, operates as the _de facto_ neutral ground for open-source collaboration. By establishing a "Foundation Stewardship" on GitHub—governed by a multi-stakeholder board rather than a single "benevolent dictator"—OpenClaw guarantees its neutrality. This stewardship ensures that the "Brain" (reasoning engine) remains decoupled from the "Hands" (execution tools), allowing the agent to swap brains based on user preference rather than corporate strategy.
 
 ### 3. Security as a Platform Service: Solving the "God Mode" Problem
 
 The most pressing argument for GitHub Stewardship is security. Current OpenClaw deployments rely on users correctly configuring local firewalls and Docker containers—a task that viral popularity has proven the average user cannot handle safely. Reports indicate that thousands of instances are currently exposing full file system access to the public internet.
 
-GitHub offers a "secure-by-construction" environment that a standalone foundation cannot easily replicate. By adopting the **GitHub Mode** architecture proposed in the project’s own design documents (`.GITHUB-MODE.md`), OpenClaw can offload security to the platform:
+GitHub offers a "secure-by-construction" environment that a standalone foundation cannot easily replicate. By adopting the **GitHub Mode** architecture proposed in the project’s own design documents (`docs/github-mode/overview.md`), OpenClaw can offload security to the platform:
 
-* **Identity & Access:** Replacing static API keys with OpenID Connect (OIDC) and GitHub native secrets.
-* **Supply Chain Security:** Utilizing Dependabot and code scanning to sanitize the "ClawHub" skill ecosystem, preventing the distribution of malicious skills which have recently plagued the platform.
-* **Permissions:** Moving from "God Mode" local execution to scoped, ephemeral permission sets within GitHub Actions.
+- **Identity & Access:** Replacing static API keys with OpenID Connect (OIDC) and GitHub native secrets.
+- **Supply Chain Security:** Utilizing Dependabot and code scanning to sanitize the "ClawHub" skill ecosystem, preventing the distribution of malicious skills which have recently plagued the platform.
+- **Permissions:** Moving from "God Mode" local execution to scoped, ephemeral permission sets within GitHub Actions.
 
 ### 4. "GitHub Mode": The Repository as the Computer
 
 The most innovative argument for this transition lies in the technical roadmap known as "GitHub Mode." This proposal envisions GitHub not just as a storage locker for code, but as the **Runtime Plane** for the agent itself.
 
-According to the project’s internal analysis (`.GITHUB-MODE-THE-IDEA.md`), OpenClaw is already architected to separate orchestration from execution. By formalizing GitHub as the stewardship environment, the project can operationalize:
+According to the project’s internal analysis (`docs/github-mode/the-idea.md`), OpenClaw is already architected to separate orchestration from execution. By formalizing GitHub as the stewardship environment, the project can operationalize:
 
-* **Continuous Intelligence:** Agents can run directly from repository triggers (Issues, PRs, Comments) using GitHub Actions as the compute layer. This eliminates the "works on my machine" friction that currently plagues the community.
-* **Auditable Agency:** Every action taken by the AI is committed to the log, creating a tamper-evident audit trail. This transforms the agent from a "black box" into a compliant enterprise tool.
-* **Environment Gates:** Promoting agent behaviors from "Dev" to "Prod" using GitHub’s native environment protection rules, ensuring that an agent cannot execute high-stakes tasks (like bank transfers or infrastructure deletion) without human approval.
+- **Continuous Intelligence:** Agents can run directly from repository triggers (Issues, PRs, Comments) using GitHub Actions as the compute layer. This eliminates the "works on my machine" friction that currently plagues the community.
+- **Auditable Agency:** Every action taken by the AI is committed to the log, creating a tamper-evident audit trail. This transforms the agent from a "black box" into a compliant enterprise tool.
+- **Environment Gates:** Promoting agent behaviors from "Dev" to "Prod" using GitHub’s native environment protection rules, ensuring that an agent cannot execute high-stakes tasks (like bank transfers or infrastructure deletion) without human approval.
 
 ### 5. Transitioning from Hobbyist Viral to Enterprise Utility
 
@@ -41,9 +41,9 @@ For OpenClaw to survive, it must graduate from a "viral weekend project" to bori
 
 A GitHub-based Foundation provides the necessary governance structures immediately:
 
-* **CODEOWNERS:** Enforcing review requirements for critical "brainstem" code (routing, tool policy) to prevent malicious commits.
-* **Attestation:** Using artifact attestations to prove that the agent running in production matches the source code, a requirement for enterprise adoption.
-* **Community Governance:** Moving away from a single-maintainer bottleneck to a federated model where maintainers from different organizations (e.g., DigitalOcean, Anthropic, community leaders) hold keys to specific subsystems (channels, memory, tools).
+- **CODEOWNERS:** Enforcing review requirements for critical "brainstem" code (routing, tool policy) to prevent malicious commits.
+- **Attestation:** Using artifact attestations to prove that the agent running in production matches the source code, a requirement for enterprise adoption.
+- **Community Governance:** Moving away from a single-maintainer bottleneck to a federated model where maintainers from different organizations (e.g., DigitalOcean, Anthropic, community leaders) hold keys to specific subsystems (channels, memory, tools).
 
 ### 6. Conclusion
 
