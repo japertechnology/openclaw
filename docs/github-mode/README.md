@@ -41,4 +41,10 @@ Runtime contract artifacts live in [`runtime/github/`](../../runtime/github/READ
 
 ## Extension Architecture
 
-When GitHub Mode requires TypeScript runtime code, it should follow the [extension pattern](../../extensions/) (`extensions/github/`) rather than embedding code in `src/`. This is enforced by [ADR 0001](adr/0001-runtime-boundary-and-ownership.md), which prohibits GitHub mode workflows from importing `src/**` internals.
+When GitHub Mode requires TypeScript runtime code, it must follow the [extension pattern](../../extensions/) by implementing that code in `extensions/github/` rather than embedding code in `src/`.
+
+This is a hard boundary, not a preference:
+
+- [ADR 0001](adr/0001-runtime-boundary-and-ownership.md) assigns `src/**` ownership to installed runtime flows and assigns GitHub Mode ownership to `.github/**` orchestration plus `runtime/github/**` contracts.
+- ADR 0001 explicitly prohibits GitHub Mode workflows/actions from importing installed runtime internals from `src/**`.
+- Existing extensions are the reference implementation for this boundary: new GitHub Mode runtime behavior should mirror extension packaging and dependency isolation instead of creating new `src/**` coupling.
