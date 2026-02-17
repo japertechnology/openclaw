@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "convergenceVersion": "v1.0.0",
+  "acceptanceCriteria": [
+    "All required contract artifacts exist under runtime/github/.",
+    "Contract validator passes locally and in CI.",
+    "Parity matrix includes owner+rationale for each installed-only mapping."
+  ],
+  "reconciliationSignals": [
+    {
+      "signal": "contract-validation-pass",
+      "source": "pnpm contracts:github:validate",
+      "required": true
+    },
+    {
+      "signal": "ci-required-check-green",
+      "source": "CI / check",
+      "required": true
+    }
+  ]
+}

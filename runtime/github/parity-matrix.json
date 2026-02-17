@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0",
+  "matrixVersion": "v1.0.0",
+  "mappings": [
+    {
+      "workflow": "build-and-test",
+      "installedRuntime": "pnpm check && pnpm test",
+      "githubMode": "ci.yml checks + test matrix",
+      "parity": "full"
+    },
+    {
+      "workflow": "policy-validation",
+      "installedRuntime": "local contract validation script",
+      "githubMode": "required CI contract validation step",
+      "parity": "full"
+    },
+    {
+      "workflow": "release-publish",
+      "installedRuntime": "manual maintainer release flow",
+      "githubMode": "not-in-scope",
+      "parity": "installed-only",
+      "owner": "@openclaw/release",
+      "rationale": "GitHub mode rollout intentionally excludes automated release publishing in Task 1 scope."
+    }
+  ]
+}
