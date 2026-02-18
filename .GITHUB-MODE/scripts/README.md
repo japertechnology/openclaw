@@ -1,12 +1,12 @@
-# 🦞 GitHub Mode scripts
+# 🦞 GitHub Mode: Scripts
+
+### Automation scripts for GitHub Mode policy checks, contract validation, and workflow guardrails.
 
 <p align="center">
   <picture>
     <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
   </picture>
 </p>
-
-Automation scripts for GitHub Mode policy checks, contract validation, and workflow guardrails.
 
 ## Script categories
 
