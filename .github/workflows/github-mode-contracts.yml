@@ -44,6 +44,7 @@ jobs:
       - uses: ./.github/actions/setup-node-env
       - name: Enforce GitHub Mode activation
         run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
+      - run: node --import tsx .GITHUB-MODE/scripts/validate-governance-approvals.ts
       - run: pnpm contracts:github:validate
       - run: node --import tsx .GITHUB-MODE/scripts/validate-github-mode-package-list.ts
 

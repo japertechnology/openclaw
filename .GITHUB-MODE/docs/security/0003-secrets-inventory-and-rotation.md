@@ -65,3 +65,20 @@ The machine-readable companion file is:
 - `.GITHUB-MODE/runtime/secrets-inventory.json`
 
 CI and policy checks should consume that file to validate required metadata fields (`owner`, `rotationCadence`).
+
+## Approval signoff
+
+```governance-signoff
+[
+  {
+    "role": "security",
+    "github": "@openclaw-security-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "runtime",
+    "github": "@openclaw-runtime-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```

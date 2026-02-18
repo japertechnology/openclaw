@@ -18,9 +18,21 @@
 Each ADR includes:
 
 - Maintainer review checklist
-- Approval signoff block
+- Machine-readable approval signoff block (`governance-signoff`)
 - Backout trigger details where applicable
 
 Phase 1 and later GitHub mode implementation phases are enabled only after all ADR signoffs are captured in-repo in the approval blocks.
+
+Signoff block format:
+
+```governance-signoff
+[
+  {
+    "role": "runtime",
+    "github": "@openclaw-runtime-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```
 
 - Phase 1 gate status: ✅ Satisfied (all Task 0 ADR approvals captured on 2026-02-16).

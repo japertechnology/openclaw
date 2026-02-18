@@ -87,6 +87,17 @@ Prohibited patterns (implementation coupling):
 
 ## Approval signoff
 
-- Runtime maintainer: Eric Mourant (`@japer`) — Approved
-- GitHub mode maintainer: Eric Mourant (`@japer`) — Approved
-- Approval date: `2026-02-16`
+```governance-signoff
+[
+  {
+    "role": "runtime",
+    "github": "@openclaw-runtime-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "github-mode",
+    "github": "@openclaw-github-mode-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```

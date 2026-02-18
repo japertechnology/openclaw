@@ -167,3 +167,20 @@ Either of the following can initiate immediate revocation:
 - a repository admin from the GitHub mode maintainers group
 
 Revocation is immediate; restoration requires full re-intake, re-scan, re-evaluation, and dual approval.
+
+## Approval signoff
+
+```governance-signoff
+[
+  {
+    "role": "security",
+    "github": "@openclaw-security-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "runtime",
+    "github": "@openclaw-runtime-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```

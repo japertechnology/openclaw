@@ -75,3 +75,20 @@ Static cloud credentials in GitHub workflow `env` values or direct `secrets.*` m
 - CI enforcement script: `.GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts`
 - CI workflow integration: `.github/workflows/github-mode-contracts.yml`
 - Security baseline reference: `.GITHUB-MODE/docs/security/README.md`
+
+## Approval signoff
+
+```governance-signoff
+[
+  {
+    "role": "security",
+    "github": "@openclaw-security-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "release",
+    "github": "@openclaw-release-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```

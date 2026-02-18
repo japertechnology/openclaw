@@ -14,6 +14,7 @@
 - Contract validation (`validate-github-runtime-contracts.ts`).
 - Security and policy linting (`github-mode-security-lint.ts`, `lint-github-mode-workflows.ts`).
 - Environment and credential guardrails (`verify-github-environments.ts`, `check-github-mode-oidc-credentials.ts`).
+- Governance approval validation (`validate-governance-approvals.ts`).
 - Upstream safety checks (`check-upstream-additions-only.ts`).
 - Docs boundary consistency checks (`check-runtime-boundary-doc-consistency.ts`).
 
