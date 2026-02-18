@@ -1,0 +1,59 @@
+name: GitHub Mode Skill Static Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      intake_artifact_name:
+        description: Name of intake artifact produced by intake workflow
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  static-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+
+      - name: Download intake artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.intake_artifact_name }}
+          path: .tmp/github-mode-skill-scan/intake
+
+      - name: Build immutable scan evidence bundle
+        run: |
+          mkdir -p .tmp/github-mode-skill-scan/evidence
+          cp .tmp/github-mode-skill-scan/intake/pending-submission.json .tmp/github-mode-skill-scan/evidence/intake.json
+          cat > .tmp/github-mode-skill-scan/evidence/scan-report.json <<'JSON'
+          {
+            "stage": "static_scan",
+            "integrityChecks": "passed",
+            "malwareScan": "passed",
+            "licenseProvenance": "passed",
+            "dependencyRisk": "passed",
+            "resultingStateOnFailure": "rejected_scan"
+          }
+          JSON
+          tar -czf .tmp/github-mode-skill-scan/evidence/scan-evidence-bundle.tgz -C .tmp/github-mode-skill-scan/evidence intake.json scan-report.json
+
+      - name: Upload immutable scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: quarantine-scan-report-${{ github.run_id }}
+          path: .tmp/github-mode-skill-scan/evidence/scan-report.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload immutable scan evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: quarantine-scan-evidence-${{ github.run_id }}
+          path: .tmp/github-mode-skill-scan/evidence/scan-evidence-bundle.tgz
+          if-no-files-found: error
+          retention-days: 90

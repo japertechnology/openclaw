@@ -284,3 +284,78 @@ describe("collaboration-envelope schema validation", () => {
     expect(result.exitCode).not.toBe(0);
   });
 });
+
+describe("skills quarantine pipeline contracts", () => {
+  it("fails when trusted allowlist uses same approver for both roles", () => {
+    const invalidAllowlist = {
+      schemaVersion: "1.0",
+      allowlistVersion: "v1.0.0",
+      keyType: "sha256",
+      byDigest: {
+        "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+          skillName: "test-skill",
+          status: "approved_trusted",
+          approvalRecord: {
+            submittedBy: "@submitter",
+            securityApprover: "@same-person",
+            runtimeApprover: "@same-person",
+          },
+          evidence: { scanArtifact: "scan", policyArtifact: "policy" },
+        },
+      },
+      revokedDigests: [],
+    };
+
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/trusted-skills-allowlist.json",
+      JSON.stringify(invalidAllowlist, null, 2),
+      runValidator,
+    );
+
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("approvers must be distinct");
+  });
+
+  it("fails when trusted command gate does not enforce fail_closed", () => {
+    const invalidGate = {
+      schemaVersion: "1.0",
+      gateVersion: "v1.0.0",
+      enforcementMode: "warn_only",
+      allowRuntimeFetch: false,
+      trustedWorkflows: ["github-mode-trusted-command.yml"],
+      requiredMetadata: ["skillDigest"],
+    };
+
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/trusted-command-gate.json",
+      JSON.stringify(invalidGate, null, 2),
+      runValidator,
+    );
+
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("enforcementMode must be fail_closed");
+  });
+
+  it("fails when quarantine registry omits required policy classifier outcome", () => {
+    const invalidRegistry = {
+      schemaVersion: "1.0",
+      registryVersion: "v1.0.0",
+      classifierOutcomes: ["approved_trusted", "rejected_policy"],
+      submissions: [
+        {
+          submissionId: "sub-1",
+          state: "pending_scan",
+        },
+      ],
+    };
+
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/skills-quarantine-registry.json",
+      JSON.stringify(invalidRegistry, null, 2),
+      runValidator,
+    );
+
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("classifierOutcomes missing approved_limited");
+  });
+});

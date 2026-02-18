@@ -1,7 +1,7 @@
-import Ajv from "ajv";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import Ajv from "ajv";
 
 type JsonObject = Record<string, unknown>;
 
@@ -11,6 +11,7 @@ type ContractCheck = {
 };
 
 const ROOT = process.cwd();
+const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
 
 const requiredContracts: ContractCheck[] = [
   {
@@ -56,12 +57,42 @@ const requiredContracts: ContractCheck[] = [
     file: ".GITHUB-MODE/runtime/collaboration-policy.json",
     requiredKeys: ["schemaVersion", "policyVersion", "defaultAction", "allowedRoutes"],
   },
+  {
+    file: ".GITHUB-MODE/runtime/skills-quarantine-registry.json",
+    requiredKeys: ["schemaVersion", "registryVersion", "classifierOutcomes", "submissions"],
+  },
+  {
+    file: ".GITHUB-MODE/runtime/trusted-skills-allowlist.json",
+    requiredKeys: ["schemaVersion", "allowlistVersion", "keyType", "byDigest", "revokedDigests"],
+  },
+  {
+    file: ".GITHUB-MODE/runtime/trusted-command-gate.json",
+    requiredKeys: [
+      "schemaVersion",
+      "gateVersion",
+      "enforcementMode",
+      "allowRuntimeFetch",
+      "trustedWorkflows",
+      "requiredMetadata",
+    ],
+  },
+  {
+    file: ".GITHUB-MODE/runtime/skills-emergency-revocations.json",
+    requiredKeys: ["schemaVersion", "revocationVersion", "events"],
+  },
 ];
 
 function readJson(filePath: string): JsonObject {
   const absolutePath = path.join(ROOT, filePath);
   const raw = readFileSync(absolutePath, "utf8");
   return JSON.parse(raw) as JsonObject;
+}
+
+function asRecord(value: unknown, message: string): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(message);
+  }
+  return value as Record<string, unknown>;
 }
 
 function assertRequiredKeys(filePath: string, data: JsonObject, keys: string[]): void {
@@ -127,9 +158,6 @@ function validateCollaborationEnvelopeSchema(): void {
   const schemaPath = ".GITHUB-MODE/runtime/collaboration-envelope.schema.json";
   const schema = readJson(schemaPath);
 
-  // Compile-only check: validates the schema is well-formed.
-  // Use strict: false because the envelope schema uses format keywords
-  // (uuid, date-time) that require ajv-formats at runtime validation time.
   const ajv = new Ajv({ allErrors: true, strict: false, logger: false });
   const validate = ajv.compile(schema);
   if (!validate) {
@@ -213,6 +241,151 @@ function validateCollaborationPolicyDenyDefault(): void {
   }
 }
 
+function validateSkillsQuarantineRegistry(): void {
+  const registryPath = ".GITHUB-MODE/runtime/skills-quarantine-registry.json";
+  const registry = readJson(registryPath);
+
+  const outcomes = registry.classifierOutcomes;
+  if (!Array.isArray(outcomes)) {
+    throw new Error(`${registryPath}: classifierOutcomes must be an array`);
+  }
+
+  const expectedOutcomes = ["approved_limited", "approved_trusted", "rejected_policy"];
+  for (const outcome of expectedOutcomes) {
+    if (!outcomes.includes(outcome)) {
+      throw new Error(`${registryPath}: classifierOutcomes missing ${outcome}`);
+    }
+  }
+
+  const submissions = registry.submissions;
+  if (!Array.isArray(submissions) || submissions.length === 0) {
+    throw new Error(`${registryPath}: submissions must be a non-empty array`);
+  }
+
+  const hasPendingScan = submissions.some(
+    (entry) =>
+      typeof entry === "object" && entry !== null && (entry as JsonObject).state === "pending_scan",
+  );
+
+  if (!hasPendingScan) {
+    throw new Error(`${registryPath}: expected at least one submission with state=pending_scan`);
+  }
+}
+
+function validateTrustedAllowlist(): void {
+  const allowlistPath = ".GITHUB-MODE/runtime/trusted-skills-allowlist.json";
+  const allowlist = readJson(allowlistPath);
+
+  if (allowlist.keyType !== "sha256") {
+    throw new Error(`${allowlistPath}: keyType must be sha256`);
+  }
+
+  const byDigest = asRecord(allowlist.byDigest, `${allowlistPath}: byDigest must be an object`);
+  const revokedDigests = allowlist.revokedDigests;
+
+  if (!Array.isArray(revokedDigests)) {
+    throw new Error(`${allowlistPath}: revokedDigests must be an array`);
+  }
+
+  for (const digest of [...Object.keys(byDigest), ...revokedDigests]) {
+    if (typeof digest !== "string" || !DIGEST_PATTERN.test(digest)) {
+      throw new Error(`${allowlistPath}: invalid digest key \`${String(digest)}\``);
+    }
+  }
+
+  for (const [digest, metadata] of Object.entries(byDigest)) {
+    const record = asRecord(metadata, `${allowlistPath}: metadata for ${digest} must be an object`);
+
+    if (record.status !== "approved_trusted") {
+      throw new Error(`${allowlistPath}: ${digest} status must be approved_trusted`);
+    }
+
+    const approval = asRecord(
+      record.approvalRecord,
+      `${allowlistPath}: ${digest} approvalRecord must be an object`,
+    );
+
+    const submittedBy = approval.submittedBy;
+    const securityApprover = approval.securityApprover;
+    const runtimeApprover = approval.runtimeApprover;
+
+    if (
+      typeof submittedBy !== "string" ||
+      typeof securityApprover !== "string" ||
+      typeof runtimeApprover !== "string"
+    ) {
+      throw new Error(
+        `${allowlistPath}: ${digest} approvalRecord requires submitter + two approvers`,
+      );
+    }
+
+    if (securityApprover === runtimeApprover) {
+      throw new Error(`${allowlistPath}: ${digest} approvers must be distinct`);
+    }
+
+    if (submittedBy === securityApprover || submittedBy === runtimeApprover) {
+      throw new Error(`${allowlistPath}: ${digest} submitter cannot self-approve`);
+    }
+  }
+}
+
+function validateTrustedCommandGate(): void {
+  const gatePath = ".GITHUB-MODE/runtime/trusted-command-gate.json";
+  const gate = readJson(gatePath);
+
+  if (gate.enforcementMode !== "fail_closed") {
+    throw new Error(`${gatePath}: enforcementMode must be fail_closed`);
+  }
+
+  if (gate.allowRuntimeFetch !== false) {
+    throw new Error(`${gatePath}: allowRuntimeFetch must be false in trusted mode`);
+  }
+
+  const workflows = gate.trustedWorkflows;
+  if (!Array.isArray(workflows) || workflows.length === 0) {
+    throw new Error(`${gatePath}: trustedWorkflows must be a non-empty array`);
+  }
+}
+
+function validateEmergencyRevocations(): void {
+  const revocationsPath = ".GITHUB-MODE/runtime/skills-emergency-revocations.json";
+  const revocations = readJson(revocationsPath);
+  const events = revocations.events;
+
+  if (!Array.isArray(events) || events.length === 0) {
+    throw new Error(`${revocationsPath}: events must be a non-empty array`);
+  }
+
+  for (const [index, event] of events.entries()) {
+    const record = asRecord(event, `${revocationsPath}: events[${index}] must be an object`);
+
+    if (record.status !== "revoked") {
+      throw new Error(`${revocationsPath}: events[${index}] status must be revoked`);
+    }
+
+    const digest = record.skillDigest;
+    if (typeof digest !== "string" || !DIGEST_PATTERN.test(digest)) {
+      throw new Error(`${revocationsPath}: events[${index}] has invalid skillDigest`);
+    }
+
+    const actions = asRecord(
+      record.actions,
+      `${revocationsPath}: events[${index}] actions must be an object`,
+    );
+
+    if (actions.invalidatedAllowlist !== true || actions.invalidatedCaches !== true) {
+      throw new Error(`${revocationsPath}: events[${index}] must invalidate allowlist and caches`);
+    }
+
+    if (
+      typeof actions.emittedIncidentIssue !== "string" ||
+      actions.emittedIncidentIssue.length === 0
+    ) {
+      throw new Error(`${revocationsPath}: events[${index}] missing emitted incident issue`);
+    }
+  }
+}
+
 function validateTaskReadinessMarker(): void {
   const tasksPath = ".GITHUB-MODE/docs/planning/implementation-tasks.md";
   const tasksDoc = readFileSync(path.join(ROOT, tasksPath), "utf8");
@@ -236,6 +409,10 @@ function main(): void {
   validateCollaborationPolicyDenyDefault();
   validateParityMatrix();
   validateConvergenceMap();
+  validateSkillsQuarantineRegistry();
+  validateTrustedAllowlist();
+  validateTrustedCommandGate();
+  validateEmergencyRevocations();
   validateTaskReadinessMarker();
 
   console.log("GitHub runtime contracts: validation passed.");

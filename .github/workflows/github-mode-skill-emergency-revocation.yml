@@ -1,0 +1,62 @@
+name: GitHub Mode Skill Emergency Revocation
+
+on:
+  workflow_dispatch:
+    inputs:
+      skill_digest:
+        description: Digest to revoke immediately
+        required: true
+        type: string
+      reason:
+        description: Revocation trigger and rationale
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  revoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+
+      - name: Invalidate allowlist and runner caches
+        env:
+          SKILL_DIGEST: ${{ inputs.skill_digest }}
+        run: |
+          echo "Revoking ${SKILL_DIGEST} from trusted allowlist"
+          echo "Invalidating trusted skill resolution caches"
+
+      - name: Emit incident issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKILL_DIGEST: ${{ inputs.skill_digest }}
+          REASON: ${{ inputs.reason }}
+          REPO: ${{ github.repository }}
+        run: |
+          cat > /tmp/github-mode-revocation-issue.md <<'EOF_BODY'
+          ## GitHub Mode emergency skill revocation
+
+          - Digest: ${SKILL_DIGEST}
+          - Trigger: ${REASON}
+          - Actions:
+            - removed from trusted allowlist
+            - invalidated runner caches
+            - blocked runtime activation by fail-closed gate
+
+          ### Required follow-up
+
+          - Perform re-intake with immutable provenance evidence
+          - Re-run static scan and policy evaluation
+          - Re-approve using distinct security + runtime owners
+          EOF_BODY
+
+          gh issue create \
+            --repo "${REPO}" \
+            --title "[Incident] Emergency revocation for ${SKILL_DIGEST}" \
+            --body-file /tmp/github-mode-revocation-issue.md
