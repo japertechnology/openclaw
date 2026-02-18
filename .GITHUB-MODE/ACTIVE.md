@@ -1,4 +1,4 @@
-# OpenClaw GitHub Activated
+# 🦞 OpenClaw GitHub Mode is Activated
 
 <p align="center">
   <picture>
