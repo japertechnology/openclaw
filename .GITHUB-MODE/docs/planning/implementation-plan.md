@@ -12,10 +12,10 @@ It is the single execution-level reference. For tactical task breakdowns, see [i
 
 OpenClaw's core thesis is **capability convergence with interaction divergence** — the same task-level outcomes across two runtime planes, each optimized for different interaction loops.
 
-| Plane | Optimized for | Interaction model |
-| --- | --- | --- |
-| Installed runtime (local) | Fast iteration, device-coupled tasks, personal flow | Synchronous, conversational, low-latency |
-| GitHub runtime (new) | Team collaboration, governed automation, auditability | Asynchronous, event-driven, evidence-backed |
+| Plane                     | Optimized for                                         | Interaction model                           |
+| ------------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| Installed runtime (local) | Fast iteration, device-coupled tasks, personal flow   | Synchronous, conversational, low-latency    |
+| GitHub runtime (new)      | Team collaboration, governed automation, auditability | Asynchronous, event-driven, evidence-backed |
 
 GitHub Mode is not a migration away from local. It is a **multiplayer expansion**: agents can hand off work across time zones, reviewer-agent and implementer-agent loops run in the same PR, and async maintenance jobs execute while humans are offline. The installed runtime remains the authority for local, persistent, device-coupled behavior.
 
@@ -23,18 +23,18 @@ This plan delivers that expansion safely, without regressing the installed exper
 
 ### Companion documents
 
-| Document | Role |
-| --- | --- |
-| [idea.md](../idea.md) | Core thesis, parity targets, intentional non-parity |
-| [overview.md](../overview.md) | Product and architecture spec with UX contracts |
-| [mvp.md](mvp.md) | Minimum viable product scope and exit criteria |
-| [mvvp.md](mvvp.md) | Minimum viable vision product — proves direction |
-| [mvvvp.md](mvvvp.md) | Minimum viable valuable product — compounding value |
-| [implementation-tasks.md](implementation-tasks.md) | Tactical task breakdown per phase |
-| [task-0-analysis.md](task-0-analysis.md) | Phase 0 impact analysis |
-| [ADR index](../adr/README.md) | Architecture decision records |
-| [Security index](../security/README.md) | Threat model and quarantine pipeline |
-| [Non-goals](../analysis/non-goals.md) | Task classes excluded from GitHub Mode |
+| Document                                           | Role                                                |
+| -------------------------------------------------- | --------------------------------------------------- |
+| [idea.md](../idea.md)                              | Core thesis, parity targets, intentional non-parity |
+| [overview.md](../overview.md)                      | Product and architecture spec with UX contracts     |
+| [mvp.md](mvp.md)                                   | Minimum viable product scope and exit criteria      |
+| [mvvp.md](mvvp.md)                                 | Minimum viable vision product — proves direction    |
+| [mvvvp.md](mvvvp.md)                               | Minimum viable valuable product — compounding value |
+| [implementation-tasks.md](implementation-tasks.md) | Tactical task breakdown per phase                   |
+| [task-0-analysis.md](task-0-analysis.md)           | Phase 0 impact analysis                             |
+| [ADR index](../adr/README.md)                      | Architecture decision records                       |
+| [Security index](../security/README.md)            | Threat model and quarantine pipeline                |
+| [Non-goals](../analysis/non-goals.md)              | Task classes excluded from GitHub Mode              |
 
 ---
 
@@ -102,12 +102,12 @@ Agent context must survive runner teardown. The persistent memory layer is defin
 
 **Minimal data model:**
 
-| Record | Purpose |
-| --- | --- |
-| `MemorySnapshot` | Latest compacted memory image for run hydration |
-| `MemoryDelta` | Ordered incremental updates between snapshots |
-| `RunCheckpoint` | Resume marker for in-progress or interrupted runs |
-| `RunJournal` | Audit trail tying memory evolution to run evidence |
+| Record           | Purpose                                            |
+| ---------------- | -------------------------------------------------- |
+| `MemorySnapshot` | Latest compacted memory image for run hydration    |
+| `MemoryDelta`    | Ordered incremental updates between snapshots      |
+| `RunCheckpoint`  | Resume marker for in-progress or interrupted runs  |
+| `RunJournal`     | Audit trail tying memory evolution to run evidence |
 
 **Retention:** hot window (7–30 days) for fast resume, warm window (90–365 days) for governance/forensics, explicit TTL expiration with auditable tombstones, legal hold overrides.
 
@@ -117,12 +117,12 @@ Every storage and checkpoint path must implement deterministic failure handling.
 
 Summary of required failure modes:
 
-| Failure | Response |
-| --- | --- |
-| Storage unavailable | Exponential backoff; preserve last committed snapshot; rehydrate on retry |
-| Snapshot schema mismatch | No automatic retry; preserve original; require migration |
-| Scan failures | One retry for transient errors; policy denials are non-retryable; fail closed |
-| Runner timeout/preemption | Auto-resume when context unchanged; replay from last checkpoint |
+| Failure                           | Response                                                                         |
+| --------------------------------- | -------------------------------------------------------------------------------- |
+| Storage unavailable               | Exponential backoff; preserve last committed snapshot; rehydrate on retry        |
+| Snapshot schema mismatch          | No automatic retry; preserve original; require migration                         |
+| Scan failures                     | One retry for transient errors; policy denials are non-retryable; fail closed    |
+| Runner timeout/preemption         | Auto-resume when context unchanged; replay from last checkpoint                  |
 | Partial upload/corrupt checkpoint | Retry with idempotency key; tombstone corrupt objects; preserve previous pointer |
 
 ---
@@ -131,15 +131,15 @@ Summary of required failure modes:
 
 Each workstream represents a coherent area of responsibility. Tasks in [implementation-tasks.md](implementation-tasks.md) are tagged by workstream.
 
-| Workstream | Scope | Phase coverage |
-| --- | --- | --- |
-| **WS-A** Runtime contracts and parity | Contract schemas, parity matrix, convergence map, validators | Phases 0–1 |
-| **WS-B** GitHub security foundation | Secrets, environments, permissions, OIDC, security lint, skill quarantine | Phases 0, 2, 3, 4, 6, 7 |
-| **WS-C** Validation, policy, eval, cost | PR checks, policy/route simulation, eval/cost gates, drift detection | Phases 3–4 |
-| **WS-D** Command runtime and bot PR loop | Command workflows, agent runs, bot PRs, UX checkpoints, state adapters | Phase 4 |
-| **WS-E** Promotion, attestation, incident ops | Promotion pipelines, attestation, drift/incident automation, fault containment | Phases 5–6 |
-| **WS-F** Multi-entity template and collaboration | Entity bootstrap, template validators, collaboration dispatch/receive | Phases 3, 6 |
-| **WS-G** Observability, compliance, governance | Artifact standards, metrics, playbooks, compliance automation, handoff | Phases 1, 4, 7 |
+| Workstream                                       | Scope                                                                          | Phase coverage          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------ | ----------------------- |
+| **WS-A** Runtime contracts and parity            | Contract schemas, parity matrix, convergence map, validators                   | Phases 0–1              |
+| **WS-B** GitHub security foundation              | Secrets, environments, permissions, OIDC, security lint, skill quarantine      | Phases 0, 2, 3, 4, 6, 7 |
+| **WS-C** Validation, policy, eval, cost          | PR checks, policy/route simulation, eval/cost gates, drift detection           | Phases 3–4              |
+| **WS-D** Command runtime and bot PR loop         | Command workflows, agent runs, bot PRs, UX checkpoints, state adapters         | Phase 4                 |
+| **WS-E** Promotion, attestation, incident ops    | Promotion pipelines, attestation, drift/incident automation, fault containment | Phases 5–6              |
+| **WS-F** Multi-entity template and collaboration | Entity bootstrap, template validators, collaboration dispatch/receive          | Phases 3, 6             |
+| **WS-G** Observability, compliance, governance   | Artifact standards, metrics, playbooks, compliance automation, handoff         | Phases 1, 4, 7          |
 
 ---
 
@@ -200,6 +200,7 @@ Phase 2 (Security)    Phase 3 (Validation Workflows)
 - ✅ **Task 0.3** — Trigger trust matrix covers fork PR, internal PR, push, schedule, dispatch. All abuse cases mapped to controls.
 
 Phase 1 proceeds only while this evidence remains valid.
+
 </details>
 
 ---
@@ -228,7 +229,7 @@ Phase 1 proceeds only while this evidence remains valid.
 
 **Deliverables:**
 
-1. Secret inventory and rotation policy document with ownership and review cadence.
+1. Secret inventory and rotation policy document with ownership and review cadence ([Security 0003](../security/0003-secrets-inventory-and-rotation.md) + runtime companion `.GITHUB-MODE/runtime/secrets-inventory.json`).
 2. GitHub Environments: `github-mode-dev`, `github-mode-staging`, `github-mode-prod` with required reviewers and branch/tag restrictions.
 3. Explicit least-privilege `permissions:` at workflow/job level for all GitHub-mode pipelines.
 4. OIDC integration for cloud access where applicable.
@@ -396,26 +397,26 @@ This is the largest and most complex phase. It delivers the core collaborative v
 
 ### Milestone map
 
-| Milestone | Phases | What it proves |
-| --- | --- | --- |
-| **M1** | 0 + 1 | Contracts, parity framework, threat model, and baseline are locked |
-| **M2** | 2 | Security foundation is enforced across all GitHub-mode workflows |
-| **M3** | 3 | Validation, policy, eval, and cost workflows gate merges |
-| **M4** | 4 | Command-to-bot-PR flow works end-to-end with trust gates |
-| **M4.1** | 4 (sub) | State adapter pipeline satisfies acceptance criteria; storage target selected |
-| **M5** | 5 | Promotions are approval-gated with verified attestations |
-| **M6** | 6 | Multi-entity bootstrap and governed collaboration work |
-| **M7** | 7 | Observability, compliance, and governance are operational |
+| Milestone | Phases  | What it proves                                                                |
+| --------- | ------- | ----------------------------------------------------------------------------- |
+| **M1**    | 0 + 1   | Contracts, parity framework, threat model, and baseline are locked            |
+| **M2**    | 2       | Security foundation is enforced across all GitHub-mode workflows              |
+| **M3**    | 3       | Validation, policy, eval, and cost workflows gate merges                      |
+| **M4**    | 4       | Command-to-bot-PR flow works end-to-end with trust gates                      |
+| **M4.1**  | 4 (sub) | State adapter pipeline satisfies acceptance criteria; storage target selected |
+| **M5**    | 5       | Promotions are approval-gated with verified attestations                      |
+| **M6**    | 6       | Multi-entity bootstrap and governed collaboration work                        |
+| **M7**    | 7       | Observability, compliance, and governance are operational                     |
 
 ### Product maturity progression
 
 Maturity stages gate scope expansion. Each stage has explicit exit criteria in its planning document.
 
-| Stage | Exit criteria document | Minimum sustained window | Key gate |
-| --- | --- | --- | --- |
-| **MVP** | [mvp.md §7](mvp.md) | — | Required PR check + trusted command-to-bot-PR + untrusted denial + parity artifact |
-| **MVVP** | [mvvp.md §5](mvvp.md) | 2 continuous weeks | MVP criteria hold + vision metrics show repeat usage and alignment |
-| **MVVVP** | [mvvvp.md §6](mvvvp.md) | 4 continuous weeks | MVVP criteria hold + operability targets + compounding value + zero safety incidents |
+| Stage     | Exit criteria document  | Minimum sustained window | Key gate                                                                             |
+| --------- | ----------------------- | ------------------------ | ------------------------------------------------------------------------------------ |
+| **MVP**   | [mvp.md §7](mvp.md)     | —                        | Required PR check + trusted command-to-bot-PR + untrusted denial + parity artifact   |
+| **MVVP**  | [mvvp.md §5](mvvp.md)   | 2 continuous weeks       | MVP criteria hold + vision metrics show repeat usage and alignment                   |
+| **MVVVP** | [mvvvp.md §6](mvvvp.md) | 4 continuous weeks       | MVVP criteria hold + operability targets + compounding value + zero safety incidents |
 
 **Rule:** Do not advance beyond MVP scope until MVP exit criteria hold. Likewise for MVVP → MVVVP.
 
@@ -427,17 +428,17 @@ With Phases 0–1 complete, the fastest path to MVP is a constrained execution s
 
 ## 9) Risk Register
 
-| ID | Risk | Likelihood | Impact | Mitigation | Phase |
-| --- | --- | --- | --- | --- | --- |
-| R1 | Runtime coupling between `src/` and GitHub Mode | Medium | High | ADR 0001 boundary checks in CI; extension architecture enforcement | All |
-| R2 | Installed runtime regression from GitHub Mode changes | Medium | Critical | ADR 0002 smoke baseline; merge-blocking checks | All |
-| R3 | Malicious skills in trusted workflows (ClawHavoc vector) | Medium | Critical | Skills quarantine pipeline; deny-by-default; static scan gates | 2, 4 |
-| R4 | State adapter complexity delays Phase 4 | High | Medium | Start with GitHub Actions artifacts as MVP storage; defer cloud storage | 4 |
-| R5 | Workflow flakiness erodes trust | Medium | Medium | Deterministic fixtures; quarantine unstable checks; reliability metrics | 3, 7 |
-| R6 | Latency expectations mismatched (UX perceived as broken) | High | Medium | Explicit async UX contract; progress checkpoints; CLI status rendering | 4 |
-| R7 | Security lint false positives slow development | Low | Low | Exception process with expiry and maintainer approval | 2 |
-| R8 | Multi-entity collaboration abuse | Low | High | Deny-by-default routing; fault containment toggle; dispatch disable | 6 |
-| R9 | Persistent memory schema drift across versions | Medium | Medium | Schema versioning; migration-required incident markers; compatibility validators | 4, 5 |
+| ID  | Risk                                                     | Likelihood | Impact   | Mitigation                                                                       | Phase |
+| --- | -------------------------------------------------------- | ---------- | -------- | -------------------------------------------------------------------------------- | ----- |
+| R1  | Runtime coupling between `src/` and GitHub Mode          | Medium     | High     | ADR 0001 boundary checks in CI; extension architecture enforcement               | All   |
+| R2  | Installed runtime regression from GitHub Mode changes    | Medium     | Critical | ADR 0002 smoke baseline; merge-blocking checks                                   | All   |
+| R3  | Malicious skills in trusted workflows (ClawHavoc vector) | Medium     | Critical | Skills quarantine pipeline; deny-by-default; static scan gates                   | 2, 4  |
+| R4  | State adapter complexity delays Phase 4                  | High       | Medium   | Start with GitHub Actions artifacts as MVP storage; defer cloud storage          | 4     |
+| R5  | Workflow flakiness erodes trust                          | Medium     | Medium   | Deterministic fixtures; quarantine unstable checks; reliability metrics          | 3, 7  |
+| R6  | Latency expectations mismatched (UX perceived as broken) | High       | Medium   | Explicit async UX contract; progress checkpoints; CLI status rendering           | 4     |
+| R7  | Security lint false positives slow development           | Low        | Low      | Exception process with expiry and maintainer approval                            | 2     |
+| R8  | Multi-entity collaboration abuse                         | Low        | High     | Deny-by-default routing; fault containment toggle; dispatch disable              | 6     |
+| R9  | Persistent memory schema drift across versions           | Medium     | Medium   | Schema versioning; migration-required incident markers; compatibility validators | 4, 5  |
 
 ---
 
