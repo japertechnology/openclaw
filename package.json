@@ -59,6 +59,7 @@
     "check:loc": "node --import tsx scripts/check-ts-max-loc.ts --max 500",
     "contracts:github:check-oidc": "node --import tsx .GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts",
     "contracts:github:lint-workflows": "node --import tsx .GITHUB-MODE/scripts/lint-github-mode-workflows.ts",
+    "contracts:github:security-lint": "node --import tsx .GITHUB-MODE/scripts/github-mode-security-lint.ts",
     "contracts:github:validate": "node --import tsx .GITHUB-MODE/scripts/validate-github-runtime-contracts.ts",
     "dev": "node scripts/run-node.mjs",
     "docs:bin": "node scripts/build-docs-list.mjs",
