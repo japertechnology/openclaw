@@ -1,3 +1,3 @@
 # OpenClaw GitHub Activated
 
-Delete this file and GitHub Mode is completely disabled.
+Delete or rename this file and GitHub Mode is completely disabled.
