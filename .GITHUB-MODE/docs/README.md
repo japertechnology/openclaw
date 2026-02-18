@@ -36,6 +36,7 @@ GitHub Mode extends OpenClaw into repository workflows, running assistant behavi
 - [Libraries](analysis/libraries.md) — external dependency inventory
 - [Directories](analysis/directories.md) — codebase directory map
 - [Non-goals](analysis/non-goals.md) — task classes that should stay outside GitHub Mode
+- [General Theory](analysis/GitHub-Mode-General-Theory.md) — the repository wrapper pattern and why it works
 
 ## Writing Style for GitHub Mode Docs
 
