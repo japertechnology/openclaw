@@ -24,22 +24,22 @@ ADR 0001 already establishes the ownership boundary. GitHub Mode may only create
 
 | Path | Purpose |
 |------|---------|
-| `docs/github-mode/**` | Planning, analysis, ADRs, security docs |
-| `runtime/github-mode/**` | Machine-validated contracts (manifests, schemas, policies) |
+| `.GITHUB-MODE/docs/**` | Planning, analysis, ADRs, security docs |
+| `.GITHUB-MODE/runtime/**` | Machine-validated contracts (manifests, schemas, policies) |
 | `.github/workflows/github-mode-*` | CI/CD workflows scoped by naming convention |
 | `.github/actions/github-mode-*` | Reusable composite actions |
-| `scripts/github-mode/**` | Validation and maintenance scripts |
-| `test/github-mode/**` | Isolated test suites for contract validation |
+| `.GITHUB-MODE/scripts/**` | Validation and maintenance scripts |
+| `.GITHUB-MODE/test/**` | Isolated test suites for contract validation |
 | `extensions/github/` | Extension package (plugin architecture) |
 
-No path outside this set is touched. The `scripts/github-mode/check-upstream-additions-only.ts` script enforces this at CI time — any PR that modifies a file outside the owned set is blocked.
+No path outside this set is touched. The `.GITHUB-MODE/scripts/check-upstream-additions-only.ts` script enforces this at CI time — any PR that modifies a file outside the owned set is blocked.
 
 ### 2.2 Why This Guarantees Conflict-Free Sync
 
 Git merge conflicts occur when two branches modify the same file regions. Since GitHub Mode only creates new files in directories that upstream does not use (or uses only for its own scoped content), there is no overlapping modification surface.
 
 - Upstream evolves `src/`, `package.json`, build config, core workflows — GitHub Mode never touches these.
-- GitHub Mode evolves `runtime/github-mode/`, `extensions/github/`, `.github/workflows/github-mode-*` — upstream never touches these.
+- GitHub Mode evolves `.GITHUB-MODE/runtime/`, `extensions/github/`, `.github/workflows/github-mode-*` — upstream never touches these.
 
 The only theoretical conflict point is `.github/workflows/` if upstream adds a workflow with the `github-mode-` prefix. The naming convention makes this practically impossible, and the CI guard script provides a safety net.
 
@@ -70,11 +70,11 @@ Or, for a more controlled approach:
 
 ```
 # Cherry-pick or copy only the owned paths
-cp -r <overlay>/runtime/github-mode/ ./runtime/github-mode/
+cp -r <overlay>/.GITHUB-MODE/runtime/ ./.GITHUB-MODE/runtime/
 cp -r <overlay>/extensions/github/ ./extensions/github/
 cp -r <overlay>/.github/workflows/github-mode-* ./.github/workflows/
-cp -r <overlay>/scripts/github-mode/ ./scripts/github-mode/
-cp -r <overlay>/docs/github-mode/ ./docs/github-mode/
+cp -r <overlay>/.GITHUB-MODE/scripts/ ./.GITHUB-MODE/scripts/
+cp -r <overlay>/.GITHUB-MODE/docs/ ./.GITHUB-MODE/docs/
 ```
 
 The extension is then discovered automatically on the next `pnpm install` + gateway restart. No configuration change is needed in the core — the plugin loader picks up `extensions/github/` by convention.
@@ -84,13 +84,13 @@ The extension is then discovered automatically on the next `pnpm install` + gate
 Removing GitHub Mode is the inverse — delete the owned paths:
 
 ```
-rm -rf runtime/github-mode/
+rm -rf .GITHUB-MODE/runtime/
 rm -rf extensions/github/
 rm -rf .github/workflows/github-mode-*
 rm -rf .github/actions/github-mode-*
-rm -rf scripts/github-mode/
-rm -rf test/github-mode/
-rm -rf docs/github-mode/
+rm -rf .GITHUB-MODE/scripts/
+rm -rf .GITHUB-MODE/test/
+rm -rf .GITHUB-MODE/docs/
 ```
 
 After removal:
@@ -108,10 +108,9 @@ A verification script can confirm clean state after uninstall:
 
 ```bash
 # Confirm no github-mode artifacts remain
-! test -d runtime/github-mode && \
+! test -d .GITHUB-MODE && \
 ! test -d extensions/github && \
 ! ls .github/workflows/github-mode-* 2>/dev/null && \
-! test -d scripts/github-mode && \
 echo "Clean: no GitHub Mode artifacts found"
 ```
 
@@ -164,13 +163,13 @@ This workflow lives inside the owned path (`.github/workflows/github-mode-*`), s
 
 ### 4.3 Drift Detection
 
-The existing `scripts/github-mode/check-upstream-additions-only.ts` script can be run post-sync to verify that the overlay has not drifted into upstream-owned territory. If a future GitHub Mode change accidentally modifies a core file, this check catches it before merge.
+The existing `.GITHUB-MODE/scripts/check-upstream-additions-only.ts` script can be run post-sync to verify that the overlay has not drifted into upstream-owned territory. If a future GitHub Mode change accidentally modifies a core file, this check catches it before merge.
 
 ## 5. Architectural Boundaries That Make This Work
 
 ### 5.1 Contract-First, Not Import-First
 
-GitHub Mode references core capabilities through **contracts** (JSON schemas, manifest files, policy documents in `runtime/github-mode/`), not through TypeScript imports. This means:
+GitHub Mode references core capabilities through **contracts** (JSON schemas, manifest files, policy documents in `.GITHUB-MODE/runtime/`), not through TypeScript imports. This means:
 
 - Core can refactor `src/` internals freely — GitHub Mode does not break.
 - GitHub Mode can evolve its contracts freely — core does not break.
@@ -199,7 +198,7 @@ Core never reads from these surfaces. Removing them is invisible to core.
 
 | Risk | Likelihood | Mitigation |
 |------|-----------|------------|
-| Upstream adds files in `runtime/github-mode/` | Very low | Naming convention + CI guard script |
+| Upstream adds files in `.GITHUB-MODE/runtime/` | Very low | Naming convention + CI guard script |
 | Plugin loader changes break extension discovery | Low | Plugin SDK versioning; extension tests |
 | Workflow naming collision (`github-mode-*` prefix) | Very low | Convention + CI enforcement |
 | Fork owner forgets to uninstall before PR to upstream | Medium | `check-upstream-additions-only.ts` blocks the PR |

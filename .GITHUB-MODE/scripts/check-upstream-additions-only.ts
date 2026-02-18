@@ -6,11 +6,8 @@
  * This allows the fork to cleanly pull upstream upgrades.
  *
  * Owned paths (safe to add/modify):
- *   - docs/github-mode/**
- *   - runtime/github-mode/**
+ *   - .GITHUB-MODE/**
  *   - .github/workflows/github-mode-*
- *   - scripts/github-mode/**
- *   - test/github-mode/**
  *
  * Everything else is upstream-owned and must not be modified.
  */
@@ -19,11 +16,8 @@ import { execSync } from "node:child_process";
 import process from "node:process";
 
 export const GITHUB_MODE_OWNED_PATTERNS = [
-  /^docs\/github-mode\//,
-  /^runtime\/github-mode\//,
+  /^\.GITHUB-MODE\//,
   /^\.github\/workflows\/github-mode-/,
-  /^scripts\/github-mode\//,
-  /^test\/github-mode\//,
 ];
 
 export function isGithubModeOwned(filePath: string): boolean {
@@ -128,11 +122,8 @@ function main(): void {
     "\nGitHub Mode changes must be purely additive — only new files or\n" +
       "modifications to GitHub-Mode-owned paths are allowed.\n" +
       "\nOwned paths:\n" +
-      "  - docs/github-mode/**\n" +
-      "  - runtime/github-mode/**\n" +
+      "  - .GITHUB-MODE/**\n" +
       "  - .github/workflows/github-mode-*\n" +
-      "  - scripts/github-mode/**\n" +
-      "  - test/github-mode/**\n" +
       "\nTo fix: move your changes into GitHub-Mode-owned paths or\n" +
       "use the extension system (extensions/) for runtime additions.",
   );

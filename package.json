@@ -57,7 +57,7 @@
     "check": "pnpm format:check && pnpm tsgo && pnpm lint",
     "check:docs": "pnpm format:docs:check && pnpm lint:docs && pnpm docs:check-links",
     "check:loc": "node --import tsx scripts/check-ts-max-loc.ts --max 500",
-    "contracts:github:validate": "node --import tsx scripts/github-mode/validate-github-runtime-contracts.ts",
+    "contracts:github:validate": "node --import tsx .GITHUB-MODE/scripts/validate-github-runtime-contracts.ts",
     "dev": "node scripts/run-node.mjs",
     "docs:bin": "node scripts/build-docs-list.mjs",
     "docs:check-links": "node scripts/docs-link-audit.mjs",

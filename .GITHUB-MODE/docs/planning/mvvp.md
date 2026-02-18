@@ -2,7 +2,7 @@
 
 This document defines the **minimum viable vision product (MVVP)** for OpenClaw GitHub Mode.
 
-It builds on `docs/github-mode/planning/mvp.md` by adding one critical bar: the first release must not only be shippable, it must demonstrate a clear long-term product direction.
+It builds on `.GITHUB-MODE/docs/planning/mvp.md` by adding one critical bar: the first release must not only be shippable, it must demonstrate a clear long-term product direction.
 
 Terminology note: MVVP is an informal extension of MVP language with no single canonical originator. In this repo, MVVP emphasizes early proof of product vision and strategic trajectory.
 
@@ -39,7 +39,7 @@ If a capability does not improve one of these jobs or clarify long-term directio
 
 ### 3.1 Contracts and policy baseline
 
-Required `runtime/github-mode/` contracts:
+Required `.GITHUB-MODE/runtime/` contracts:
 
 - `runtime-manifest.json`
 - `adapter-contracts.json`

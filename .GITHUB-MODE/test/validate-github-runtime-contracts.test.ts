@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const ROOT = process.cwd();
-const SCRIPT = "scripts/github-mode/validate-github-runtime-contracts.ts";
+const SCRIPT = ".GITHUB-MODE/scripts/validate-github-runtime-contracts.ts";
 
 function runValidator(): { stdout: string; exitCode: number } {
   try {
@@ -51,7 +51,7 @@ describe("validate-github-runtime-contracts", () => {
 
   it("fails when runtime-manifest.json is missing a required key", () => {
     const result = withTempFile(
-      "runtime/github-mode/runtime-manifest.json",
+      ".GITHUB-MODE/runtime/runtime-manifest.json",
       JSON.stringify({ schemaVersion: "1.0" }),
       runValidator,
     );
@@ -73,7 +73,7 @@ describe("validate-github-runtime-contracts", () => {
       ],
     };
     const result = withTempFile(
-      "runtime/github-mode/parity-matrix.json",
+      ".GITHUB-MODE/runtime/parity-matrix.json",
       JSON.stringify(invalidMatrix, null, 2),
       runValidator,
     );
@@ -96,7 +96,7 @@ describe("validate-github-runtime-contracts", () => {
       ],
     };
     const result = withTempFile(
-      "runtime/github-mode/parity-matrix.json",
+      ".GITHUB-MODE/runtime/parity-matrix.json",
       JSON.stringify(noOwner, null, 2),
       runValidator,
     );
@@ -112,7 +112,7 @@ describe("validate-github-runtime-contracts", () => {
       reconciliationSignals: [{ signal: "test", source: "test", required: false }],
     };
     const result = withTempFile(
-      "runtime/github-mode/workspace-convergence-map.json",
+      ".GITHUB-MODE/runtime/workspace-convergence-map.json",
       JSON.stringify(noRequiredSignal, null, 2),
       runValidator,
     );
@@ -133,7 +133,7 @@ describe("validate-github-runtime-contracts", () => {
       ],
     };
     const result = withTempFile(
-      "runtime/github-mode/runtime-manifest.json",
+      ".GITHUB-MODE/runtime/runtime-manifest.json",
       JSON.stringify(badManifest, null, 2),
       runValidator,
     );
@@ -160,7 +160,7 @@ describe("validate-github-runtime-contracts", () => {
       ],
     };
     const result = withTempFile(
-      "runtime/github-mode/parity-matrix.json",
+      ".GITHUB-MODE/runtime/parity-matrix.json",
       JSON.stringify(validMatrix, null, 2),
       runValidator,
     );
@@ -170,13 +170,13 @@ describe("validate-github-runtime-contracts", () => {
 
 describe("entity-manifest validation", () => {
   it("fails when entity-manifest.json is missing", () => {
-    const result = withRemovedFile("runtime/github-mode/entity-manifest.json", runValidator);
+    const result = withRemovedFile(".GITHUB-MODE/runtime/entity-manifest.json", runValidator);
     expect(result.exitCode).not.toBe(0);
   });
 
   it("fails when entity-manifest.json is missing required key", () => {
     const result = withTempFile(
-      "runtime/github-mode/entity-manifest.json",
+      ".GITHUB-MODE/runtime/entity-manifest.json",
       JSON.stringify({ schemaVersion: "1.0" }),
       runValidator,
     );
@@ -192,7 +192,7 @@ describe("entity-manifest validation", () => {
       trustTier: "trusted",
     };
     const result = withTempFile(
-      "runtime/github-mode/entity-manifest.json",
+      ".GITHUB-MODE/runtime/entity-manifest.json",
       JSON.stringify(badEntity, null, 2),
       runValidator,
     );
@@ -208,7 +208,7 @@ describe("entity-manifest validation", () => {
       trustTier: "super-trusted",
     };
     const result = withTempFile(
-      "runtime/github-mode/entity-manifest.json",
+      ".GITHUB-MODE/runtime/entity-manifest.json",
       JSON.stringify(badTrust, null, 2),
       runValidator,
     );
@@ -219,13 +219,13 @@ describe("entity-manifest validation", () => {
 
 describe("collaboration-policy validation", () => {
   it("fails when collaboration-policy.json is missing", () => {
-    const result = withRemovedFile("runtime/github-mode/collaboration-policy.json", runValidator);
+    const result = withRemovedFile(".GITHUB-MODE/runtime/collaboration-policy.json", runValidator);
     expect(result.exitCode).not.toBe(0);
   });
 
   it("fails when collaboration-policy.json is missing required key", () => {
     const result = withTempFile(
-      "runtime/github-mode/collaboration-policy.json",
+      ".GITHUB-MODE/runtime/collaboration-policy.json",
       JSON.stringify({ schemaVersion: "1.0" }),
       runValidator,
     );
@@ -241,7 +241,7 @@ describe("collaboration-policy validation", () => {
       allowedRoutes: [],
     };
     const result = withTempFile(
-      "runtime/github-mode/collaboration-policy.json",
+      ".GITHUB-MODE/runtime/collaboration-policy.json",
       JSON.stringify(badPolicy, null, 2),
       runValidator,
     );
@@ -257,7 +257,7 @@ describe("collaboration-policy validation", () => {
       allowedRoutes: [],
     };
     const result = withTempFile(
-      "runtime/github-mode/collaboration-policy.json",
+      ".GITHUB-MODE/runtime/collaboration-policy.json",
       JSON.stringify(validDenyPolicy, null, 2),
       runValidator,
     );
@@ -268,7 +268,7 @@ describe("collaboration-policy validation", () => {
 describe("collaboration-envelope schema validation", () => {
   it("fails when collaboration-envelope.schema.json is missing", () => {
     const result = withRemovedFile(
-      "runtime/github-mode/collaboration-envelope.schema.json",
+      ".GITHUB-MODE/runtime/collaboration-envelope.schema.json",
       runValidator,
     );
     expect(result.exitCode).not.toBe(0);
@@ -277,7 +277,7 @@ describe("collaboration-envelope schema validation", () => {
   it("fails when collaboration-envelope.schema.json is invalid JSON Schema", () => {
     const badSchema = { type: "invalid-type" };
     const result = withTempFile(
-      "runtime/github-mode/collaboration-envelope.schema.json",
+      ".GITHUB-MODE/runtime/collaboration-envelope.schema.json",
       JSON.stringify(badSchema, null, 2),
       runValidator,
     );

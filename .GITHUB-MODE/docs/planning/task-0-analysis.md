@@ -9,7 +9,7 @@
 
 ## Scope and Intent
 
-This document analyzes the implementation impact of **Phase 0 (Tasks 0.1–0.3)** from `docs/github-mode/planning/implementation-tasks.md`:
+This document analyzes the implementation impact of **Phase 0 (Tasks 0.1–0.3)** from `.GITHUB-MODE/docs/planning/implementation-tasks.md`:
 
 - **Task 0.1:** Runtime Boundary ADR Package
 - **Task 0.2:** Installed Runtime Regression Baseline

@@ -4,7 +4,7 @@ This document defines the **minimum viable implementation** of GitHub Mode for O
 
 Terminology note: in product practice, **MVP** means **Minimum Viable Product**. The term is widely credited to Frank Robinson and later popularized through Eric Ries and the Lean Startup model.
 
-It intentionally narrows scope from `docs/github-mode/overview.md` and `docs/github-mode/planning/implementation-plan.md` so we can ship a secure, useful first version quickly while preserving the current installed runtime.
+It intentionally narrows scope from `.GITHUB-MODE/docs/overview.md` and `.GITHUB-MODE/docs/planning/implementation-plan.md` so we can ship a secure, useful first version quickly while preserving the current installed runtime.
 
 ---
 
@@ -28,7 +28,7 @@ Working definition used here: the smallest product increment that enables valida
 ### 2.1 In scope
 
 - Shared runtime reuse for core orchestration + tool-policy paths where feasible.
-- `runtime/github-mode/` contract scaffolding with schema validation in CI.
+- `.GITHUB-MODE/runtime/` contract scaffolding with schema validation in CI.
 - Security baseline for GitHub workflows (least privilege, SHA-pinned actions, trust-tiered behavior).
 - Three baseline workflow classes:
   - PR validation/checks
@@ -46,7 +46,7 @@ Working definition used here: the smallest product increment that enables valida
 
 ## 3) MVP Runtime Contracts
 
-Create `runtime/github-mode/` with the smallest contract set needed to operate safely:
+Create `.GITHUB-MODE/runtime/` with the smallest contract set needed to operate safely:
 
 - `runtime-manifest.json`
 - `adapter-contracts.json`
@@ -69,7 +69,7 @@ MVP contract rules:
 
 Implement `github-mode-check.yml` (or equivalent naming) as a required check:
 
-- Validate runtime/github-mode schemas and contracts.
+- Validate .GITHUB-MODE/runtime schemas and contracts.
 - Run policy and routing checks relevant to changed files.
 - Publish deterministic artifacts + a concise markdown summary.
 - Run safely for fork PRs with no secrets exposure.
@@ -150,7 +150,7 @@ Initial parity target:
 
 GitHub Mode MVP is complete when all are true:
 
-1. Required PR check enforces runtime/github-mode contract validity and trust-safe execution.
+1. Required PR check enforces .GITHUB-MODE/runtime contract validity and trust-safe execution.
 2. Trusted maintainer command can produce a bot PR end-to-end.
 3. Untrusted actor cannot trigger privileged adapters or secret-backed paths.
 4. Parity matrix artifact is produced and visible in CI summaries.

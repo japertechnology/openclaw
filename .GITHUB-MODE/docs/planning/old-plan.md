@@ -1,6 +1,6 @@
 # OpenClaw GitHub Mode Implementation Plan (OLD)
 
-This plan operationalizes `docs/github-mode/overview.md` into phased execution with clear deliverables, gates, and rollback safety.
+This plan operationalizes `.GITHUB-MODE/docs/overview.md` into phased execution with clear deliverables, gates, and rollback safety.
 
 ---
 
@@ -152,14 +152,14 @@ Anything not persisted in this model (or a strict superset) is treated as epheme
 Status: ✅ Locked and satisfied (2026-02-16).
 
 - ✅ **Task 0.1 evidence captured**
-  - ADR package approved in `docs/github-mode/adr/0001-runtime-boundary-and-ownership.md` and `docs/github-mode/adr/0002-installed-runtime-non-regression-guardrails.md`.
-  - ADR index records gate status in `docs/github-mode/adr/README.md`.
+  - ADR package approved in `.GITHUB-MODE/docs/adr/0001-runtime-boundary-and-ownership.md` and `.GITHUB-MODE/docs/adr/0002-installed-runtime-non-regression-guardrails.md`.
+  - ADR index records gate status in `.GITHUB-MODE/docs/adr/README.md`.
 - ✅ **Task 0.2 evidence captured**
-  - Installed-runtime non-regression policy and backout trigger (`runtime coupling detected`) documented in `docs/github-mode/adr/0002-installed-runtime-non-regression-guardrails.md`.
+  - Installed-runtime non-regression policy and backout trigger (`runtime coupling detected`) documented in `.GITHUB-MODE/docs/adr/0002-installed-runtime-non-regression-guardrails.md`.
   - CI baseline hooks live in existing install smoke workflows (`.github/workflows/install-smoke.yml` and `.github/workflows/sandbox-common-smoke.yml`) and provide the installed-runtime smoke baseline foundation referenced by Task 0.
 - ✅ **Task 0.3 evidence captured**
-  - Trigger trust matrix and abuse/control mapping approved in `docs/github-mode/security/0001-github-trigger-trust-matrix.md`.
-  - Security index records gate status in `docs/github-mode/security/README.md`.
+  - Trigger trust matrix and abuse/control mapping approved in `.GITHUB-MODE/docs/security/0001-github-trigger-trust-matrix.md`.
+  - Security index records gate status in `.GITHUB-MODE/docs/security/README.md`.
 
 Phase 1 is authorized to proceed only while this evidence remains valid and approvals remain current.
 
@@ -178,7 +178,7 @@ Phase 1 is authorized to proceed only while this evidence remains valid and appr
 
 ### Deliverables
 
-Create `runtime/github-mode/` core contracts and schemas:
+Create `.GITHUB-MODE/runtime/` core contracts and schemas:
 
 - `manifest.schema.json`
 - `runtime-manifest.json`

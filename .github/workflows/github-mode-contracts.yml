@@ -2,17 +2,11 @@ name: GitHub Mode Contracts
 on:
   pull_request:
     paths:
-      - "runtime/github-mode/**"
-      - "docs/github-mode/**"
-      - "scripts/github-mode/**"
-      - "test/github-mode/**"
+      - ".GITHUB-MODE/**"
   push:
     branches: [main]
     paths:
-      - "runtime/github-mode/**"
-      - "docs/github-mode/**"
-      - "scripts/github-mode/**"
-      - "test/github-mode/**"
+      - ".GITHUB-MODE/**"
 
 permissions:
   contents: read
@@ -32,4 +26,4 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node-env
-      - run: node --import tsx scripts/github-mode/check-upstream-additions-only.ts
+      - run: node --import tsx .GITHUB-MODE/scripts/check-upstream-additions-only.ts

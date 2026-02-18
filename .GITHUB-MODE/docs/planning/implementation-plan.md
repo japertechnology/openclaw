@@ -210,7 +210,7 @@ Phase 1 proceeds only while this evidence remains valid.
 
 **Deliverables completed:**
 
-- All `runtime/github-mode/` contract artifacts (manifest, adapters, command policy, trust levels, parity matrix, convergence map, entity/collaboration schemas)
+- All `.GITHUB-MODE/runtime/` contract artifacts (manifest, adapters, command policy, trust levels, parity matrix, convergence map, entity/collaboration schemas)
 - Schema validators via `pnpm contracts:github:validate`
 - Parity and convergence validators
 - Contract versioning and compatibility policy
@@ -454,7 +454,7 @@ Each phase must include:
 
 1. Contracts and parity validation (`pnpm contracts:github:validate`).
 2. Security lint (permissions, pinning, trigger safety).
-3. Upstream sync guard (`scripts/github-mode/check-upstream-additions-only.ts`).
+3. Upstream sync guard (`.GITHUB-MODE/scripts/check-upstream-additions-only.ts`).
 4. Policy and route checks.
 5. Eval and cost threshold checks (for impacted subsystems).
 

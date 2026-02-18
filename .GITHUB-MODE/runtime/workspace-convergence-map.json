@@ -2,7 +2,7 @@
   "schemaVersion": "1.0",
   "convergenceVersion": "v1.1.0",
   "acceptanceCriteria": [
-    "All required contract artifacts exist under runtime/github-mode/.",
+    "All required contract artifacts exist under .GITHUB-MODE/runtime/.",
     "Contract validator passes locally and in CI.",
     "Parity matrix includes owner+rationale for each installed-only mapping.",
     "Entity manifest schema and instance files exist and validate.",

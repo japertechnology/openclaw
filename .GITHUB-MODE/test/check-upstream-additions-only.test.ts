@@ -4,36 +4,27 @@ import {
   findViolations,
   isGithubModeOwned,
   parseDiffEntries,
-} from "../../scripts/github-mode/check-upstream-additions-only.js";
+} from "../scripts/check-upstream-additions-only.js";
 
 describe("isGithubModeOwned", () => {
-  it("accepts docs/github-mode paths", () => {
-    expect(isGithubModeOwned("docs/github-mode/README.md")).toBe(true);
-    expect(isGithubModeOwned("docs/github-mode/adr/0001-foo.md")).toBe(true);
-  });
-
-  it("accepts runtime/github-mode paths", () => {
-    expect(isGithubModeOwned("runtime/github-mode/runtime-manifest.json")).toBe(true);
-    expect(isGithubModeOwned("runtime/github-mode/parity-matrix.json")).toBe(true);
+  it("accepts .GITHUB-MODE paths", () => {
+    expect(isGithubModeOwned(".GITHUB-MODE/docs/README.md")).toBe(true);
+    expect(isGithubModeOwned(".GITHUB-MODE/docs/adr/0001-foo.md")).toBe(true);
+    expect(isGithubModeOwned(".GITHUB-MODE/runtime/runtime-manifest.json")).toBe(true);
+    expect(isGithubModeOwned(".GITHUB-MODE/runtime/parity-matrix.json")).toBe(true);
+    expect(isGithubModeOwned(".GITHUB-MODE/scripts/validate-github-runtime-contracts.ts")).toBe(
+      true,
+    );
+    expect(isGithubModeOwned(".GITHUB-MODE/scripts/check-upstream-additions-only.ts")).toBe(true);
+    expect(isGithubModeOwned(".GITHUB-MODE/test/check-upstream-additions-only.test.ts")).toBe(true);
+    expect(isGithubModeOwned(".GITHUB-MODE/test/validate-github-runtime-contracts.test.ts")).toBe(
+      true,
+    );
   });
 
   it("accepts github-mode workflow files", () => {
     expect(isGithubModeOwned(".github/workflows/github-mode-contracts.yml")).toBe(true);
     expect(isGithubModeOwned(".github/workflows/github-mode-build.yml")).toBe(true);
-  });
-
-  it("accepts owned scripts", () => {
-    expect(isGithubModeOwned("scripts/github-mode/validate-github-runtime-contracts.ts")).toBe(
-      true,
-    );
-    expect(isGithubModeOwned("scripts/github-mode/check-upstream-additions-only.ts")).toBe(true);
-  });
-
-  it("accepts owned test files", () => {
-    expect(isGithubModeOwned("test/github-mode/check-upstream-additions-only.test.ts")).toBe(true);
-    expect(isGithubModeOwned("test/github-mode/validate-github-runtime-contracts.test.ts")).toBe(
-      true,
-    );
   });
 
   it("rejects upstream files", () => {
@@ -55,16 +46,16 @@ describe("findViolations", () => {
     const entries: DiffEntry[] = [
       { status: "A", path: "package.json" },
       { status: "A", path: "src/new-file.ts" },
-      { status: "A", path: "docs/github-mode/new.md" },
+      { status: "A", path: ".GITHUB-MODE/docs/new.md" },
     ];
     expect(findViolations(entries)).toEqual([]);
   });
 
   it("allows modifications to github-mode-owned paths", () => {
     const entries: DiffEntry[] = [
-      { status: "M", path: "docs/github-mode/README.md" },
-      { status: "M", path: "runtime/github-mode/parity-matrix.json" },
-      { status: "M", path: "scripts/github-mode/validate-github-runtime-contracts.ts" },
+      { status: "M", path: ".GITHUB-MODE/docs/README.md" },
+      { status: "M", path: ".GITHUB-MODE/runtime/parity-matrix.json" },
+      { status: "M", path: ".GITHUB-MODE/scripts/validate-github-runtime-contracts.ts" },
     ];
     expect(findViolations(entries)).toEqual([]);
   });
@@ -72,7 +63,7 @@ describe("findViolations", () => {
   it("flags modifications to upstream files", () => {
     const entries: DiffEntry[] = [
       { status: "M", path: "package.json" },
-      { status: "A", path: "docs/github-mode/new.md" },
+      { status: "A", path: ".GITHUB-MODE/docs/new.md" },
     ];
     expect(findViolations(entries)).toEqual(["M\tpackage.json"]);
   });
@@ -87,7 +78,7 @@ describe("findViolations", () => {
       { status: "M", path: "package.json" },
       { status: "M", path: ".github/workflows/ci.yml" },
       { status: "D", path: "src/removed.ts" },
-      { status: "A", path: "runtime/github-mode/new-contract.json" },
+      { status: "A", path: ".GITHUB-MODE/runtime/new-contract.json" },
     ];
     const violations = findViolations(entries);
     expect(violations).toHaveLength(3);
@@ -157,8 +148,8 @@ describe("findViolations with renames", () => {
 
   it("allows rename within github-mode-owned paths", () => {
     const entries: DiffEntry[] = [
-      { status: "R100", path: "docs/github-mode/old.md" },
-      { status: "R100", path: "docs/github-mode/new.md" },
+      { status: "R100", path: ".GITHUB-MODE/docs/old.md" },
+      { status: "R100", path: ".GITHUB-MODE/docs/new.md" },
     ];
     expect(findViolations(entries)).toEqual([]);
   });
@@ -166,7 +157,7 @@ describe("findViolations with renames", () => {
   it("flags rename from upstream to owned path", () => {
     const entries: DiffEntry[] = [
       { status: "R100", path: "src/moved.ts" },
-      { status: "R100", path: "docs/github-mode/moved.md" },
+      { status: "R100", path: ".GITHUB-MODE/docs/moved.md" },
     ];
     const violations = findViolations(entries);
     expect(violations).toHaveLength(1);

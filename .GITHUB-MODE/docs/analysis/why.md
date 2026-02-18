@@ -24,7 +24,7 @@ GitHub, while owned by Microsoft, operates as the _de facto_ neutral ground for 
 
 The most pressing argument for GitHub Stewardship is security. Current OpenClaw deployments rely on users correctly configuring local firewalls and Docker containers—a task that viral popularity has proven the average user cannot handle safely. Reports indicate that thousands of instances are currently exposing full file system access to the public internet.
 
-GitHub offers a "secure-by-construction" environment that a standalone foundation cannot easily replicate. By adopting the **GitHub Mode** architecture proposed in the project’s own design documents (`docs/github-mode/overview.md`), OpenClaw can offload security to the platform:
+GitHub offers a "secure-by-construction" environment that a standalone foundation cannot easily replicate. By adopting the **GitHub Mode** architecture proposed in the project’s own design documents (`.GITHUB-MODE/docs/overview.md`), OpenClaw can offload security to the platform:
 
 - **Identity & Access:** Replacing static API keys with OpenID Connect (OIDC) and GitHub native secrets.
 - **Supply Chain Security:** Utilizing Dependabot and code scanning to sanitize the "ClawHub" skill ecosystem, preventing the distribution of malicious skills which have recently plagued the platform.
@@ -34,7 +34,7 @@ GitHub offers a "secure-by-construction" environment that a standalone foundatio
 
 The most innovative argument for this transition lies in the technical roadmap known as "GitHub Mode." This proposal envisions GitHub not just as a storage locker for code, but as a **Runtime Plane** for collaborative agent operations. Local mode remains the quickest loop for personal development; GitHub mode extends that capability into shared repositories where multiple humans and multiple agents can coordinate safely.
 
-According to the project’s internal analysis (`docs/github-mode/idea.md`), OpenClaw is already architected to separate orchestration from execution. By formalizing GitHub as the stewardship environment, the project can operationalize:
+According to the project’s internal analysis (`.GITHUB-MODE/docs/idea.md`), OpenClaw is already architected to separate orchestration from execution. By formalizing GitHub as the stewardship environment, the project can operationalize:
 
 - **Continuous Intelligence:** Agents can run directly from repository triggers (Issues, PRs, Comments) using GitHub Actions as the compute layer. This eliminates the "works on my machine" friction that currently plagues the community.
 - **Auditable Agency:** Every action taken by the AI is committed to the log, creating a tamper-evident audit trail. This transforms the agent from a "black box" into a compliant enterprise tool.

@@ -4,7 +4,7 @@ Below is a tactical execution breakdown for **Phases 0–7**, with each task map
 
 ## Phase 0 — Baseline and Design Locks
 
-Phase 0 status: ✅ Complete (Task 0.1, 0.2, 0.3 accepted on 2026-02-16; see `docs/github-mode/planning/implementation-plan.md` evidence snapshot and `docs/github-mode/planning/task-0-analysis.md`).
+Phase 0 status: ✅ Complete (Task 0.1, 0.2, 0.3 accepted on 2026-02-16; see `.GITHUB-MODE/docs/planning/implementation-plan.md` evidence snapshot and `.GITHUB-MODE/docs/planning/task-0-analysis.md`).
 
 ### Task 0.1 — Runtime Boundary ADR Package
 
@@ -82,7 +82,7 @@ When defining or implementing tasks in Phases 1–7, include where durable state
 
 ## Cross-cutting Runtime Constraint — Extension Architecture Boundary
 
-GitHub Mode TypeScript runtime code must follow the extension pattern by implementing code in `extensions/github/` rather than embedding code in `src/`. See `docs/github-mode/README.md` and ADR 0001 for the full boundary rationale.
+GitHub Mode TypeScript runtime code must follow the extension pattern by implementing code in `extensions/github/` rather than embedding code in `src/`. See `.GITHUB-MODE/docs/README.md` and ADR 0001 for the full boundary rationale.
 
 - GitHub Mode workflows/actions must not import installed runtime internals from `src/**`.
 - New GitHub Mode runtime behavior should mirror extension packaging and dependency isolation.
@@ -92,9 +92,9 @@ GitHub Mode TypeScript runtime code must follow the extension pattern by impleme
 
 ## Cross-cutting Runtime Constraint — Upstream Sync Guard
 
-GitHub Mode changes must be purely additive so the fork can cleanly pull upstream OpenClaw upgrades. The `check-upstream-additions-only` script (`scripts/github-mode/check-upstream-additions-only.ts`) enforces this in CI.
+GitHub Mode changes must be purely additive so the fork can cleanly pull upstream OpenClaw upgrades. The `check-upstream-additions-only` script (`.GITHUB-MODE/scripts/check-upstream-additions-only.ts`) enforces this in CI.
 
-**Owned paths** (safe to add or modify): `docs/github-mode/**`, `runtime/github-mode/**`, `.github/workflows/github-mode-*`, `scripts/github-mode/**`, `test/github-mode/**`.
+**Owned paths** (safe to add or modify): `.GITHUB-MODE/docs/**`, `.GITHUB-MODE/runtime/**`, `.github/workflows/github-mode-*`, `.GITHUB-MODE/scripts/**`, `.GITHUB-MODE/test/**`.
 
 Everything else is upstream-owned. Modifications to upstream files will fail the guard.
 
@@ -102,7 +102,7 @@ Everything else is upstream-owned. Modifications to upstream files will fail the
 
 ## Cross-cutting Scope Constraint — Non-Goals Reference
 
-Task classes that should stay outside GitHub Mode are defined in `docs/github-mode/analysis/non-goals.md`. All task and workflow designs must respect these boundaries:
+Task classes that should stay outside GitHub Mode are defined in `.GITHUB-MODE/docs/analysis/non-goals.md`. All task and workflow designs must respect these boundaries:
 
 1. Real-time conversational loops and live operator steering.
 2. Device-coupled operations requiring local hardware/IPC.
@@ -126,21 +126,21 @@ Status: ✅ Complete.
 
 **Workstream:** WS-A
 
-**Scope:** Add `runtime/github-mode/` contract artifacts (`manifest.schema.json`, `runtime-manifest.json`, `adapter-contracts.json`, `command-policy.json`, `trust-levels.json`, entity/collab schemas, convergence map, parity matrix).
+**Scope:** Add `.GITHUB-MODE/runtime/` contract artifacts (`manifest.schema.json`, `runtime-manifest.json`, `adapter-contracts.json`, `command-policy.json`, `trust-levels.json`, entity/collab schemas, convergence map, parity matrix).
 
 **Task 1.1 contract dependencies (implemented):**
 
-- Manifest contract: [`runtime/github-mode/manifest.schema.json`](../../../runtime/github-mode/manifest.schema.json), [`runtime/github-mode/runtime-manifest.json`](../../../runtime/github-mode/runtime-manifest.json)
-- Adapter contract: [`runtime/github-mode/adapter-contracts.json`](../../../runtime/github-mode/adapter-contracts.json)
-- Policy contract: [`runtime/github-mode/command-policy.json`](../../../runtime/github-mode/command-policy.json)
-- Trust contract: [`runtime/github-mode/trust-levels.json`](../../../runtime/github-mode/trust-levels.json)
-- Parity contract: [`runtime/github-mode/parity-matrix.json`](../../../runtime/github-mode/parity-matrix.json)
-- Convergence contract: [`runtime/github-mode/workspace-convergence-map.json`](../../../runtime/github-mode/workspace-convergence-map.json)
-- Entity manifest contract: [`runtime/github-mode/entity-manifest.schema.json`](../../../runtime/github-mode/entity-manifest.schema.json), [`runtime/github-mode/entity-manifest.json`](../../../runtime/github-mode/entity-manifest.json)
-- Collaboration policy contract: [`runtime/github-mode/collaboration-policy.schema.json`](../../../runtime/github-mode/collaboration-policy.schema.json), [`runtime/github-mode/collaboration-policy.json`](../../../runtime/github-mode/collaboration-policy.json)
-- Collaboration envelope contract: [`runtime/github-mode/collaboration-envelope.schema.json`](../../../runtime/github-mode/collaboration-envelope.schema.json)
-- Consumption guide: [`runtime/github-mode/README.md`](../../../runtime/github-mode/README.md)
-- Validation hook: [`scripts/github-mode/validate-github-runtime-contracts.ts`](../../../scripts/github-mode/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
+- Manifest contract: [`.GITHUB-MODE/runtime/manifest.schema.json`](../../runtime/manifest.schema.json), [`.GITHUB-MODE/runtime/runtime-manifest.json`](../../runtime/runtime-manifest.json)
+- Adapter contract: [`.GITHUB-MODE/runtime/adapter-contracts.json`](../../runtime/adapter-contracts.json)
+- Policy contract: [`.GITHUB-MODE/runtime/command-policy.json`](../../runtime/command-policy.json)
+- Trust contract: [`.GITHUB-MODE/runtime/trust-levels.json`](../../runtime/trust-levels.json)
+- Parity contract: [`.GITHUB-MODE/runtime/parity-matrix.json`](../../runtime/parity-matrix.json)
+- Convergence contract: [`.GITHUB-MODE/runtime/workspace-convergence-map.json`](../../runtime/workspace-convergence-map.json)
+- Entity manifest contract: [`.GITHUB-MODE/runtime/entity-manifest.schema.json`](../../runtime/entity-manifest.schema.json), [`.GITHUB-MODE/runtime/entity-manifest.json`](../../runtime/entity-manifest.json)
+- Collaboration policy contract: [`.GITHUB-MODE/runtime/collaboration-policy.schema.json`](../../runtime/collaboration-policy.schema.json), [`.GITHUB-MODE/runtime/collaboration-policy.json`](../../runtime/collaboration-policy.json)
+- Collaboration envelope contract: [`.GITHUB-MODE/runtime/collaboration-envelope.schema.json`](../../runtime/collaboration-envelope.schema.json)
+- Consumption guide: [`.GITHUB-MODE/runtime/README.md`](../../runtime/README.md)
+- Validation hook: [`.GITHUB-MODE/scripts/validate-github-runtime-contracts.ts`](../../scripts/validate-github-runtime-contracts.ts) via `pnpm contracts:github:validate`
 
 **Acceptance Criteria:**
 
@@ -193,7 +193,7 @@ Status: ✅ Complete.
 
 - Incompatible schema change without migration notes fails.
 - Compatibility validator is updated as part of breaking changes.
-- ✅ Process is documented in contributor workflow (see `runtime/github-mode/README.md` "Contract versioning and compatibility" section).
+- ✅ Process is documented in contributor workflow (see `.GITHUB-MODE/runtime/README.md` "Contract versioning and compatibility" section).
 
 ---
 
@@ -281,7 +281,7 @@ Status: ✅ Complete.
 
 **Workstream:** WS-B
 
-**Scope:** Implement the skills quarantine and vetting pipeline defined in `docs/github-mode/security/0002-skills-quarantine-pipeline.md` for trusted GitHub Mode workflows. This covers intake, static scan, policy evaluation, approval/publish to trusted registry, production enforcement, and emergency revocation.
+**Scope:** Implement the skills quarantine and vetting pipeline defined in `.GITHUB-MODE/docs/security/0002-skills-quarantine-pipeline.md` for trusted GitHub Mode workflows. This covers intake, static scan, policy evaluation, approval/publish to trusted registry, production enforcement, and emergency revocation.
 
 **Acceptance Criteria:**
 
@@ -460,7 +460,7 @@ Status: ✅ Complete.
 
 **Workstream:** WS-D
 
-**Scope:** Implement the 6-checkpoint lifecycle and user-facing state model defined in `docs/github-mode/overview.md` §3.3–3.4 for all GitHub Mode remote runs. Checkpoints: Provisioning → Runner startup → Hydration → Scanning → Execution → Upload/finalize.
+**Scope:** Implement the 6-checkpoint lifecycle and user-facing state model defined in `.GITHUB-MODE/docs/overview.md` §3.3–3.4 for all GitHub Mode remote runs. Checkpoints: Provisioning → Runner startup → Hydration → Scanning → Execution → Upload/finalize.
 
 **Acceptance Criteria:**
 
@@ -480,7 +480,7 @@ Status: ✅ Complete.
 
 **Workstream:** WS-D
 
-**Scope:** Implement the durable persistent-memory layer defined in `docs/github-mode/planning/implementation-plan.md` §2.1 so agent context survives runner teardown. Runner filesystem is never a source of truth.
+**Scope:** Implement the durable persistent-memory layer defined in `.GITHUB-MODE/docs/planning/implementation-plan.md` §2.1 so agent context survives runner teardown. Runner filesystem is never a source of truth.
 
 **Acceptance Criteria:**
 
@@ -498,7 +498,7 @@ Status: ✅ Complete.
 
 **Workstream:** WS-D
 
-**Scope:** Implement the failure-mode contract defined in `docs/github-mode/overview.md` §4.3 and `docs/github-mode/planning/implementation-plan.md` §2.1 for all checkpointed GitHub runs.
+**Scope:** Implement the failure-mode contract defined in `.GITHUB-MODE/docs/overview.md` §4.3 and `.GITHUB-MODE/docs/planning/implementation-plan.md` §2.1 for all checkpointed GitHub runs.
 
 **Acceptance Criteria:**
 
@@ -666,7 +666,7 @@ Status: ✅ Complete.
 
 **Workstream:** WS-G
 
-**Scope:** Build metrics/reporting covering all dimensions from `docs/github-mode/planning/implementation-plan.md` §4 Phase 7, `docs/github-mode/planning/mvvp.md` §4, and `docs/github-mode/planning/mvvvp.md` §5.
+**Scope:** Build metrics/reporting covering all dimensions from `.GITHUB-MODE/docs/planning/implementation-plan.md` §4 Phase 7, `.GITHUB-MODE/docs/planning/mvvp.md` §4, and `.GITHUB-MODE/docs/planning/mvvvp.md` §5.
 
 Required metric categories (union of plan, MVVP, and MVVVP requirements):
 
@@ -743,7 +743,7 @@ Required metric categories (union of plan, MVVP, and MVVVP requirements):
 
 Label stories by **workstream (WS-A…WS-G)** and **milestone (M1…M7)** for dependency tracking.
 
-### MVP Rollout Phases (from `docs/github-mode/planning/mvp.md` §8)
+### MVP Rollout Phases (from `.GITHUB-MODE/docs/planning/mvp.md` §8)
 
 Rollout is staged to manage risk:
 
@@ -757,8 +757,8 @@ Rollout is staged to manage risk:
 
 Each maturity stage has explicit exit criteria defined in its planning document:
 
-- **MVP exit criteria:** `docs/github-mode/planning/mvp.md` §7 — required PR check, trusted command-to-bot-PR, untrusted denial, parity artifact, installed runtime unchanged.
-- **MVVP exit criteria:** `docs/github-mode/planning/mvvp.md` §5 — MVP criteria sustained for 2 weeks plus vision metrics showing repeat usage and alignment.
-- **MVVVP exit criteria:** `docs/github-mode/planning/mvvvp.md` §6 — MVVP criteria sustained for 4 weeks plus operability targets, compounding value, and zero safety incidents.
+- **MVP exit criteria:** `.GITHUB-MODE/docs/planning/mvp.md` §7 — required PR check, trusted command-to-bot-PR, untrusted denial, parity artifact, installed runtime unchanged.
+- **MVVP exit criteria:** `.GITHUB-MODE/docs/planning/mvvp.md` §5 — MVP criteria sustained for 2 weeks plus vision metrics showing repeat usage and alignment.
+- **MVVVP exit criteria:** `.GITHUB-MODE/docs/planning/mvvvp.md` §6 — MVVP criteria sustained for 4 weeks plus operability targets, compounding value, and zero safety incidents.
 
 Scope expansion is gated by maturity: do not advance beyond MVP scope until MVP exit criteria hold, and likewise for MVVP → MVVVP.

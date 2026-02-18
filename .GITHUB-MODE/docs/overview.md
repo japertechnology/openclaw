@@ -4,7 +4,7 @@
 
 This document defines a **high-fidelity GitHub Runtime Plane** for OpenClaw that can run substantial assistant behavior from repository commits and workflows, while preserving the existing installed/runtime experience on user devices.
 
-It is a product and architecture spec, not an implementation checklist (that lives in `docs/github-mode/planning/implementation-plan.md`).
+It is a product and architecture spec, not an implementation checklist (that lives in `.GITHUB-MODE/docs/planning/implementation-plan.md`).
 
 ---
 
@@ -67,7 +67,7 @@ OpenClaw executes from repo state in GitHub Actions/Environments:
 
 ## 3) Functional Coverage Model
 
-Every installed feature is classified in `runtime/github-mode/parity-matrix.json` as one of:
+Every installed feature is classified in `.GITHUB-MODE/runtime/parity-matrix.json` as one of:
 
 - `native`: runs unchanged in GitHub mode
 - `adapter`: same semantics via a GitHub-safe adapter
@@ -254,9 +254,9 @@ GitHub mode uses repository-native contracts as control surfaces:
 - `eval/`
 - `attestations/`
 - `docs/ai/`
-- `runtime/github-mode/` (GitHub mode contracts)
+- `.GITHUB-MODE/runtime/` (GitHub mode contracts)
 
-### 5.1 Required `runtime/github-mode/` artifacts
+### 5.1 Required `.GITHUB-MODE/runtime/` artifacts
 
 - `runtime-manifest.json`
 - `adapter-contracts.json`
@@ -275,9 +275,9 @@ GitHub mode must support creating **multiple OpenClaw entities** in one user/org
 
 Each entity repo must define (Phase 6 deliverables; not yet implemented):
 
-- `runtime/github-mode/entity-manifest.json`
-- `runtime/github-mode/collaboration-policy.json`
-- `runtime/github-mode/remote-entities.json`
+- `.GITHUB-MODE/runtime/entity-manifest.json`
+- `.GITHUB-MODE/runtime/collaboration-policy.json`
+- `.GITHUB-MODE/runtime/remote-entities.json`
 
 ### 6.1 Bootstrap baseline
 
