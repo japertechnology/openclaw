@@ -10,6 +10,7 @@
 
 ## Script categories
 
+- Activation gate (`check-github-mode-active.ts`) used by all `github-mode-*` entry workflows.
 - Contract validation (`validate-github-runtime-contracts.ts`).
 - Security and policy linting (`github-mode-security-lint.ts`, `lint-github-mode-workflows.ts`).
 - Environment and credential guardrails (`verify-github-environments.ts`, `check-github-mode-oidc-credentials.ts`).

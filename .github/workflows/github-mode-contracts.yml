@@ -21,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - uses: ./.github/actions/setup-node-env
+      - name: Enforce GitHub Mode activation
+        run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
       - run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts
   lint-workflow-security:
     runs-on: ubuntu-latest
@@ -29,6 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - uses: ./.github/actions/setup-node-env
+      - name: Enforce GitHub Mode activation
+        run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
       - run: node --import tsx .GITHUB-MODE/scripts/lint-github-mode-workflows.ts
 
   validate-contracts:
@@ -38,6 +42,8 @@ jobs:
     steps:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - uses: ./.github/actions/setup-node-env
+      - name: Enforce GitHub Mode activation
+        run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
       - run: pnpm contracts:github:validate
       - run: node --import tsx .GITHUB-MODE/scripts/validate-github-mode-package-list.ts
 
@@ -50,4 +56,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node-env
+      - name: Enforce GitHub Mode activation
+        run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
       - run: node --import tsx .GITHUB-MODE/scripts/check-upstream-additions-only.ts
