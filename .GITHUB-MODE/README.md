@@ -21,6 +21,8 @@
 
 #### GitHub Mode is an additive runtime for **OpenClaw** that shifts orchestration to repository-native workflows while preserving compatibility with the installed runtime. It is designed for teams that need strict reviewability, policy boundaries, and durable runtime contracts.
 
+This is a repository wrapper is not a framework, a library, or a platform. It is a structural pattern - a way of managing files, contracts, and workflows so that a GitHub repository becomes a participant in its own infrastructure rather than a passive occupant.
+
 ---
 
 ## Why GitHub Mode
