@@ -2,6 +2,8 @@
 
 # 🦞 OpenClaw with GitHub Mode
 
+### A first-class runtime plane for OpenClaw, not just a CI wrapper around source code.
+
 <p align="center">
   <picture>
     <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
@@ -13,12 +15,10 @@
   <a href="LICENCE.md"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
 </p>
 
-#### OpenClaw with GitHub Mode allows GitHub to be a first-class runtime plane for OpenClaw, not just a CI wrapper around source code. GitHub Mode trades individual interaction speed for team-scale capabilities with no local equivalent.
+### GitHub Mode is an additive runtime for **OpenClaw** that shifts orchestration to repository-native workflows while preserving compatibility with the installed runtime. It is designed for teams that need strict reviewability, policy boundaries, and durable runtime contracts.
 
 - GitHub-Mode Docs: https://github.com/japertechnology/openclaw/tree/main/.GITHUB-MODE/docs
 - GitHub-Mode Runtime Contracts: https://github.com/japertechnology/openclaw/tree/main/.GITHUB-MODE/runtime
-
-#### GitHub Mode is an additive runtime for **OpenClaw** that shifts orchestration to repository-native workflows while preserving compatibility with the installed runtime. It is designed for teams that need strict reviewability, policy boundaries, and durable runtime contracts.
 
 This is a repository wrapper is not a framework, a library, or a platform. It is a structural pattern - a way of managing files, contracts, and workflows so that a GitHub repository becomes a participant in its own infrastructure rather than a passive occupant.
 
