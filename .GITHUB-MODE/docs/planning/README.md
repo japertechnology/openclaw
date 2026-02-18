@@ -1,12 +1,12 @@
-# 🦞 GitHub Mode planning documents
+# 🦞 GitHub Mode: Planning
+
+### This folder contains implementation planning artifacts for GitHub Mode rollout phases.
 
 <p align="center">
   <picture>
     <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
   </picture>
 </p>
-
-This folder contains implementation planning artifacts for GitHub Mode rollout phases.
 
 ## Typical contents
 
