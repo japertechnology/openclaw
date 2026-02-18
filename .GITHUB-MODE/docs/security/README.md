@@ -88,4 +88,16 @@ These artifacts define:
 
 Phase 1 and later implementation tasks are enabled only after security artifact approvals are captured in-repo in the approval signoff blocks.
 
+Signoff block format:
+
+```governance-signoff
+[
+  {
+    "role": "security",
+    "github": "@openclaw-security-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```
+
 - Phase 1 gate status: ✅ Satisfied (Task 0.3 threat model approvals captured on 2026-02-16).

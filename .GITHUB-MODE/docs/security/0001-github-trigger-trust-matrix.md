@@ -128,6 +128,22 @@ The matrix applies to planned Phase 3 workflows:
 
 ## Approval signoff
 
-- Security maintainer: Eric Mourant (`@japer`) — Approved 2026-02-16
-- GitHub mode maintainer: Eric Mourant (`@japer`) — Approved 2026-02-16
-- Runtime maintainer reviewer: Eric Mourant (`@japer`) — Approved 2026-02-16
+```governance-signoff
+[
+  {
+    "role": "security",
+    "github": "@openclaw-security-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "github-mode",
+    "github": "@openclaw-github-mode-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "runtime",
+    "github": "@openclaw-runtime-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```

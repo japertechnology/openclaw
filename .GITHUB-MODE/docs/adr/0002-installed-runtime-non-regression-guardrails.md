@@ -63,6 +63,17 @@ When trigger fires, maintainers must:
 
 ## Approval signoff
 
-- Runtime maintainer: Eric Mourant (`@japer`) — Approved
-- Release maintainer: Eric Mourant (`@japer`) — Approved
-- Approval date: `2026-02-16`
+```governance-signoff
+[
+  {
+    "role": "runtime",
+    "github": "@openclaw-runtime-lead",
+    "approved_at": "2026-02-18"
+  },
+  {
+    "role": "release",
+    "github": "@openclaw-release-lead",
+    "approved_at": "2026-02-18"
+  }
+]
+```
