@@ -1,0 +1,45 @@
+name: GitHub Mode OIDC Deploy Scaffold
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-env
+      - name: Build artifact
+        run: pnpm build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: github-mode-${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-env
+      - name: Federation placeholder
+        run: |
+          echo "Exchange GitHub OIDC token for cloud role credentials here."
+          echo "Do not inject static cloud credentials into env or repository secrets."
+      - name: Deploy placeholder
+        run: |
+          echo "Deploy workload using short-lived credentials from cloud federation."

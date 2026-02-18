@@ -7,6 +7,7 @@ This directory contains the baseline threat modeling artifacts for GitHub mode r
 - [GitHub trigger trust matrix and threat model](0001-github-trigger-trust-matrix.md)
 - [Skills quarantine pipeline for trusted runs](0002-skills-quarantine-pipeline.md)
 - [Secrets inventory and rotation standard](0003-secrets-inventory-and-rotation.md)
+- [OIDC trust relationships and fallback policy](0004-oidc-trust-relationships-and-fallback.md)
 
 ## Workflow hardening policy
 
@@ -21,6 +22,7 @@ Policy requirements:
   `@main`, and `@master` are rejected.
 - `actions/checkout` is pinned to a full commit SHA in the contracts workflow, and all jobs
   in that workflow explicitly keep `permissions` at `contents: read`.
+- GitHub mode cloud deployments must use OIDC federation; static cloud credentials in workflow env/secrets patterns are rejected by `.GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts`.
 
 ## Environment protection baseline (Task 2.2)
 

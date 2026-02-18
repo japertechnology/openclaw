@@ -14,6 +14,15 @@ permissions:
   contents: read
 
 jobs:
+
+  check-oidc-credentials:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - uses: ./.github/actions/setup-node-env
+      - run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts
   lint-workflow-security:
     runs-on: ubuntu-latest
     permissions:

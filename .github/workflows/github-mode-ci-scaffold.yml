@@ -1,0 +1,26 @@
+name: GitHub Mode CI Scaffold
+
+on:
+  pull_request:
+    paths:
+      - ".GITHUB-MODE/**"
+      - ".github/workflows/github-mode-*.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".GITHUB-MODE/**"
+      - ".github/workflows/github-mode-*.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-env
+      - name: Validate GitHub Mode runtime contracts
+        run: pnpm contracts:github:validate
