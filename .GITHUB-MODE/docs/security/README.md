@@ -8,6 +8,51 @@ This directory contains the baseline threat modeling artifacts for GitHub mode r
 - [Skills quarantine pipeline for trusted runs](0002-skills-quarantine-pipeline.md)
 - [Secrets inventory and rotation standard](0003-secrets-inventory-and-rotation.md)
 
+## Environment protection baseline (Task 2.2)
+
+Task 2.2 is enforced by `.GITHUB-MODE/scripts/verify-github-environments.ts` and CI workflow `.github/workflows/github-mode-security.yml`.
+
+Required environments and exact expected settings:
+
+### `github-mode-dev`
+
+- Required reviewers protection rule enabled.
+- At least **1 reviewer**.
+- `prevent_self_review=true`.
+- Deployment branch policy shape:
+  - `protected_branches=false`
+  - `custom_branch_policies=true`
+- Allowed deployment branch/tag policies:
+  - branch `github-mode/dev`
+  - tag `github-mode-dev-*`
+
+### `github-mode-staging`
+
+- Required reviewers protection rule enabled.
+- At least **1 reviewer**.
+- `prevent_self_review=true`.
+- Deployment branch policy shape:
+  - `protected_branches=false`
+  - `custom_branch_policies=true`
+- Allowed deployment branch/tag policies:
+  - branch `github-mode/staging`
+  - tag `github-mode-staging-*`
+
+### `github-mode-prod`
+
+- Required reviewers protection rule enabled.
+- At least **2 reviewers**.
+- Reviewer types must include at least one **User** and one **Team** reviewer.
+- `prevent_self_review=true`.
+- Deployment branch policy shape:
+  - `protected_branches=false`
+  - `custom_branch_policies=true`
+- Allowed deployment branch/tag policies:
+  - branch `main`
+  - tag `v*`
+
+Any missing environment or policy drift fails CI.
+
 ## Scope
 
 These artifacts define:

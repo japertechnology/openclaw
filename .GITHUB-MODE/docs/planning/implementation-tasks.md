@@ -234,6 +234,12 @@ Status: ✅ Complete.
 
 **Security Check:** Must enforce guardrails for approval-gated promotion and no direct privileged branch mutations.
 
+**Evidence References:**
+
+- `.GITHUB-MODE/docs/security/README.md` (Environment protection baseline / Task 2.2)
+- `.GITHUB-MODE/scripts/verify-github-environments.ts`
+- `.github/workflows/github-mode-security.yml`
+
 ---
 
 ### Task 2.3 — Workflow Permission Hardening
