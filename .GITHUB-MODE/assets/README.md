@@ -1,4 +1,4 @@
-# 🦞 with GitHub Mode - Assets
+# 🦞 GitHub Mode assets
 
 <p align="center">
   <picture>
