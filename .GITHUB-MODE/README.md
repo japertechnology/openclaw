@@ -15,7 +15,7 @@
   <a href="LICENCE.md"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
 </p>
 
-### GitHub Mode is an additive runtime for **OpenClaw** that shifts orchestration to repository-native workflows while preserving compatibility with the installed runtime. It is designed for teams that need strict reviewability, policy boundaries, and durable runtime contracts.
+#### GitHub Mode is an additive runtime for **OpenClaw** that shifts orchestration to repository-native workflows while preserving compatibility with the installed runtime. It is designed for teams that need strict reviewability, policy boundaries, and durable runtime contracts.
 
 - GitHub-Mode Docs: https://github.com/japertechnology/openclaw/tree/main/.GITHUB-MODE/docs
 - GitHub-Mode Runtime Contracts: https://github.com/japertechnology/openclaw/tree/main/.GITHUB-MODE/runtime
