@@ -1,4 +1,4 @@
-# 🦞 GitHub Mode
+# 🦞 Open Claw with GitHub Mode
 
 <p align="center">
   <picture>
