@@ -1,6 +1,6 @@
-# 🦞 GitHub Mode: Solo Development Mode
+# 🦞 GitHub Mode: Under Development
 
-### GitHub Mode is in active single-maintainer development.
+### GitHub Mode is in active development.
 
 <p align="center">
   <picture>
@@ -8,6 +8,6 @@
   </picture>
 </p>
 
-## Enforcement behavior
+## File existence behavior
 
-A temporary override of shared governance controls.  
+- A temporary override of shared governance controls.
