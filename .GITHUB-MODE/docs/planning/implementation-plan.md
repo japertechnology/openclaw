@@ -225,7 +225,9 @@ Phase 1 proceeds only while this evidence remains valid.
 
 ### Phase 2 — Security foundation (GitHub-native)
 
-**Status:** Not started. **Depends on:** Phase 1 ✅.
+**Status:** ✅ Complete. **Depends on:** Phase 1 ✅.
+
+**Completion evidence:** See [implementation-tasks.md Task 2.1–2.6 evidence references](implementation-tasks.md#phase-2--security-foundation-github-native) and [security index](../security/README.md).
 
 **Deliverables:**
 

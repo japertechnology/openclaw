@@ -199,7 +199,11 @@ Status: ✅ Complete.
 
 ## Phase 2 — Security Foundation (GitHub-native)
 
+Phase 2 status: ✅ Complete (Tasks 2.1–2.6 implemented with enforcement scripts/workflows and runtime contracts).
+
 ### Task 2.1 — Secrets Inventory and Rotation Standard
+
+Status: ✅ Complete.
 
 **Workstream:** WS-B
 
@@ -221,6 +225,8 @@ Status: ✅ Complete.
 ---
 
 ### Task 2.2 — Environment Protection Configuration
+
+Status: ✅ Complete.
 
 **Workstream:** WS-B
 
@@ -244,6 +250,8 @@ Status: ✅ Complete.
 
 ### Task 2.3 — Workflow Permission Hardening
 
+Status: ✅ Complete.
+
 **Workstream:** WS-B
 
 **Scope:** Add explicit least-privilege permissions: at workflow/job level for all GitHub-mode pipelines.
@@ -254,9 +262,17 @@ Status: ✅ Complete.
 - Security lint passes for over-broad permissions.
 - Fork PR jobs have zero secret access.
 
+**Evidence References:**
+
+- `.GITHUB-MODE/scripts/github-mode-security-lint.ts`
+- `.GITHUB-MODE/scripts/lint-github-mode-workflows.ts`
+- `.github/workflows/github-mode-security-lint.yml`
+
 ---
 
 ### Task 2.4 — OIDC Adoption for Cloud Access
+
+Status: ✅ Complete.
 
 **Workstream:** WS-B
 
@@ -270,9 +286,17 @@ Status: ✅ Complete.
 
 **Security Check:** Must satisfy checklist item: “OIDC replaces static cloud credentials where possible”.
 
+**Evidence References:**
+
+- `.GITHUB-MODE/docs/security/0004-oidc-trust-relationships-and-fallback.md`
+- `.GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts`
+- `.github/workflows/github-mode-oidc-deploy-scaffold.yml`
+
 ---
 
 ### Task 2.5 — Security Lint and Simulation Harness
+
+Status: ✅ Complete.
 
 **Workstream:** WS-B
 
@@ -286,9 +310,17 @@ Status: ✅ Complete.
 
 **Security Check:** Must enforce “all third-party actions pinned to full commit SHA.”
 
+**Evidence References:**
+
+- `.GITHUB-MODE/scripts/github-mode-security-lint.ts`
+- `.GITHUB-MODE/test/github-mode-security-lint.test.ts`
+- `.github/workflows/github-mode-security-lint.yml`
+
 ---
 
 ### Task 2.6 — Skills Quarantine Pipeline
+
+Status: ✅ Complete.
 
 **Workstream:** WS-B
 
@@ -307,6 +339,19 @@ Status: ✅ Complete.
 - Skill provenance policy enforced: signed/pinned packages, source provenance checks, dependency provenance requirements, deny-by-default for untrusted sources.
 
 **Security Check:** Must enforce “only vetted skills can run in trusted GitHub mode workflows” and “deny by default for untrusted sources.”
+
+**Evidence References:**
+
+- `.GITHUB-MODE/docs/security/0002-skills-quarantine-pipeline.md`
+- `.GITHUB-MODE/runtime/skills-quarantine-registry.json`
+- `.GITHUB-MODE/runtime/trusted-skills-allowlist.json`
+- `.GITHUB-MODE/runtime/skills-emergency-revocations.json`
+- `.GITHUB-MODE/runtime/trusted-command-gate.json`
+- `.GITHUB-MODE/scripts/enforce-trusted-skill-gate.ts`
+- `.github/workflows/github-mode-skill-intake.yml`
+- `.github/workflows/github-mode-skill-static-scan.yml`
+- `.github/workflows/github-mode-skill-policy-classifier.yml`
+- `.github/workflows/github-mode-skill-emergency-revocation.yml`
 
 ---
 
