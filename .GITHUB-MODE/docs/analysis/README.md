@@ -1,12 +1,12 @@
-# 🦞 GitHub Mode analysis docs
+# 🦞 GitHub Mode: Analysis
+
+### This directory captures exploratory and comparative analysis that informs GitHub Mode architecture and decisions.
 
 <p align="center">
   <picture>
     <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
   </picture>
 </p>
-
-This directory captures exploratory and comparative analysis that informs GitHub Mode architecture and decisions.
 
 ## What belongs here
 
