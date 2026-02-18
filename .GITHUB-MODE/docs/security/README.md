@@ -8,6 +8,20 @@ This directory contains the baseline threat modeling artifacts for GitHub mode r
 - [Skills quarantine pipeline for trusted runs](0002-skills-quarantine-pipeline.md)
 - [Secrets inventory and rotation standard](0003-secrets-inventory-and-rotation.md)
 
+## Workflow hardening policy
+
+GitHub mode workflows (`.github/workflows/github-mode-*.yml`) are guarded by
+`.GITHUB-MODE/scripts/lint-github-mode-workflows.ts` and enforced in
+`.github/workflows/github-mode-contracts.yml`.
+
+Policy requirements:
+
+- Every GitHub mode workflow must declare explicit `permissions` (top-level or per-job).
+- Third-party actions must use immutable refs (full commit SHA); mutable refs like `@v*`,
+  `@main`, and `@master` are rejected.
+- `actions/checkout` is pinned to a full commit SHA in the contracts workflow, and all jobs
+  in that workflow explicitly keep `permissions` at `contents: read`.
+
 ## Environment protection baseline (Task 2.2)
 
 Task 2.2 is enforced by `.GITHUB-MODE/scripts/verify-github-environments.ts` and CI workflow `.github/workflows/github-mode-security.yml`.

@@ -3,26 +3,41 @@ on:
   pull_request:
     paths:
       - ".GITHUB-MODE/**"
+      - ".github/workflows/github-mode-*.yml"
   push:
     branches: [main]
     paths:
       - ".GITHUB-MODE/**"
+      - ".github/workflows/github-mode-*.yml"
 
 permissions:
   contents: read
 
 jobs:
+  lint-workflow-security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - uses: ./.github/actions/setup-node-env
+      - run: node --import tsx .GITHUB-MODE/scripts/lint-github-mode-workflows.ts
+
   validate-contracts:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - uses: ./.github/actions/setup-node-env
       - run: pnpm contracts:github:validate
 
   check-additions-only:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node-env
