@@ -56,11 +56,12 @@ For architecture rationale, read:
 
 Use this map to orient changes:
 
+- `.GITHUB-MODE/assets/` — resource docs and multi-media.
 - `.GITHUB-MODE/docs/` — architecture, security, planning, and analysis docs.
 - `.GITHUB-MODE/runtime/` — runtime contracts and schemas.
-- `.github/workflows/github-mode-*` — GitHub Mode CI and policy workflows.
 - `.GITHUB-MODE/scripts/` — contract validation and upstream-guard scripts.
 - `.GITHUB-MODE/test/` — validation and upstream-sync guard test coverage.
+- `.github/workflows/github-mode-*` — GitHub Mode CI and policy workflows.
 
 ---
 
