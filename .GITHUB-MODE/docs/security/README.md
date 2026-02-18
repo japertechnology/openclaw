@@ -1,4 +1,10 @@
-# GitHub Mode Security Foundation
+# 🦞 GitHub Mode Security Foundation
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
+  </picture>
+</p>
 
 This directory contains the baseline threat modeling artifacts for GitHub mode rollout.
 
