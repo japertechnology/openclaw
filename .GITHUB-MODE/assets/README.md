@@ -1,4 +1,4 @@
-# 🦞 GitHub Mode assets
+# 🦞 GitHub Mode: Assets
 
 ### Static assets used by GitHub Mode documentation and validation tooling live here.
 
