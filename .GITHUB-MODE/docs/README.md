@@ -1,12 +1,12 @@
-# 🦞 Open Claw with GitHub Mode
+# 🦞 Open Claw with GitHub Mode: Documentation
+
+### GitHub Mode extends OpenClaw into repository workflows, running assistant behavior directly from repository state while preserving the installed runtime experience.
 
 <p align="center">
   <picture>
     <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
   </picture>
 </p>
-
-GitHub Mode extends OpenClaw into repository workflows, running assistant behavior directly from repository state while preserving the installed runtime experience.
 
 ## Architecture
 
