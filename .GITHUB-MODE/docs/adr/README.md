@@ -1,4 +1,10 @@
-# GitHub Mode ADR Package
+# 🦞 GitHub Mode ADR Package
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
+  </picture>
+</p>
 
 This directory contains architecture decisions that lock runtime boundaries for GitHub mode rollout.
 
