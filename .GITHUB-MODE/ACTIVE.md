@@ -1,5 +1,13 @@
 # 🦞 GitHub Mode: Activated
 
+### Delete or rename this file to disable GitHub Mode.
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
+  </picture>
+</p>
+
 GitHub Mode is **explicitly enabled** while this file exists at:
 
 - `.GITHUB-MODE/ACTIVE.md`
@@ -25,10 +33,3 @@ That fail-closed guard blocks all subsequent workflow logic.
 - `.github/workflows/github-mode-skill-static-scan.yml`
 - `.github/workflows/github-mode-trusted-command.yml`
 
-Delete or rename this file to disable GitHub Mode entry workflows.
-
-<p align="center">
-  <picture>
-    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
-  </picture>
-</p>
