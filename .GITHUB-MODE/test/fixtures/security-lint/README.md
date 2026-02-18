@@ -1,4 +1,10 @@
-# Security lint fixtures
+# 🦞 GitHub Mode: Security Lint Fixtures
+
+<p align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
+  </picture>
+</p>
 
 These YAML files are input scenarios for `.GITHUB-MODE/test/github-mode-security-lint.test.ts`.
 
