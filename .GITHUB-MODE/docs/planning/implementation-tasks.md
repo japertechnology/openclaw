@@ -213,6 +213,11 @@ Status: ✅ Complete.
 
 **Security Check:** Must enforce “GitHub mode never requires custom in-repo secret vaulting” and “secrets only via GitHub Secrets/Environment Secrets”.
 
+**Evidence References:**
+
+- `.GITHUB-MODE/docs/security/0003-secrets-inventory-and-rotation.md`
+- `.GITHUB-MODE/runtime/secrets-inventory.json`
+
 ---
 
 ### Task 2.2 — Environment Protection Configuration
