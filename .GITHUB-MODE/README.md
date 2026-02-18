@@ -150,6 +150,18 @@ Use these as the canonical roadmap before introducing new architecture branches.
 
 GitHub Mode depends on guardrails that should stay green for every PR touching mode-owned paths.
 
+### Activation gate (fail-closed)
+
+Every `github-mode-*` workflow includes an explicit activation guard as its first blocking step:
+
+- `node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts`
+
+The guard requires `.GITHUB-MODE/ACTIVE.md` to exist. If it is missing, workflows fail immediately with:
+
+- `GitHub Mode disabled by missing ACTIVE.md`
+
+This enforcement applies to all GitHub Mode entry workflows under `.github/workflows/github-mode-*.yml`.
+
 Core checks:
 
 - Runtime contracts validation (`pnpm contracts:github:validate`)
