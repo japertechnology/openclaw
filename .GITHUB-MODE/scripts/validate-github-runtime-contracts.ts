@@ -463,6 +463,23 @@ function validateEmergencyRevocations(): void {
   }
 }
 
+function validateAdapterContractsSchema(): void {
+  const schemaPath = ".GITHUB-MODE/runtime/adapter-contracts.schema.json";
+  const instancePath = ".GITHUB-MODE/runtime/adapter-contracts.json";
+  const schema = readJson(schemaPath);
+  const instance = readJson(instancePath);
+
+  const ajv = new Ajv({ allErrors: true, strict: true });
+  const validate = ajv.compile(schema);
+  const valid = validate(instance);
+  if (!valid) {
+    const errors = validate.errors
+      ?.map((error) => `${error.instancePath || "/"} ${error.message}`)
+      .join("; ");
+    throw new Error(`${instancePath}: schema validation failed (${errors ?? "unknown error"})`);
+  }
+}
+
 function validateProvenanceMetadataSchema(): void {
   const schemaPath = ".GITHUB-MODE/runtime/provenance-metadata.schema.json";
   const schema = readJson(schemaPath);
@@ -504,6 +521,7 @@ function main(): void {
 
   validateManifestSchema();
   validateEntityManifestSchema();
+  validateAdapterContractsSchema();
   validateCollaborationPolicySchema();
   validateCollaborationEnvelopeSchema();
   validateCollaborationPolicyDenyDefault();

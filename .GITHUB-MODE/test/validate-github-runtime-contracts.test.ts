@@ -293,6 +293,89 @@ describe("collaboration-policy validation", () => {
   });
 });
 
+describe("adapter-contracts schema validation", () => {
+  it("fails when adapter-contracts.json does not match schema", () => {
+    const badContracts = {
+      schemaVersion: "1.0",
+      contractsVersion: "v1.0.0",
+      adapters: [
+        {
+          name: "INVALID CAPS AND SPACES",
+          capability: "test",
+          trustLevels: ["trusted"],
+          constraints: ["test constraint"],
+        },
+      ],
+    };
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/adapter-contracts.json",
+      JSON.stringify(badContracts, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+
+  it("fails when adapter has invalid trust level", () => {
+    const badTrust = {
+      schemaVersion: "1.0",
+      contractsVersion: "v1.0.0",
+      adapters: [
+        {
+          name: "test-adapter",
+          capability: "test capability",
+          trustLevels: ["super-trusted"],
+          constraints: ["test constraint"],
+        },
+      ],
+    };
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/adapter-contracts.json",
+      JSON.stringify(badTrust, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+
+  it("fails when adapter has empty constraints", () => {
+    const noConstraints = {
+      schemaVersion: "1.0",
+      contractsVersion: "v1.0.0",
+      adapters: [
+        {
+          name: "test-adapter",
+          capability: "test capability",
+          trustLevels: ["trusted"],
+          constraints: [],
+        },
+      ],
+    };
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/adapter-contracts.json",
+      JSON.stringify(noConstraints, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+
+  it("fails when adapters array is empty", () => {
+    const emptyAdapters = {
+      schemaVersion: "1.0",
+      contractsVersion: "v1.0.0",
+      adapters: [],
+    };
+    const result = withTempFile(
+      ".GITHUB-MODE/runtime/adapter-contracts.json",
+      JSON.stringify(emptyAdapters, null, 2),
+      runValidator,
+    );
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("schema validation failed");
+  });
+});
+
 describe("collaboration-envelope schema validation", () => {
   it("fails when collaboration-envelope.schema.json is missing", () => {
     const result = withRemovedFile(
