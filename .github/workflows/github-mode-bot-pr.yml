@@ -158,6 +158,28 @@ jobs:
       contents: read
       pull-requests: write
     steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - uses: ./.github/actions/setup-node-env
+
+      - name: Enforce policy-gated adapter invocation (Task 4.3)
+        env:
+          GITHUB_MODE_ADAPTER: repo-write
+          GITHUB_MODE_ACTION: open-pr
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/github-mode-bot-pr-policy-gate"
+          node --import tsx .GITHUB-MODE/scripts/enforce-policy-gated-adapter.ts \
+            --json-out "$RUNNER_TEMP/github-mode-bot-pr-policy-gate/policy-decision.json" \
+            --summary-out "$RUNNER_TEMP/github-mode-bot-pr-policy-gate/policy-summary.md"
+
+      - name: Upload policy-gated adapter evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: github-mode-bot-pr-policy-gate-evidence
+          path: ${{ runner.temp }}/github-mode-bot-pr-policy-gate/
+          retention-days: 90
+
       - name: Create pull request
         env:
           GH_TOKEN: ${{ github.token }}
