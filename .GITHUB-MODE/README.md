@@ -35,6 +35,8 @@ Standard OpenClaw operation is excellent for personal/local operation. GitHub Mo
 
 If you need repeatability across contributors and repositories, GitHub Mode is the right abstraction.
 
+### gh-openclaw: daily-synced GitHub runtime extension of OpenClaw - no local install required
+
 ---
 
 ## Scope and boundaries
