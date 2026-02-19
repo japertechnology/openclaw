@@ -1,4 +1,4 @@
-##### ⚠️ WARNING: This project is under active development. Planned release in March 2026.
+##### ✅ GitHub Mode is now operational with full OpenClaw agent integration.
 
 # 🦞 OpenClaw with GitHub Mode
 
@@ -17,10 +17,25 @@
 
 #### GitHub Mode is an additive runtime for **OpenClaw** that shifts orchestration to repository-native workflows while preserving compatibility with the installed runtime. It is designed for teams that need strict reviewability, policy boundaries, and durable runtime contracts.
 
+**🎉 NEW: GitHub Mode now executes real OpenClaw agents!** See [USAGE.md](USAGE.md) for quick start.
+
 - GitHub-Mode Docs: https://github.com/japertechnology/openclaw/tree/main/.GITHUB-MODE/docs
 - GitHub-Mode Runtime Contracts: https://github.com/japertechnology/openclaw/tree/main/.GITHUB-MODE/runtime
+- **Usage Guide: [USAGE.md](USAGE.md)**
 
 This is a repository wrapper is not a framework, a library, or a platform. It is a structural pattern - a way of managing files, contracts, and workflows so that a GitHub repository becomes a participant in its own infrastructure rather than a passive occupant.
+
+---
+
+## Quick Start
+
+**Try it now:**
+
+1. Comment on any issue: `/openclaw explain src/commands/agent.ts`
+2. Comment on a PR: `/openclaw review`
+3. Add the `openclaw` label to an issue for automatic analysis
+
+**See [USAGE.md](USAGE.md) for complete documentation.**
 
 ---
 
@@ -62,6 +77,48 @@ Use this map to orient changes:
 - `.GITHUB-MODE/scripts/` — contract validation and upstream-guard scripts.
 - `.GITHUB-MODE/test/` — validation and upstream-sync guard test coverage.
 - `.github/workflows/github-mode-*` — GitHub Mode CI and policy workflows.
+- **`.GITHUB-MODE/USAGE.md`** — User guide for triggering agents and workflows.
+
+---
+
+## Implementation Status
+
+### ✅ Completed (Phase 1-3)
+
+- **Agent Integration**: OpenClaw agents execute in GitHub Actions via `pnpm openclaw agent`
+- **Event Triggers**: Issue comments, PR comments, issue labels all trigger workflows
+- **Security Gates**: All validation, trust, policy, and provenance gates operational
+- **Bot PR Automation**: Changes committed to bot branches, PRs created automatically
+- **Output Capture**: Full logs in artifacts, summaries in workflow UI
+- **Documentation**: Complete usage guide and troubleshooting
+
+### 🎯 Current Capabilities
+
+```bash
+# Issue comments
+/openclaw explain src/agent.ts
+/openclaw refactor src/old-code.ts
+/openclaw test src/new-feature.ts
+
+# PR comments
+/openclaw review                    # Analyzes all PR changes
+/openclaw test src/changed-file.ts  # Targets specific file
+
+# Auto-analysis
+Add 'openclaw' label to any issue → automatic analysis
+```
+
+**Results:**
+
+- Agent output in workflow artifacts
+- Summary (last 100 lines) in workflow UI
+- Bot branch + PR if changes made
+
+### ⏳ Deferred (Optional Future Work)
+
+- **State Management**: Agent memory persistence across runs (requires external storage)
+- **Long-running Tasks**: Checkpoint/restore for multi-step workflows
+- **Interactive Sessions**: Back-and-forth agent conversations (non-goal for GitHub Actions)
 
 ---
 
