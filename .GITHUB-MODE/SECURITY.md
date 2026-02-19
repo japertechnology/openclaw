@@ -4,7 +4,7 @@
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/gh-openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
   </picture>
 </p>
 
@@ -15,7 +15,7 @@ Report vulnerabilities to the repository where the issue lives.
 For avoidance of doubt:
 
 - **OpenClaw contacts and security ownership for OpenClaw products remain with the OpenClaw team** (openclaw/\* repositories).
-- **`japertechnology/openclaw` is only for OpenClaw with GitHub Mode components** and should not be used for unrelated OpenClaw core/mobile/gateway disclosures.
+- **`japer-technology/gh-openclaw` is only for OpenClaw with GitHub Mode components** and should not be used for unrelated OpenClaw core/mobile/gateway disclosures.
 
 Primary OpenClaw security reporting repositories:
 
@@ -28,7 +28,7 @@ Primary OpenClaw security reporting repositories:
 
 OpenClaw with GitHub Mode implementation components (only):
 
-- **GitHub Mode components** — https://github.com/japertechnology/openclaw
+- **GitHub Mode components** — https://github.com/japer-technology/gh-openclaw
 
 If you're unsure where to report, email **eric.mourant@japer.technology** and we will route it.
 

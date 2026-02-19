@@ -4,7 +4,7 @@
 
 <p align="center">
   <picture>
-    <img src="https://raw.githubusercontent.com/japertechnology/openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
+    <img src="https://raw.githubusercontent.com/japer-technology/gh-openclaw/main/.GITHUB-MODE/assets/logo.png" alt="OpenClaw with GitHub Mode" width="500">
   </picture>
 </p>
 
@@ -103,7 +103,7 @@ These docs are designed to withstand continuous OpenClaw core evolution by follo
 
 2. **Governance scripts do not import `src/`.** Contract validation, security lint, and drift detection use `.GITHUB-MODE/runtime/` contracts. Core refactors do not break governance validation.
 
-3. **`.GITHUB-MODE` PRs must not modify `src/**` files.** The `check-upstream-additions-only` script enforces this. Source changes arrive via upstream sync.
+3. **`.GITHUB-MODE` PRs must not modify `src/**`files.** The`check-upstream-additions-only` script enforces this. Source changes arrive via upstream sync.
 
 4. **Contract-first validation.** Runtime contracts in `.GITHUB-MODE/runtime/` are the only machine-validated governance artifacts. The validation script (`.GITHUB-MODE/scripts/validate-github-runtime-contracts.ts`) checks contract structure, not doc prose.
 

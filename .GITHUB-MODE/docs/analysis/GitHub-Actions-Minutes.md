@@ -4,13 +4,13 @@
 
 **Status:** Analysis snapshot
 
-**Scope:** Quantitative analysis of GitHub Actions minute consumption across all workflows in `japertechnology/openclaw`, with billing implications, optimization assessment, and projections for GitHub Mode scaling.
+**Scope:** Quantitative analysis of GitHub Actions minute consumption across all workflows in `japer-technology/gh-openclaw`, with billing implications, optimization assessment, and projections for GitHub Mode scaling.
 
 ---
 
 ## 1. Executive Summary
 
-The `japertechnology/openclaw` repository currently runs **9 user-defined workflows** plus dynamic workflows (Copilot coding agent). As of 2026-02-18, the repository has accumulated **702 workflow runs** since its creation on 2026-02-16.
+The `japer-technology/gh-openclaw` repository currently runs **9 user-defined workflows** plus dynamic workflows (Copilot coding agent). As of 2026-02-18, the repository has accumulated **702 workflow runs** since its creation on 2026-02-16.
 
 **Key findings:**
 

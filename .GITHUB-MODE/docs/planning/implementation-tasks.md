@@ -235,7 +235,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using the canonical pattern:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using the filename convention:
   `task-2.1-secrets-rotation-evidence-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include ISO8601 UTC timestamp, actor identity, reviewed environment scope, and rotation/revocation outcome.
@@ -267,7 +267,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-2.2-environment-protection-verify-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, environment name, reviewer gate result, and branch/tag restriction enforcement result.
@@ -297,7 +297,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-2.3-permissions-hardening-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, workflow identifier, evaluated permission map, and untrusted-trigger secret access result.
@@ -331,7 +331,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-2.4-oidc-deploy-proof-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Each evidence artifact must record and preserve:
@@ -368,7 +368,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-2.5-security-lint-simulation-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, unpinned-action detection outcome, permission-hardening outcome, and untrusted-secret simulation result.
@@ -415,7 +415,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-2.6-quarantine-e2e-<submission_id>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence set must include immutable records for each stage with shared correlation id:
@@ -459,7 +459,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-3.1-ci-workflow-set-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, workflow name, trigger type, artifact output summary, and required-check gate result.
@@ -492,7 +492,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real fork PR execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-3.2-fork-safety-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, fork PR reference, secret-access audit result, and permission-level confirmation.
@@ -524,7 +524,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-3.3-policy-drift-detection-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, drift detection outcome, remediation pointer presence, and workflow blocking result.
@@ -560,7 +560,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-3.4-eval-cost-thresholds-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, eval threshold outcome, cost threshold outcome, and artifact attachment confirmation.
@@ -591,7 +591,7 @@ Status: 🟢 Code-complete.
 **Operational evidence (required for ✅ Complete):**
 
 - Immutable workflow run URL captured for a real execution using:
-  `https://github.com/openclaw/openclaw/actions/runs/<run_id>`
+  `https://github.com/japer-technology/gh-openclaw/actions/runs/<run_id>`
 - Immutable artifact reference(s) linked in this section using:
   `task-3.5-template-drift-detection-<env>-<YYYYMMDDTHHMMSSZ>.json`
 - Evidence file must include timestamp, template drift detection outcome, migration guidance presence, and required-check result.

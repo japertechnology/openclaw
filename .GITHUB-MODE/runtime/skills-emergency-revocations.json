@@ -13,7 +13,7 @@
       "actions": {
         "invalidatedAllowlist": true,
         "invalidatedCaches": true,
-        "emittedIncidentIssue": "https://github.com/openclaw/openclaw/issues/99999"
+        "emittedIncidentIssue": "https://github.com/japer-technology/gh-openclaw/issues/99999"
       }
     }
   ]

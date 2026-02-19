@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-02-18",
+  "updatedAt": "2026-02-19",
   "mergeStrategy": "union-with-root-openclaw-package-json",
   "description": "GitHub Mode package requirements that must be merged with (not replace) the current OpenClaw package set.",
   "required": {
