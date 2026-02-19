@@ -4,8 +4,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 EXTRA_COMPOSE_FILE="$ROOT_DIR/docker-compose.extra.yml"
+# Prefer OPENCLAW_IMAGE when operators want to reuse a prebuilt tag.
 IMAGE_NAME="${OPENCLAW_IMAGE:-openclaw:local}"
+# Optional comma-separated host mounts added to both gateway and CLI services.
 EXTRA_MOUNTS="${OPENCLAW_EXTRA_MOUNTS:-}"
+# Optional Docker volume or host path mounted at /home/node.
 HOME_VOLUME_NAME="${OPENCLAW_HOME_VOLUME:-}"
 
 require_cmd() {
@@ -38,6 +41,8 @@ export OPENCLAW_EXTRA_MOUNTS="$EXTRA_MOUNTS"
 export OPENCLAW_HOME_VOLUME="$HOME_VOLUME_NAME"
 
 if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
+  # Use cryptographically secure token generation. openssl is preferred for
+  # speed/portability; python3 fallback covers minimal systems.
   if command -v openssl >/dev/null 2>&1; then
     OPENCLAW_GATEWAY_TOKEN="$(openssl rand -hex 32)"
   else
@@ -54,6 +59,8 @@ COMPOSE_FILES=("$COMPOSE_FILE")
 COMPOSE_ARGS=()
 
 write_extra_compose() {
+  # Generates docker-compose.extra.yml for optional mounts so the baseline
+  # docker-compose.yml stays stable and easy to diff/review.
   local home_volume="$1"
   shift
   local mount
@@ -99,6 +106,8 @@ YAML
 
 VALID_MOUNTS=()
 if [[ -n "$EXTRA_MOUNTS" ]]; then
+  # Keep parsing Bash 3.2-safe: trim whitespace and drop empty entries from
+  # comma-separated OPENCLAW_EXTRA_MOUNTS values.
   IFS=',' read -r -a mounts <<<"$EXTRA_MOUNTS"
   for mount in "${mounts[@]}"; do
     mount="${mount#"${mount%%[![:space:]]*}"}"
@@ -121,6 +130,8 @@ fi
 for compose_file in "${COMPOSE_FILES[@]}"; do
   COMPOSE_ARGS+=("-f" "$compose_file")
 done
+
+# Human-readable command hint shown in setup output to copy/paste exactly.
 COMPOSE_HINT="docker compose"
 for compose_file in "${COMPOSE_FILES[@]}"; do
   COMPOSE_HINT+=" -f ${compose_file}"
@@ -177,6 +188,7 @@ upsert_env "$ENV_FILE" \
   OPENCLAW_DOCKER_APT_PACKAGES
 
 echo "==> Building Docker image: $IMAGE_NAME"
+# Build arg allows extra apt packages without mutating Dockerfile.
 docker build \
   --build-arg "OPENCLAW_DOCKER_APT_PACKAGES=${OPENCLAW_DOCKER_APT_PACKAGES}" \
   -t "$IMAGE_NAME" \

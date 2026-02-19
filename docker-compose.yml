@@ -1,22 +1,31 @@
 services:
+  # Gateway service that exposes the OpenClaw multiplexed HTTP+WS endpoint
+  # plus the bridge port used by browser/canvas helpers.
   openclaw-gateway:
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     environment:
+      # Keep container paths and terminal behavior deterministic so onboarding,
+      # CLI prompts, and log formatting match local runs.
       HOME: /home/node
       TERM: xterm-256color
+      # Shared auth token used by clients and health checks.
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      # Optional provider credentials for web-based Claude integrations.
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
       CLAUDE_WEB_COOKIE: ${CLAUDE_WEB_COOKIE}
     volumes:
+      # Persist OpenClaw state and workspace across container restarts.
       - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
     ports:
+      # Primary gateway port and adjacent bridge port; defaults keep docs/examples aligned.
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
       - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
     init: true
     restart: unless-stopped
     command:
+      # Keep command array in sync with src/docker-setup.test.ts expectations.
       [
         "node",
         "dist/index.js",
@@ -27,12 +36,15 @@ services:
         "18789",
       ]
 
+  # Utility container for interactive CLI commands (onboarding, channel login,
+  # diagnostics). It shares the same config/workspace mounts as the gateway.
   openclaw-cli:
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     environment:
       HOME: /home/node
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      # Prevent accidental attempts to launch a host browser from inside Docker.
       BROWSER: echo
       CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
       CLAUDE_WEB_SESSION_KEY: ${CLAUDE_WEB_SESSION_KEY}
