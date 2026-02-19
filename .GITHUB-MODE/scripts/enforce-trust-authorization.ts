@@ -6,6 +6,7 @@ type JsonObject = Record<string, unknown>;
 
 const TRUST_LEVELS_PATH = ".GITHUB-MODE/runtime/trust-levels.json";
 const ADAPTER_CONTRACTS_PATH = ".GITHUB-MODE/runtime/adapter-contracts.json";
+const COMMAND_POLICY_PATH = ".GITHUB-MODE/runtime/command-policy.json";
 
 export type TrustLevel = {
   id: string;
@@ -75,10 +76,34 @@ export function resolveAdapterContract(
 }
 
 /**
+ * Validate that command-policy.json is in enforcement mode with active constraints.
+ * Returns an error reason string if validation fails, or undefined if valid.
+ */
+export function validateCommandPolicyEnforcement(root: string): string | undefined {
+  let commandPolicy: JsonObject;
+  try {
+    commandPolicy = readJson(COMMAND_POLICY_PATH, root);
+  } catch {
+    return `command-policy.json could not be read — fail-closed denial`;
+  }
+
+  if (commandPolicy.enforcementMode !== "enforce") {
+    return `command-policy enforcementMode is "${String(commandPolicy.enforcementMode)}", expected "enforce" — fail-closed denial`;
+  }
+
+  const constraints = commandPolicy.constraints;
+  if (!Array.isArray(constraints) || constraints.length === 0) {
+    return "command-policy.json constraints are missing or empty — fail-closed denial";
+  }
+
+  return undefined;
+}
+
+/**
  * Enforce trust-level-based authorization for an actor requesting an adapter.
  *
  * Fail-closed: any indeterminate state (missing trust level, missing adapter,
- * invalid data) results in denial.
+ * invalid data, inactive command policy) results in denial.
  */
 export function enforceTrustAuthorization(
   root: string,
@@ -88,6 +113,17 @@ export function enforceTrustAuthorization(
 ): AuthorizationDecision {
   const timestamp = new Date().toISOString();
   const base = { actor, trustLevel: trustLevelId, adapter: adapterName, timestamp };
+
+  // Validate command policy is in active enforcement
+  const policyError = validateCommandPolicyEnforcement(root);
+  if (policyError) {
+    return {
+      ...base,
+      allowed: false,
+      reason: policyError,
+      evidence: COMMAND_POLICY_PATH,
+    };
+  }
 
   // Resolve trust level definition
   const trustLevel = resolveTrustLevel(root, trustLevelId);

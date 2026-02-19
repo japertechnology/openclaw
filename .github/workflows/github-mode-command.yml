@@ -122,7 +122,7 @@ jobs:
       - name: Enforce trust-aware authorization (Task 4.2)
         env:
           GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_MODE_TRUST_LEVEL: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork && 'untrusted' || 'trusted' }}
+          GITHUB_MODE_TRUST_LEVEL: ${{ github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork && 'untrusted' || 'semi-trusted') || 'trusted' }}
           GITHUB_MODE_ADAPTER: repo-write
         run: |
           set -euo pipefail
