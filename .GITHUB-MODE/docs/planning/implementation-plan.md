@@ -155,7 +155,7 @@ Phase 1 (Contract Scaffolding) ✅ Complete
     │
     ├──────────────────────┐
     ▼                      ▼
-Phase 2 (Security)    Phase 3 (Validation Workflows)
+Phase 2 (Security) ✅    Phase 3 (Validation Workflows) ✅
     │                      │        [can run in parallel]
     └──────┬───────────────┘
            ▼
@@ -253,7 +253,7 @@ Phase 1 proceeds only while this evidence remains valid.
 
 ### Phase 3 — Core validation, simulation, eval, and cost workflows
 
-**Status:** Not started. **Depends on:** Phase 1 ✅. **Can run in parallel with:** Phase 2.
+**Status:** Code-complete. **Depends on:** Phase 1 ✅. **Can run in parallel with:** Phase 2 ✅.
 
 **Deliverables:**
 

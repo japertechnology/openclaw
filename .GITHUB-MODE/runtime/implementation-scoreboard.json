@@ -58,6 +58,58 @@
       ]
     },
     {
+      "id": "phase3-ci-workflow-set",
+      "description": "Phase 3 core CI workflows (build, check, test, policy, route-sim, eval-tier0, cost, sync-templates) are implemented with deterministic artifacts and markdown summaries.",
+      "state": "operational",
+      "evidence": [
+        ".github/workflows/github-mode-build.yml",
+        ".github/workflows/github-mode-check.yml",
+        ".github/workflows/github-mode-test.yml",
+        ".github/workflows/github-mode-policy.yml",
+        ".github/workflows/github-mode-route-sim.yml",
+        ".github/workflows/github-mode-eval-tier0.yml",
+        ".github/workflows/github-mode-cost.yml",
+        ".github/workflows/github-mode-sync-templates.yml"
+      ]
+    },
+    {
+      "id": "phase3-policy-drift-detection",
+      "description": "Policy and route drift detection with remediation pointers, enforced in CI workflows.",
+      "state": "operational",
+      "evidence": [
+        ".GITHUB-MODE/scripts/check-policy-drift.ts",
+        ".GITHUB-MODE/test/check-policy-drift.test.ts",
+        ".github/workflows/github-mode-policy.yml",
+        ".github/workflows/github-mode-route-sim.yml"
+      ]
+    },
+    {
+      "id": "phase3-eval-cost-threshold-gates",
+      "description": "Eval and cost threshold gates enforce versioned policy-governed limits that block promotion on failure.",
+      "state": "operational",
+      "evidence": [
+        ".GITHUB-MODE/scripts/check-eval-thresholds.ts",
+        ".GITHUB-MODE/scripts/check-cost-thresholds.ts",
+        ".GITHUB-MODE/test/check-eval-thresholds.test.ts",
+        ".GITHUB-MODE/test/check-cost-thresholds.test.ts",
+        ".GITHUB-MODE/runtime/eval-thresholds.json",
+        ".GITHUB-MODE/runtime/cost-thresholds.json",
+        ".github/workflows/github-mode-eval-tier0.yml",
+        ".github/workflows/github-mode-cost.yml"
+      ]
+    },
+    {
+      "id": "phase3-template-drift-detection",
+      "description": "Template drift detection with migration guidance against a versioned baseline.",
+      "state": "operational",
+      "evidence": [
+        ".GITHUB-MODE/scripts/check-template-drift.ts",
+        ".GITHUB-MODE/test/check-template-drift.test.ts",
+        ".GITHUB-MODE/runtime/template-baseline.json",
+        ".github/workflows/github-mode-sync-templates.yml"
+      ]
+    },
+    {
       "id": "trusted-command-bot-pr",
       "description": "Trusted maintainer commands can execute and produce bot-authored pull requests end-to-end.",
       "state": "spec-only",

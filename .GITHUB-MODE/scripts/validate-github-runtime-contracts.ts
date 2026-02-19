@@ -81,6 +81,18 @@ const requiredContracts: ContractCheck[] = [
     file: ".GITHUB-MODE/runtime/skills-emergency-revocations.json",
     requiredKeys: ["schemaVersion", "revocationVersion", "events"],
   },
+  {
+    file: ".GITHUB-MODE/runtime/eval-thresholds.json",
+    requiredKeys: ["schemaVersion", "thresholdsVersion", "enforcementMode", "tiers", "subsystems"],
+  },
+  {
+    file: ".GITHUB-MODE/runtime/cost-thresholds.json",
+    requiredKeys: ["schemaVersion", "thresholdsVersion", "enforcementMode", "gates"],
+  },
+  {
+    file: ".GITHUB-MODE/runtime/template-baseline.json",
+    requiredKeys: ["schemaVersion", "baselineVersion", "requiredFiles"],
+  },
 ];
 
 function readJson(filePath: string): JsonObject {

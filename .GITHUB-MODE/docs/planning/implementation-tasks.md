@@ -419,6 +419,8 @@ Status: 🟢 Code-complete.
 
 ## Phase 3 — Validation, Simulation, Eval, and Cost Workflows
 
+**Status:** Code-complete. See [phase-3-full-implementation-checklist.md](phase-3-full-implementation-checklist.md) for evidence.
+
 ### Task 3.1 — Core CI Workflow Set Implementation
 
 **Workstream:** WS-C (Validation/policy/eval/cost)
