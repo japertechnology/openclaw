@@ -110,10 +110,38 @@
       ]
     },
     {
+      "id": "phase4-command-workflow-set",
+      "description": "Phase 4.1 command runtime workflows (command, agent-run, bot-pr) with fail-closed pre-agent gates in deterministic order.",
+      "state": "operational",
+      "evidence": [
+        ".github/workflows/github-mode-command.yml",
+        ".github/workflows/github-mode-agent-run.yml",
+        ".github/workflows/github-mode-bot-pr.yml",
+        ".GITHUB-MODE/scripts/run-pre-agent-gates.ts",
+        ".GITHUB-MODE/test/run-pre-agent-gates.test.ts"
+      ]
+    },
+    {
+      "id": "phase4-pre-agent-gate-enforcement",
+      "description": "Pre-agent gates enforce fail-closed skill-package-scan, lockfile-provenance, and policy-eval in deterministic order before agent execution.",
+      "state": "operational",
+      "evidence": [
+        ".GITHUB-MODE/scripts/run-pre-agent-gates.ts",
+        ".GITHUB-MODE/test/run-pre-agent-gates.test.ts",
+        ".GITHUB-MODE/runtime/command-policy.json",
+        ".GITHUB-MODE/runtime/trusted-command-gate.json"
+      ]
+    },
+    {
       "id": "trusted-command-bot-pr",
       "description": "Trusted maintainer commands can execute and produce bot-authored pull requests end-to-end.",
-      "state": "spec-only",
-      "evidence": [".GITHUB-MODE/docs/planning/mvp.md"]
+      "state": "scaffold",
+      "evidence": [
+        ".github/workflows/github-mode-command.yml",
+        ".github/workflows/github-mode-agent-run.yml",
+        ".github/workflows/github-mode-bot-pr.yml",
+        ".GITHUB-MODE/docs/planning/mvp.md"
+      ]
     },
     {
       "id": "untrusted-privilege-blocking",
