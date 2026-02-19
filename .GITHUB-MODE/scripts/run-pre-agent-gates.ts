@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -249,6 +249,28 @@ function formatGatesSummary(result: PreAgentGatesResult): string {
   return lines.join("\n");
 }
 
+function parseCliArgs(argv: string[]): {
+  jsonOut?: string;
+  summaryOut?: string;
+} {
+  const parsed: { jsonOut?: string; summaryOut?: string } = {};
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--json-out") {
+      parsed.jsonOut = argv[index + 1];
+      index += 1;
+      continue;
+    }
+    if (arg === "--summary-out") {
+      parsed.summaryOut = argv[index + 1];
+      index += 1;
+    }
+  }
+
+  return parsed;
+}
+
 function main(): void {
   const command = process.env.GITHUB_MODE_COMMAND;
   if (!command) {
@@ -259,6 +281,15 @@ function main(): void {
   const root = process.cwd();
   const result = runPreAgentGates(root, command);
   const summary = formatGatesSummary(result);
+  const { jsonOut, summaryOut } = parseCliArgs(process.argv.slice(2));
+
+  if (jsonOut) {
+    writeFileSync(jsonOut, `${JSON.stringify(result, null, 2)}\n`, "utf8");
+  }
+
+  if (summaryOut) {
+    writeFileSync(summaryOut, `${summary}\n`, "utf8");
+  }
 
   console.log(summary);
 

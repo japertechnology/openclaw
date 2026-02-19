@@ -134,13 +134,14 @@
     },
     {
       "id": "trusted-command-bot-pr",
-      "description": "Trusted maintainer commands can execute and produce bot-authored pull requests end-to-end.",
-      "state": "scaffold",
+      "description": "Trusted command workflow supports end-to-end command-to-agent-to-bot-pr sequencing for trusted users with explicit create-pr gating.",
+      "state": "operational",
       "evidence": [
-        ".github/workflows/github-mode-command.yml",
+        ".GITHUB-MODE/docs/planning/mvp.md",
+        ".GITHUB-MODE/scripts/run-pre-agent-gates.ts",
         ".github/workflows/github-mode-agent-run.yml",
         ".github/workflows/github-mode-bot-pr.yml",
-        ".GITHUB-MODE/docs/planning/mvp.md"
+        ".github/workflows/github-mode-command.yml"
       ]
     },
     {

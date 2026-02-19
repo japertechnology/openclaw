@@ -21,6 +21,18 @@ on:
         required: false
         type: string
         default: "{}"
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
+      run_context:
+        required: false
+        type: string
+        default: "{}"
 
 permissions:
   contents: read
@@ -46,6 +58,8 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/github-mode-agent-run"
           if node --import tsx .GITHUB-MODE/scripts/run-pre-agent-gates.ts \
+            --json-out "$RUNNER_TEMP/github-mode-agent-run/gate-records.json" \
+            --summary-out "$RUNNER_TEMP/github-mode-agent-run/gate-summary.md" \
             | tee "$RUNNER_TEMP/github-mode-agent-run/gates-output.txt"; then
             echo "passed=true" >> "$GITHUB_OUTPUT"
           else
@@ -53,6 +67,16 @@ jobs:
             echo "::error::Pre-agent gates failed. Agent execution blocked."
             exit 1
           fi
+
+      - name: Publish pre-agent gate records
+        if: always()
+        run: |
+          {
+            echo ""
+            echo "### Pre-agent gate records"
+            jq -r '.gates[] | "- gate=\(.gate) result=\(.result) reason=\(.reason) evidence=\(.evidence)"' \
+              "$RUNNER_TEMP/github-mode-agent-run/gate-records.json"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Emit gate evidence
         if: always()

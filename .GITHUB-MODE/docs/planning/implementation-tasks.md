@@ -594,6 +594,8 @@ Phase 4 readiness: Phase 2 (✅ code-complete) + Phase 3 (✅ code-complete). Bo
 
 ### Task 4.1 — Command Workflow Implementation
 
+Status: ✅ Complete.
+
 **Workstream:** WS-D (Command runtime and bot PR loop)
 
 **Scope:** Implement `github-mode-command.yml`, `github-mode-agent-run.yml`, `github-mode-bot-pr.yml`.
@@ -610,6 +612,14 @@ Phase 4 readiness: Phase 2 (✅ code-complete) + Phase 3 (✅ code-complete). Bo
   - `reason=<short machine-parseable reason>`
   - `evidence=<artifact-or-log-reference>`
 - End-to-end command-to-PR works for trusted users.
+
+**Evidence References:**
+
+- `.github/workflows/github-mode-command.yml`
+- `.github/workflows/github-mode-agent-run.yml`
+- `.github/workflows/github-mode-bot-pr.yml`
+- `.GITHUB-MODE/scripts/run-pre-agent-gates.ts`
+- `.GITHUB-MODE/test/run-pre-agent-gates.test.ts`
 
 ---
 

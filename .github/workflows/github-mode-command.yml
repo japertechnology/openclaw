@@ -16,6 +16,11 @@ on:
         description: "Target file or path for the command"
         required: true
         type: string
+      open_bot_pr:
+        description: "Run bot PR workflow after agent execution"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -41,6 +46,8 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/github-mode-command"
           if node --import tsx .GITHUB-MODE/scripts/run-pre-agent-gates.ts \
+            --json-out "$RUNNER_TEMP/github-mode-command/gate-records.json" \
+            --summary-out "$RUNNER_TEMP/github-mode-command/gate-summary.md" \
             | tee "$RUNNER_TEMP/github-mode-command/gates-output.txt"; then
             echo "passed=true" >> "$GITHUB_OUTPUT"
           else
@@ -48,6 +55,16 @@ jobs:
             echo "::error::Pre-agent gates failed. Agent execution blocked."
             exit 1
           fi
+
+      - name: Publish pre-agent gate records
+        if: always()
+        run: |
+          {
+            echo ""
+            echo "### Pre-agent gate records"
+            jq -r '.gates[] | "- gate=\(.gate) result=\(.result) reason=\(.reason) evidence=\(.evidence)"' \
+              "$RUNNER_TEMP/github-mode-command/gate-records.json"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Emit gate evidence
         if: always()
@@ -128,3 +145,25 @@ jobs:
           name: github-mode-command-dispatch-evidence
           path: ${{ runner.temp }}/github-mode-command-dispatch/evidence.json
           retention-days: 90
+
+  bot-pr:
+    needs:
+      - pre-agent-gates
+      - dispatch-agent
+    if: needs.pre-agent-gates.outputs.gates_passed == 'true' && inputs.open_bot_pr
+    uses: ./.github/workflows/github-mode-bot-pr.yml
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      command: ${{ inputs.command }}
+      branch_name: github-mode-bot/${{ github.run_id }}-${{ inputs.command }}
+      pr_title: "GitHub Mode: ${{ inputs.command }} ${{ inputs.target }}"
+      pr_body: |
+        Automated PR created by GitHub Mode command workflow.
+
+        - command: `${{ inputs.command }}`
+        - target: `${{ inputs.target }}`
+        - source run: `${{ github.run_id }}`
+      source_run_id: ${{ github.run_id }}
+      create_pull_request: true
