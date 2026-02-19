@@ -673,6 +673,7 @@ Status: ✅ Complete.
 - `.GITHUB-MODE/runtime/adapter-contracts.json`
 - `.github/workflows/github-mode-command.yml`
 - `.github/workflows/github-mode-agent-run.yml`
+- `.github/workflows/github-mode-bot-pr.yml`
 
 ---
 
