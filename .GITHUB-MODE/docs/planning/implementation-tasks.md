@@ -186,8 +186,8 @@ Status: ✅ Complete.
 **Acceptance Criteria:**
 
 - ✅ Validator fails when installed-only entries lack owner/rationale.
-- Validator fails when high-value workflows are unmapped.
-- Parity report artifact (`github-mode-parity-report`) is generated in `.github/workflows/github-mode-contracts.yml` (`validate-contracts` job, `Generate parity report artifact` + `Upload parity report artifact` steps) for PRs affecting relevant subsystems.
+- ✅ Validator fails when high-value workflows are unmapped.
+- ✅ Parity report artifact (`github-mode-parity-report`) is generated in `.github/workflows/github-mode-contracts.yml` (`validate-contracts` job, `Generate parity report artifact` + `Upload parity report artifact` steps) for PRs affecting relevant subsystems.
 
 ---
 
@@ -201,8 +201,8 @@ Status: ✅ Complete.
 
 **Acceptance Criteria:**
 
-- Incompatible schema change without migration notes fails.
-- Compatibility validator is updated as part of breaking changes.
+- ✅ Incompatible schema change without migration notes fails.
+- ✅ Compatibility validator is updated as part of breaking changes.
 - ✅ Process is documented in contributor workflow (see `.GITHUB-MODE/runtime/README.md` "Contract versioning and compatibility" section).
 
 ---
@@ -606,20 +606,20 @@ Phase 4 readiness: Phase 2 (✅ code-complete) + Phase 3 (✅ code-complete). Bo
 
 **Key `src/` modules used by Phase 4:**
 
-| Module | Source path | Purpose in GitHub Mode |
-| --- | --- | --- |
-| Agent runner | `src/agents/` | Core execution engine — runs agent tasks, manages tool invocation, sandbox |
-| Auto-reply | `src/auto-reply/` | Orchestration layer — reply generation, model interaction, conversation flow |
-| Routing | `src/routing/` | Agent route resolution — determines which agent handles a given command |
-| Tool policy | `src/agents/tool-policy.ts` | Policy gates for tool usage during agent execution |
-| Providers | `src/providers/` | Model provider integrations (Anthropic, OpenAI, etc.) for inference |
-| Security | `src/security/` | Audit, tool policy validation, skill scanning |
-| Config | `src/config/` | Configuration loading, validation, and merging |
-| Memory | `src/memory/` | Conversation memory for agent context |
-| Sessions | `src/sessions/` | Session state management for agent conversations |
-| Plugins | `src/plugins/`, `src/plugin-sdk/` | Plugin system and SDK for extensibility |
-| Hooks | `src/hooks/` | Internal event system for lifecycle events |
-| Infrastructure | `src/infra/` | Environment handling, networking, process management |
+| Module         | Source path                       | Purpose in GitHub Mode                                                       |
+| -------------- | --------------------------------- | ---------------------------------------------------------------------------- |
+| Agent runner   | `src/agents/`                     | Core execution engine — runs agent tasks, manages tool invocation, sandbox   |
+| Auto-reply     | `src/auto-reply/`                 | Orchestration layer — reply generation, model interaction, conversation flow |
+| Routing        | `src/routing/`                    | Agent route resolution — determines which agent handles a given command      |
+| Tool policy    | `src/agents/tool-policy.ts`       | Policy gates for tool usage during agent execution                           |
+| Providers      | `src/providers/`                  | Model provider integrations (Anthropic, OpenAI, etc.) for inference          |
+| Security       | `src/security/`                   | Audit, tool policy validation, skill scanning                                |
+| Config         | `src/config/`                     | Configuration loading, validation, and merging                               |
+| Memory         | `src/memory/`                     | Conversation memory for agent context                                        |
+| Sessions       | `src/sessions/`                   | Session state management for agent conversations                             |
+| Plugins        | `src/plugins/`, `src/plugin-sdk/` | Plugin system and SDK for extensibility                                      |
+| Hooks          | `src/hooks/`                      | Internal event system for lifecycle events                                   |
+| Infrastructure | `src/infra/`                      | Environment handling, networking, process management                         |
 
 ### Task 4.1 — Command Workflow Implementation
 
