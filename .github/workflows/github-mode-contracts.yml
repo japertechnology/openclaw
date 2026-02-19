@@ -41,11 +41,14 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/setup-node-env
       - name: Enforce GitHub Mode activation
         run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
       - run: node --import tsx .GITHUB-MODE/scripts/validate-governance-approvals.ts
       - run: pnpm contracts:github:validate
+      - run: node --import tsx .GITHUB-MODE/scripts/check-contract-compatibility.ts
       - run: node --import tsx .GITHUB-MODE/scripts/validate-github-mode-package-list.ts
       - run: node --import tsx .GITHUB-MODE/scripts/check-implementation-scoreboard.ts
       - name: Generate parity report artifact
