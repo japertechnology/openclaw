@@ -46,6 +46,7 @@ const requiredContracts: ContractCheck[] = [
       "schemaVersion",
       "convergenceVersion",
       "acceptanceCriteria",
+      "requiredHighValueWorkflows",
       "reconciliationSignals",
     ],
   },
@@ -230,6 +231,70 @@ function validateConvergenceMap(): void {
   }
 }
 
+function validateRequiredHighValueWorkflowCoverage(): void {
+  const convergencePath = ".GITHUB-MODE/runtime/workspace-convergence-map.json";
+  const parityPath = ".GITHUB-MODE/runtime/parity-matrix.json";
+  const convergence = readJson(convergencePath);
+  const parity = readJson(parityPath);
+
+  const requiredWorkflows = convergence.requiredHighValueWorkflows;
+  if (!Array.isArray(requiredWorkflows) || requiredWorkflows.length === 0) {
+    throw new Error(`${convergencePath}: requiredHighValueWorkflows must be a non-empty array`);
+  }
+
+  const invalidRequired = requiredWorkflows.filter((workflow) => typeof workflow !== "string");
+  if (invalidRequired.length > 0) {
+    throw new Error(
+      `${convergencePath}: requiredHighValueWorkflows must contain only workflow ID strings`,
+    );
+  }
+
+  const duplicates = new Set<string>();
+  const seen = new Set<string>();
+  for (const workflow of requiredWorkflows as string[]) {
+    if (seen.has(workflow)) {
+      duplicates.add(workflow);
+    }
+    seen.add(workflow);
+  }
+
+  if (duplicates.size > 0) {
+    throw new Error(
+      `${convergencePath}: requiredHighValueWorkflows contains duplicates: ${Array.from(duplicates)
+        .toSorted()
+        .join(", ")}`,
+    );
+  }
+
+  const mappings = parity.mappings;
+  if (!Array.isArray(mappings)) {
+    throw new Error(`${parityPath}: mappings must be an array`);
+  }
+
+  const parityWorkflowIds = new Set<string>();
+  for (const [index, mapping] of mappings.entries()) {
+    if (!mapping || typeof mapping !== "object") {
+      throw new Error(`${parityPath}: mappings[${index}] must be an object`);
+    }
+
+    const workflow = (mapping as JsonObject).workflow;
+    if (typeof workflow !== "string" || workflow.length === 0) {
+      throw new Error(`${parityPath}: mappings[${index}].workflow must be a non-empty string`);
+    }
+
+    parityWorkflowIds.add(workflow);
+  }
+
+  const missing = (requiredWorkflows as string[]).filter(
+    (workflow) => !parityWorkflowIds.has(workflow),
+  );
+  if (missing.length > 0) {
+    throw new Error(
+      `${parityPath}: missing required high-value workflow mappings for: ${missing.toSorted().join(", ")}`,
+    );
+  }
+}
+
 function validateCollaborationPolicyDenyDefault(): void {
   const policyPath = ".GITHUB-MODE/runtime/collaboration-policy.json";
   const policy = readJson(policyPath);
@@ -409,6 +474,7 @@ function main(): void {
   validateCollaborationPolicyDenyDefault();
   validateParityMatrix();
   validateConvergenceMap();
+  validateRequiredHighValueWorkflowCoverage();
   validateSkillsQuarantineRegistry();
   validateTrustedAllowlist();
   validateTrustedCommandGate();

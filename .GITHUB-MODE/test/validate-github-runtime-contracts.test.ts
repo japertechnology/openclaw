@@ -3,6 +3,9 @@ import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
+const PARITY_PATH = ".GITHUB-MODE/runtime/parity-matrix.json";
+const CONVERGENCE_PATH = ".GITHUB-MODE/runtime/workspace-convergence-map.json";
+
 const ROOT = process.cwd();
 const SCRIPT = ".GITHUB-MODE/scripts/validate-github-runtime-contracts.ts";
 
@@ -42,6 +45,25 @@ function withRemovedFile<T>(filePath: string, fn: () => T): T {
   }
 }
 
+type ParityMapping = {
+  workflow: string;
+  installedRuntime: string;
+  githubMode: string;
+  parity: string;
+};
+type ParityContract = { mappings: ParityMapping[] } & Record<string, unknown>;
+type ConvergenceContract = { requiredHighValueWorkflows: string[] } & Record<string, unknown>;
+
+function withRuntimeContracts<T>(
+  fn: (contracts: { parity: ParityContract; convergence: ConvergenceContract }) => T,
+): T {
+  const parity = JSON.parse(readFileSync(path.join(ROOT, PARITY_PATH), "utf8")) as ParityContract;
+  const convergence = JSON.parse(
+    readFileSync(path.join(ROOT, CONVERGENCE_PATH), "utf8"),
+  ) as ConvergenceContract;
+  return fn({ parity, convergence });
+}
+
 describe("validate-github-runtime-contracts", () => {
   it("passes with valid contracts", () => {
     const result = runValidator();
@@ -72,11 +94,7 @@ describe("validate-github-runtime-contracts", () => {
         },
       ],
     };
-    const result = withTempFile(
-      ".GITHUB-MODE/runtime/parity-matrix.json",
-      JSON.stringify(invalidMatrix, null, 2),
-      runValidator,
-    );
+    const result = withTempFile(PARITY_PATH, JSON.stringify(invalidMatrix, null, 2), runValidator);
     expect(result.exitCode).not.toBe(0);
     expect(result.stdout).toContain("invalid parity value");
   });
@@ -95,11 +113,7 @@ describe("validate-github-runtime-contracts", () => {
         },
       ],
     };
-    const result = withTempFile(
-      ".GITHUB-MODE/runtime/parity-matrix.json",
-      JSON.stringify(noOwner, null, 2),
-      runValidator,
-    );
+    const result = withTempFile(PARITY_PATH, JSON.stringify(noOwner, null, 2), runValidator);
     expect(result.exitCode).not.toBe(0);
     expect(result.stdout).toContain("requires both");
   });
@@ -109,10 +123,11 @@ describe("validate-github-runtime-contracts", () => {
       schemaVersion: "1.0",
       convergenceVersion: "v1.0.0",
       acceptanceCriteria: ["Some criteria"],
+      requiredHighValueWorkflows: ["build-and-test"],
       reconciliationSignals: [{ signal: "test", source: "test", required: false }],
     };
     const result = withTempFile(
-      ".GITHUB-MODE/runtime/workspace-convergence-map.json",
+      CONVERGENCE_PATH,
       JSON.stringify(noRequiredSignal, null, 2),
       runValidator,
     );
@@ -141,29 +156,42 @@ describe("validate-github-runtime-contracts", () => {
     expect(result.stdout).toContain("schema validation failed");
   });
 
-  it("accepts valid parity values: native, adapter, emulated, installed-only", () => {
-    const validMatrix = {
-      schemaVersion: "1.0",
-      matrixVersion: "v1.0.0",
-      mappings: [
-        { workflow: "w1", installedRuntime: "ir1", githubMode: "gm1", parity: "native" },
-        { workflow: "w2", installedRuntime: "ir2", githubMode: "gm2", parity: "adapter" },
-        { workflow: "w3", installedRuntime: "ir3", githubMode: "gm3", parity: "emulated" },
-        {
-          workflow: "w4",
-          installedRuntime: "ir4",
-          githubMode: "gm4",
-          parity: "installed-only",
-          owner: "@test",
-          rationale: "Test",
-        },
-      ],
-    };
-    const result = withTempFile(
-      ".GITHUB-MODE/runtime/parity-matrix.json",
-      JSON.stringify(validMatrix, null, 2),
-      runValidator,
-    );
+  it("fails when required high-value workflows are missing from parity matrix mappings", () => {
+    const result = withRuntimeContracts(({ parity, convergence }) => {
+      const required = convergence.requiredHighValueWorkflows;
+      const workflowToRemove = required[0];
+      const mappings = parity.mappings.filter((mapping) => mapping.workflow !== workflowToRemove);
+
+      return withTempFile(
+        PARITY_PATH,
+        JSON.stringify({ ...parity, mappings }, null, 2),
+        runValidator,
+      );
+    });
+
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout).toContain("missing required high-value workflow mappings");
+  });
+
+  it("passes when all required high-value workflows are present in parity matrix mappings", () => {
+    const result = withRuntimeContracts(({ parity, convergence }) => {
+      const required = convergence.requiredHighValueWorkflows;
+      const existing = new Set(parity.mappings.map((mapping) => mapping.workflow));
+      const missing = required.filter((workflow) => !existing.has(workflow));
+      const appendedMappings = missing.map((workflow) => ({
+        workflow,
+        installedRuntime: `${workflow} installed runtime`,
+        githubMode: `${workflow} github mode`,
+        parity: "adapter",
+      }));
+
+      return withTempFile(
+        PARITY_PATH,
+        JSON.stringify({ ...parity, mappings: [...parity.mappings, ...appendedMappings] }, null, 2),
+        runValidator,
+      );
+    });
+
     expect(result.exitCode).toBe(0);
   });
 });

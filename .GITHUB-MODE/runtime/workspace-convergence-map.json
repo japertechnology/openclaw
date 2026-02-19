@@ -11,6 +11,21 @@
     "Parity matrix covers all planned workflow classes from the implementation plan.",
     "Contract versioning and compatibility policy is documented."
   ],
+  "requiredHighValueWorkflows": [
+    "build-and-test",
+    "policy-validation",
+    "route-simulation",
+    "eval-tier0",
+    "cost-check",
+    "command",
+    "agent-run",
+    "bot-pr",
+    "drift-detection",
+    "promote-dev",
+    "promote-staging",
+    "promote-prod",
+    "incident-response"
+  ],
   "reconciliationSignals": [
     {
       "signal": "contract-validation-pass",
