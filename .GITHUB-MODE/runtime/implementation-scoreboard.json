@@ -147,10 +147,15 @@
     {
       "id": "untrusted-privilege-blocking",
       "description": "Untrusted actors are blocked from privileged adapters and secret-backed paths.",
-      "state": "scaffold",
+      "state": "operational",
       "evidence": [
+        ".GITHUB-MODE/scripts/enforce-trust-authorization.ts",
+        ".GITHUB-MODE/test/enforce-trust-authorization.test.ts",
         ".GITHUB-MODE/runtime/trust-levels.json",
-        ".GITHUB-MODE/runtime/command-policy.json"
+        ".GITHUB-MODE/runtime/adapter-contracts.json",
+        ".GITHUB-MODE/runtime/command-policy.json",
+        ".github/workflows/github-mode-command.yml",
+        ".github/workflows/github-mode-agent-run.yml"
       ]
     },
     {
