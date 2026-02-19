@@ -40,10 +40,35 @@ jobs:
       - uses: ./.github/actions/setup-node-env
       - name: Enforce GitHub Mode activation
         run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-active.ts
-      - name: Federation placeholder
+      - name: Verify no static cloud credentials
+        run: node --import tsx .GITHUB-MODE/scripts/check-github-mode-oidc-credentials.ts
+      - name: Request OIDC token
+        id: oidc
         run: |
-          echo "Exchange GitHub OIDC token for cloud role credentials here."
-          echo "Do not inject static cloud credentials into env or repository secrets."
-      - name: Deploy placeholder
+          OIDC_TOKEN=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
+          if [ -z "$OIDC_TOKEN" ] || [ "$OIDC_TOKEN" = "null" ]; then
+            echo "::error::OIDC token exchange failed"
+            exit 1
+          fi
+          echo "::add-mask::$OIDC_TOKEN"
+          echo "token_exchanged=true" >> "$GITHUB_OUTPUT"
+      - name: Emit deploy evidence
         run: |
-          echo "Deploy workload using short-lived credentials from cloud federation."
+          cat <<EOF > /tmp/oidc-deploy-evidence.json
+          {
+            "environment": "github-mode-${{ inputs.environment }}",
+            "token_exchange": "${{ steps.oidc.outputs.token_exchanged }}",
+            "deploy_result": "pending_cloud_integration",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "run_id": "${{ github.run_id }}",
+            "actor": "${{ github.actor }}"
+          }
+          EOF
+          cat /tmp/oidc-deploy-evidence.json
+      - name: Upload deploy evidence
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: oidc-deploy-evidence-${{ inputs.environment }}
+          path: /tmp/oidc-deploy-evidence.json
+          retention-days: 90

@@ -50,4 +50,20 @@ describe("github-mode-security-lint", () => {
     expect(pinningErrors[0]).toContain("actions/checkout@v4");
     expect(pinningErrors[1]).toContain("actions/upload-artifact@v4");
   });
+
+  it("flags workflows with no explicit permissions declaration", () => {
+    const errors = runFixture("missing-explicit-permissions.yml");
+    expect(errors.length).toBeGreaterThanOrEqual(1);
+    expect(errors[0]).toContain("missing explicit permissions");
+  });
+
+  it("allows local action refs and docker refs without SHA pinning", () => {
+    const errors = runFixture("local-action-refs-safe.yml");
+    expect(errors).toEqual([]);
+  });
+
+  it("allows write permissions in pull_request context when fork guard is present", () => {
+    const errors = runFixture("write-perms-with-fork-guard.yml");
+    expect(errors).toEqual([]);
+  });
 });
