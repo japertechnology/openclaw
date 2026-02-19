@@ -1,0 +1,10 @@
+Repository native assistant automation built for collaborative engineering teams
+Workflow governed OpenClaw runtime orchestration across active code repositories
+Policy gated pull request execution with clear operational accountability
+Auditable collaboration through GitHub workflow driven repository runtime operations
+Contract first architecture enabling safe autonomous assistant powered automation
+Async repository operations with durable transparent execution and traceability
+Security aware governance for reliable assistant runtime policy enforcement
+Source controlled behavior with explicit policy based execution boundaries
+Deterministic CI powered assistant runtime execution designed for teams
+Team aligned automation protected by enforceable governance and guardrails
