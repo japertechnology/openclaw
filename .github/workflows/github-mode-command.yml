@@ -116,6 +116,9 @@ jobs:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - uses: ./.github/actions/setup-node-env
 
+      - name: Build openclaw runtime from source
+        run: pnpm build
+
       - name: Enforce trust-aware authorization (Task 4.2)
         env:
           GITHUB_ACTOR: ${{ github.actor }}
@@ -175,13 +178,20 @@ jobs:
           path: ${{ runner.temp }}/github-mode-command-provenance/
           retention-days: 90
 
-      - name: Execute command
+      - name: Execute command via openclaw agent engine
         env:
           GITHUB_MODE_COMMAND: ${{ inputs.command }}
           GITHUB_MODE_TARGET: ${{ inputs.target }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          echo "Command dispatched: $GITHUB_MODE_COMMAND on $GITHUB_MODE_TARGET"
-          echo "Agent execution placeholder — awaiting Task 4.7 state adapter pipeline."
+          set -euo pipefail
+          echo "Executing: $GITHUB_MODE_COMMAND on $GITHUB_MODE_TARGET via openclaw agent engine"
+          node openclaw.mjs agent \
+            --agent main \
+            --message "$GITHUB_MODE_COMMAND $GITHUB_MODE_TARGET" \
+            --local \
+            --json
 
       - name: Emit dispatch evidence
         run: |
