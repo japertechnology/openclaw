@@ -65,9 +65,7 @@ describe("enforce-trusted-skill-gate", () => {
 
   it("fails for a revoked skill digest", () => {
     const root = createFixtureRoot(VALID_GATE, VALID_ALLOWLIST);
-    expect(() => validateSkillGate(REVOKED_DIGEST, root)).toThrow(
-      `${REVOKED_DIGEST} is revoked`,
-    );
+    expect(() => validateSkillGate(REVOKED_DIGEST, root)).toThrow(`${REVOKED_DIGEST} is revoked`);
   });
 
   it("fails for an unknown skill digest not in the allowlist", () => {

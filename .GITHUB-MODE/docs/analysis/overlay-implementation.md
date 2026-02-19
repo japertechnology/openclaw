@@ -22,15 +22,15 @@ These constraints rule out embedded approaches (patching source, injecting impor
 
 ADR 0001 already establishes the ownership boundary. GitHub Mode may only create or modify files within these paths:
 
-| Path | Purpose |
-|------|---------|
-| `.GITHUB-MODE/docs/**` | Planning, analysis, ADRs, security docs |
-| `.GITHUB-MODE/runtime/**` | Machine-validated contracts (manifests, schemas, policies) |
-| `.github/workflows/github-mode-*` | CI/CD workflows scoped by naming convention |
-| `.github/actions/github-mode-*` | Reusable composite actions |
-| `.GITHUB-MODE/scripts/**` | Validation and maintenance scripts |
-| `.GITHUB-MODE/test/**` | Isolated test suites for contract validation |
-| `extensions/github/` | Extension package (plugin architecture) |
+| Path                              | Purpose                                                    |
+| --------------------------------- | ---------------------------------------------------------- |
+| `.GITHUB-MODE/docs/**`            | Planning, analysis, ADRs, security docs                    |
+| `.GITHUB-MODE/runtime/**`         | Machine-validated contracts (manifests, schemas, policies) |
+| `.github/workflows/github-mode-*` | CI/CD workflows scoped by naming convention                |
+| `.github/actions/github-mode-*`   | Reusable composite actions                                 |
+| `.GITHUB-MODE/scripts/**`         | Validation and maintenance scripts                         |
+| `.GITHUB-MODE/test/**`            | Isolated test suites for contract validation               |
+| `extensions/github/`              | Extension package (plugin architecture)                    |
 
 No path outside this set is touched. The `.GITHUB-MODE/scripts/check-upstream-additions-only.ts` script enforces this at CI time — any PR that modifies a file outside the owned set is blocked.
 
@@ -137,7 +137,7 @@ GitHub Mode can include a self-maintaining sync workflow:
 name: github-mode-upstream-sync
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Weekly Monday 6 AM UTC
+    - cron: "0 6 * * 1" # Weekly Monday 6 AM UTC
   workflow_dispatch: {}
 
 jobs:
@@ -196,24 +196,24 @@ Core never reads from these surfaces. Removing them is invisible to core.
 
 ## 6. Risk Analysis
 
-| Risk | Likelihood | Mitigation |
-|------|-----------|------------|
-| Upstream adds files in `.GITHUB-MODE/runtime/` | Very low | Naming convention + CI guard script |
-| Plugin loader changes break extension discovery | Low | Plugin SDK versioning; extension tests |
-| Workflow naming collision (`github-mode-*` prefix) | Very low | Convention + CI enforcement |
-| Fork owner forgets to uninstall before PR to upstream | Medium | `check-upstream-additions-only.ts` blocks the PR |
-| Contract schema drift after major core refactor | Medium | Scheduled drift detection workflow |
-| Extension requires core change for new capability | Medium | Feature request to core; never patch `src/` directly |
+| Risk                                                  | Likelihood | Mitigation                                           |
+| ----------------------------------------------------- | ---------- | ---------------------------------------------------- |
+| Upstream adds files in `.GITHUB-MODE/runtime/`        | Very low   | Naming convention + CI guard script                  |
+| Plugin loader changes break extension discovery       | Low        | Plugin SDK versioning; extension tests               |
+| Workflow naming collision (`github-mode-*` prefix)    | Very low   | Convention + CI enforcement                          |
+| Fork owner forgets to uninstall before PR to upstream | Medium     | `check-upstream-additions-only.ts` blocks the PR     |
+| Contract schema drift after major core refactor       | Medium     | Scheduled drift detection workflow                   |
+| Extension requires core change for new capability     | Medium     | Feature request to core; never patch `src/` directly |
 
 ## 7. Comparison With Alternative Approaches
 
-| Approach | Source modification | Sync conflicts | Clean uninstall | Verdict |
-|----------|-------------------|----------------|-----------------|---------|
-| **Overlay (current)** | None | None | Yes, delete owned paths | Recommended |
-| Patch files (`*.patch`) | Applied at build | On every sync | Revert patches | Fragile |
-| Git submodule | None | Rare | Remove submodule | Complex UX |
-| Monorepo embedding | Heavy | Frequent | Impossible cleanly | Rejected |
-| Separate repository | None | N/A | N/A | Loses co-location benefits |
+| Approach                | Source modification | Sync conflicts | Clean uninstall         | Verdict                    |
+| ----------------------- | ------------------- | -------------- | ----------------------- | -------------------------- |
+| **Overlay (current)**   | None                | None           | Yes, delete owned paths | Recommended                |
+| Patch files (`*.patch`) | Applied at build    | On every sync  | Revert patches          | Fragile                    |
+| Git submodule           | None                | Rare           | Remove submodule        | Complex UX                 |
+| Monorepo embedding      | Heavy               | Frequent       | Impossible cleanly      | Rejected                   |
+| Separate repository     | None                | N/A            | N/A                     | Loses co-location benefits |
 
 The overlay approach is the only one that satisfies all three constraints (zero mutation, clean uninstall, conflict-free sync) without introducing operational complexity.
 
@@ -230,4 +230,3 @@ GitHub Mode is implementable as a pure overlay because OpenClaw's architecture a
 A fork owner can install GitHub Mode by adding files to owned paths, sync with upstream at any cadence without conflicts, and fully remove the overlay by deleting those same paths — returning to a state indistinguishable from vanilla upstream. The installed runtime is never aware that GitHub Mode existed.
 
 Alternative approaches were compared — patches, submodules, monorepo embedding, and separate repos were all evaluated and found inferior to this overlay approach.
-

@@ -22,14 +22,14 @@ This report quantifies the expected performance differences across seven dimensi
 
 This is the most visible performance difference and the one most likely to shape user perception.
 
-| Phase | Local Installed | GitHub Mode | Delta |
-|-------|----------------|-------------|-------|
-| Input acceptance | Immediate (stdin/channel socket) | Webhook dispatch + event queue | +1-5 s |
-| Runtime startup | Already running (gateway process) | Runner allocation + container boot | +15-90 s |
-| Dependency resolution | Pre-installed in node_modules | `pnpm install` or cache restore | +5-30 s |
-| State hydration | Local filesystem/SQLite (in-process) | Download checkpoint from external storage | +3-15 s |
-| Model API call | Direct HTTPS to provider | Direct HTTPS to provider (same) | ~0 s |
-| **Total time to first token** | **< 2 s** | **30-120 s** | **+28-118 s** |
+| Phase                         | Local Installed                      | GitHub Mode                               | Delta         |
+| ----------------------------- | ------------------------------------ | ----------------------------------------- | ------------- |
+| Input acceptance              | Immediate (stdin/channel socket)     | Webhook dispatch + event queue            | +1-5 s        |
+| Runtime startup               | Already running (gateway process)    | Runner allocation + container boot        | +15-90 s      |
+| Dependency resolution         | Pre-installed in node_modules        | `pnpm install` or cache restore           | +5-30 s       |
+| State hydration               | Local filesystem/SQLite (in-process) | Download checkpoint from external storage | +3-15 s       |
+| Model API call                | Direct HTTPS to provider             | Direct HTTPS to provider (same)           | ~0 s          |
+| **Total time to first token** | **< 2 s**                            | **30-120 s**                              | **+28-118 s** |
 
 **Why this matters:** A locally installed OpenClaw responds to a message in under two seconds because the gateway process is already running, dependencies are loaded, and state is in-memory or on local disk. GitHub Mode must cold-start an entire execution environment before the agent can begin thinking.
 
@@ -37,11 +37,11 @@ This is the most visible performance difference and the one most likely to shape
 
 ### 2.2 Throughput (Interactions per Hour)
 
-| Metric | Local Installed | GitHub Mode |
-|--------|----------------|-------------|
-| Sequential interactions per hour | 30-120 (conversational pace) | 5-15 (workflow-bound) |
-| Concurrent interactions | 1 per gateway (sequential model calls) | Multiple workflows in parallel |
-| Batch task execution | Serial, operator-driven | Parallel across runners |
+| Metric                           | Local Installed                        | GitHub Mode                    |
+| -------------------------------- | -------------------------------------- | ------------------------------ |
+| Sequential interactions per hour | 30-120 (conversational pace)           | 5-15 (workflow-bound)          |
+| Concurrent interactions          | 1 per gateway (sequential model calls) | Multiple workflows in parallel |
+| Batch task execution             | Serial, operator-driven                | Parallel across runners        |
 
 **The throughput tradeoff:** Local mode handles high-frequency, low-complexity interactions efficiently. GitHub Mode handles fewer interactions per hour but can run multiple independent workflows in parallel across separate runners.
 
@@ -49,11 +49,11 @@ For a single back-and-forth conversation, local mode is 4-10x faster in raw thro
 
 ### 2.3 Cold Start and Warm Start
 
-| Scenario | Local Installed | GitHub Mode |
-|----------|----------------|-------------|
-| Cold start (first run) | 3-10 s (process launch + init) | 45-120 s (runner + checkout + install + hydrate) |
-| Warm start (subsequent) | < 1 s (process already running) | 30-90 s (runner reuse is not guaranteed) |
-| Hot path (mid-conversation) | < 0.5 s (in-memory context) | N/A (no persistent session between runs) |
+| Scenario                    | Local Installed                 | GitHub Mode                                      |
+| --------------------------- | ------------------------------- | ------------------------------------------------ |
+| Cold start (first run)      | 3-10 s (process launch + init)  | 45-120 s (runner + checkout + install + hydrate) |
+| Warm start (subsequent)     | < 1 s (process already running) | 30-90 s (runner reuse is not guaranteed)         |
+| Hot path (mid-conversation) | < 0.5 s (in-memory context)     | N/A (no persistent session between runs)         |
 
 **Critical difference:** The locally installed runtime maintains a long-lived process with warm caches, loaded modules, and in-memory session state. GitHub Actions runners are ephemeral: every workflow run is effectively a cold start. GitHub provides runner caching, but cache restoration adds its own overhead and cannot replicate the performance of an already-running process.
 
@@ -61,12 +61,12 @@ There is no true "warm start" in GitHub Mode. Even with aggressive caching of `n
 
 ### 2.4 Memory and State Performance
 
-| Operation | Local Installed | GitHub Mode |
-|-----------|----------------|-------------|
-| Memory recall (vector search) | 5-50 ms (local SQLite-vec / LanceDB) | 500-3000 ms (download snapshot + query) |
-| Session context load | In-process (already in memory) | Deserialize from artifact/storage | 
-| State persistence | Immediate (local filesystem write) | Upload to external storage at run end |
-| Cross-run continuity | Seamless (persistent process) | Checkpoint-based (explicit hydrate/dehydrate) |
+| Operation                     | Local Installed                      | GitHub Mode                                   |
+| ----------------------------- | ------------------------------------ | --------------------------------------------- |
+| Memory recall (vector search) | 5-50 ms (local SQLite-vec / LanceDB) | 500-3000 ms (download snapshot + query)       |
+| Session context load          | In-process (already in memory)       | Deserialize from artifact/storage             |
+| State persistence             | Immediate (local filesystem write)   | Upload to external storage at run end         |
+| Cross-run continuity          | Seamless (persistent process)        | Checkpoint-based (explicit hydrate/dehydrate) |
 
 **The amnesia problem:** Local mode never forgets context within a session because the process is persistent. GitHub Mode must explicitly serialize state at the end of each run and deserialize it at the start of the next. This hydration/dehydration cycle adds latency and introduces a failure surface (corrupt checkpoints, storage unavailability, schema mismatches).
 
@@ -74,14 +74,14 @@ The overview spec (Section 4.3) defines recovery semantics for each failure mode
 
 ### 2.5 Tool Execution Performance
 
-| Tool Category | Local Installed | GitHub Mode | Notes |
-|---------------|----------------|-------------|-------|
-| File read/write | < 1 ms (local disk) | < 1 ms (runner disk) | Equivalent within a run |
-| Shell/exec | < 100 ms (local process) | < 100 ms (runner process) | Equivalent within a run |
-| Web fetch/API calls | Network-dependent | Network-dependent | Equivalent (both use public internet) |
-| Browser automation | Local browser instance | Headless on runner | Comparable; runner may have more CPU |
-| Device-coupled tools | Native hardware access | Unavailable | Installed-only classification |
-| Memory tools | Local vector DB | Hydrated snapshot | +500-3000 ms per query (hydration cost) |
+| Tool Category        | Local Installed          | GitHub Mode               | Notes                                   |
+| -------------------- | ------------------------ | ------------------------- | --------------------------------------- |
+| File read/write      | < 1 ms (local disk)      | < 1 ms (runner disk)      | Equivalent within a run                 |
+| Shell/exec           | < 100 ms (local process) | < 100 ms (runner process) | Equivalent within a run                 |
+| Web fetch/API calls  | Network-dependent        | Network-dependent         | Equivalent (both use public internet)   |
+| Browser automation   | Local browser instance   | Headless on runner        | Comparable; runner may have more CPU    |
+| Device-coupled tools | Native hardware access   | Unavailable               | Installed-only classification           |
+| Memory tools         | Local vector DB          | Hydrated snapshot         | +500-3000 ms per query (hydration cost) |
 
 **Once running, tool execution is comparable.** The performance gap is almost entirely in startup and state management. Within an active workflow run, file operations, shell commands, and API calls perform similarly to local execution. GitHub-hosted runners typically have 2-4 vCPUs and 7-16 GB RAM, which is adequate for most agent workloads.
 
@@ -89,14 +89,14 @@ The exception is device-coupled tools (camera, microphone, screen capture, local
 
 ### 2.6 Compute Resources
 
-| Resource | Local Installed | GitHub Mode (GitHub-hosted) | GitHub Mode (self-hosted) |
-|----------|----------------|----------------------------|--------------------------|
-| CPU | User hardware (varies widely) | 2-4 vCPUs (standard runner) | User-controlled |
-| RAM | User hardware (varies widely) | 7-16 GB | User-controlled |
-| Disk I/O | Local SSD/HDD | SSD (runner ephemeral disk) | User-controlled |
-| GPU access | If available locally | Not available (standard runners) | If provisioned |
-| Network egress | User ISP bandwidth | Azure/GitHub datacenter bandwidth | User-controlled |
-| Cost model | Hardware owned; electricity | Free tier: 2,000 min/month; paid tiers scale | User infrastructure cost |
+| Resource       | Local Installed               | GitHub Mode (GitHub-hosted)                  | GitHub Mode (self-hosted) |
+| -------------- | ----------------------------- | -------------------------------------------- | ------------------------- |
+| CPU            | User hardware (varies widely) | 2-4 vCPUs (standard runner)                  | User-controlled           |
+| RAM            | User hardware (varies widely) | 7-16 GB                                      | User-controlled           |
+| Disk I/O       | Local SSD/HDD                 | SSD (runner ephemeral disk)                  | User-controlled           |
+| GPU access     | If available locally          | Not available (standard runners)             | If provisioned            |
+| Network egress | User ISP bandwidth            | Azure/GitHub datacenter bandwidth            | User-controlled           |
+| Cost model     | Hardware owned; electricity   | Free tier: 2,000 min/month; paid tiers scale | User infrastructure cost  |
 
 **Resource predictability:** Local installations vary wildly, from Raspberry Pi 5 (4 cores, 8 GB) to high-end workstations. GitHub-hosted runners provide a consistent baseline that is adequate for text-based agent workloads but may be insufficient for heavy media processing or large-scale eval runs. Self-hosted runners eliminate this constraint but shift operational burden to the team.
 
@@ -104,14 +104,14 @@ The exception is device-coupled tools (camera, microphone, screen capture, local
 
 For representative task classes, estimated completion times:
 
-| Task | Local Installed | GitHub Mode | Overhead Source |
-|------|----------------|-------------|-----------------|
-| Answer a simple question | 2-5 s | 60-150 s | Runner startup + hydration |
-| Review a PR and post comments | 10-30 s | 90-180 s | Runner startup + checkout + hydration |
-| Run eval suite on a dataset | 2-10 min | 4-15 min | Startup + hydration + artifact upload |
-| Generate and open a PR | 15-60 s | 120-300 s | Startup + hydration + git operations + finalization |
-| Batch: 5 independent policy checks | 5-25 min (serial) | 3-8 min (parallel) | Parallelism advantage offsets startup cost |
-| Scheduled drift monitoring | N/A (manual trigger) | 90-300 s (automated) | No local equivalent for unattended runs |
+| Task                               | Local Installed      | GitHub Mode          | Overhead Source                                     |
+| ---------------------------------- | -------------------- | -------------------- | --------------------------------------------------- |
+| Answer a simple question           | 2-5 s                | 60-150 s             | Runner startup + hydration                          |
+| Review a PR and post comments      | 10-30 s              | 90-180 s             | Runner startup + checkout + hydration               |
+| Run eval suite on a dataset        | 2-10 min             | 4-15 min             | Startup + hydration + artifact upload               |
+| Generate and open a PR             | 15-60 s              | 120-300 s            | Startup + hydration + git operations + finalization |
+| Batch: 5 independent policy checks | 5-25 min (serial)    | 3-8 min (parallel)   | Parallelism advantage offsets startup cost          |
+| Scheduled drift monitoring         | N/A (manual trigger) | 90-300 s (automated) | No local equivalent for unattended runs             |
 
 **Key insight:** For individual interactive tasks, local mode is consistently faster. For batch operations, scheduled automation, and unattended workflows, GitHub Mode can match or exceed local throughput through parallelism and elimination of human scheduling overhead.
 
@@ -198,14 +198,14 @@ GitHub Mode Run Timeline (typical PR review task)
 
 These optimizations can reduce but not eliminate the performance gap:
 
-| Optimization | Potential Saving | Complexity |
-|-------------|-----------------|------------|
-| Aggressive `actions/cache` for node_modules | 10-25 s | Low |
-| Pre-built container image with dependencies | 15-40 s | Medium |
-| Self-hosted runners (warm pool) | 15-30 s (runner allocation) | High |
-| Checkpoint storage co-located with runners | 3-10 s (hydration) | Medium |
-| Lightweight worker tier for simple queries | 20-60 s (skip full runner) | High |
-| Workflow-level concurrency for batch tasks | Total time reduction via parallelism | Low |
+| Optimization                                | Potential Saving                     | Complexity |
+| ------------------------------------------- | ------------------------------------ | ---------- |
+| Aggressive `actions/cache` for node_modules | 10-25 s                              | Low        |
+| Pre-built container image with dependencies | 15-40 s                              | Medium     |
+| Self-hosted runners (warm pool)             | 15-30 s (runner allocation)          | High       |
+| Checkpoint storage co-located with runners  | 3-10 s (hydration)                   | Medium     |
+| Lightweight worker tier for simple queries  | 20-60 s (skip full runner)           | High       |
+| Workflow-level concurrency for batch tasks  | Total time reduction via parallelism | Low        |
 
 The Cloudflare Workers middle tier mentioned in existing analysis (critique-1.md) could address the lightweight query case, routing simple questions to a low-latency worker while reserving full GitHub Actions runs for complex automation tasks.
 
@@ -236,21 +236,21 @@ The Cloudflare Workers middle tier mentioned in existing analysis (critique-1.md
 
 ## 8. Summary Table
 
-| Dimension | Local Installed | GitHub Mode | Winner |
-|-----------|----------------|-------------|--------|
-| Time to first token | < 2 s | 30-120 s | Local |
-| Conversational throughput | 30-120 interactions/hr | 5-15 interactions/hr | Local |
-| Batch parallelism | Serial | Concurrent across runners | GitHub |
-| Environment consistency | Varies by machine | Reproducible runners | GitHub |
-| Unattended automation | Not available | Scheduled workflows | GitHub |
-| Team coordination | Manual | Repository-native | GitHub |
-| Device-coupled tools | Full access | Not available | Local |
-| Memory recall latency | 5-50 ms | 500-3000 ms | Local |
-| Tool execution (during run) | Baseline | Comparable | Tie |
-| State continuity | Seamless | Checkpoint-based | Local |
-| Audit trail | Minimal | Complete | GitHub |
-| Cost at low volume | Hardware owned | Free tier (2,000 min/month) | Tie |
-| Cost at high volume | Electricity | Runner minutes billing | Context-dependent |
+| Dimension                   | Local Installed        | GitHub Mode                 | Winner            |
+| --------------------------- | ---------------------- | --------------------------- | ----------------- |
+| Time to first token         | < 2 s                  | 30-120 s                    | Local             |
+| Conversational throughput   | 30-120 interactions/hr | 5-15 interactions/hr        | Local             |
+| Batch parallelism           | Serial                 | Concurrent across runners   | GitHub            |
+| Environment consistency     | Varies by machine      | Reproducible runners        | GitHub            |
+| Unattended automation       | Not available          | Scheduled workflows         | GitHub            |
+| Team coordination           | Manual                 | Repository-native           | GitHub            |
+| Device-coupled tools        | Full access            | Not available               | Local             |
+| Memory recall latency       | 5-50 ms                | 500-3000 ms                 | Local             |
+| Tool execution (during run) | Baseline               | Comparable                  | Tie               |
+| State continuity            | Seamless               | Checkpoint-based            | Local             |
+| Audit trail                 | Minimal                | Complete                    | GitHub            |
+| Cost at low volume          | Hardware owned         | Free tier (2,000 min/month) | Tie               |
+| Cost at high volume         | Electricity            | Runner minutes billing      | Context-dependent |
 
 ---
 

@@ -32,4 +32,3 @@ That fail-closed guard blocks all subsequent workflow logic.
 - `.github/workflows/github-mode-skill-policy-classifier.yml`
 - `.github/workflows/github-mode-skill-static-scan.yml`
 - `.github/workflows/github-mode-trusted-command.yml`
-

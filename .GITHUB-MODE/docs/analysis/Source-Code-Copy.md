@@ -28,11 +28,11 @@ The motivations are:
 
 From the parity matrix (`.GITHUB-MODE/runtime/parity-matrix.json`), GitHub Mode workflows fall into three execution categories:
 
-| Category | Workflows | OpenClaw dependency |
-|----------|-----------|-------------------|
-| **Native** | build-test, policy-validation, drift-detection, security-scan | None — pure GitHub Actions |
-| **Adapter** | command, agent-run, route-simulation, eval, cost-check, bot-pr, promotions, incident-response, entity-bootstrap, collaboration | Requires OpenClaw runtime modules |
-| **Installed-only** | release-publish, channel-sessions, device-actions, local-tunnel | Not applicable — stays in full OpenClaw |
+| Category           | Workflows                                                                                                                      | OpenClaw dependency                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| **Native**         | build-test, policy-validation, drift-detection, security-scan                                                                  | None — pure GitHub Actions              |
+| **Adapter**        | command, agent-run, route-simulation, eval, cost-check, bot-pr, promotions, incident-response, entity-bootstrap, collaboration | Requires OpenClaw runtime modules       |
+| **Installed-only** | release-publish, channel-sessions, device-actions, local-tunnel                                                                | Not applicable — stays in full OpenClaw |
 
 The **adapter** workflows are the copy target. They need OpenClaw's agent execution engine, configuration system, routing logic, and plugin infrastructure — but not channels, native apps, TUI, media pipelines, or device-specific code.
 
@@ -40,54 +40,55 @@ The **adapter** workflows are the copy target. They need OpenClaw's agent execut
 
 These `src/` modules would be copied into `.GITHUB-MODE/openclaw/`:
 
-| Module | Source path | Copy target | Why needed |
-|--------|------------|-------------|------------|
-| **Agent runner** | `src/agents/` | `.GITHUB-MODE/openclaw/agents/` | Core execution engine — runs agent tasks, manages compaction, sandbox, tool invocation |
-| **Configuration** | `src/config/` | `.GITHUB-MODE/openclaw/config/` | Loads, validates, and merges config; every module depends on it |
-| **Plugin system** | `src/plugins/` | `.GITHUB-MODE/openclaw/plugins/` | Plugin loader, registry, manifest handling — GitHub Mode registers as a plugin |
-| **Plugin SDK** | `src/plugin-sdk/` | `.GITHUB-MODE/openclaw/plugin-sdk/` | Stable API surface for extensions; the contract between core and GitHub Mode |
-| **Routing** | `src/routing/` | `.GITHUB-MODE/openclaw/routing/` | Agent route resolution — determines which agent handles a given session |
-| **Hooks** | `src/hooks/` | `.GITHUB-MODE/openclaw/hooks/` | Internal event system; plugins wire into lifecycle events through hooks |
-| **Providers** | `src/providers/` | `.GITHUB-MODE/openclaw/providers/` | Model provider integrations (Anthropic, OpenAI, etc.) — agents need inference |
-| **Security** | `src/security/` | `.GITHUB-MODE/openclaw/security/` | Audit, tool policy validation, skill scanning — policy gates depend on these |
-| **Infrastructure** | `src/infra/` (subset) | `.GITHUB-MODE/openclaw/infra/` | Networking utilities, file locking, environment handling, process management |
-| **Utilities** | `src/utils/` | `.GITHUB-MODE/openclaw/utils/` | Shared helpers — delivery context, message normalization, timeouts |
-| **Logging** | `src/logging/`, `src/logger.ts` | `.GITHUB-MODE/openclaw/logging/`, `logger.ts` | Structured logging used across all modules |
-| **Sessions** | `src/sessions/` | `.GITHUB-MODE/openclaw/sessions/` | Session state management for agent conversations |
-| **Memory** | `src/memory/` | `.GITHUB-MODE/openclaw/memory/` | Conversation memory — agent runs need context history |
-| **Skills** | `src/skills/` | `.GITHUB-MODE/openclaw/skills/` | Skill loading and execution — agents invoke skills as tools |
-| **Shared types** | `src/types/`, `src/shared/` | `.GITHUB-MODE/openclaw/types/`, `shared/` | TypeScript declarations and shared interfaces |
-| **Entry/index** | `src/index.ts`, `src/runtime.ts` | `.GITHUB-MODE/openclaw/index.ts`, `runtime.ts` | Module export surface and runtime bootstrap |
+| Module             | Source path                      | Copy target                                    | Why needed                                                                             |
+| ------------------ | -------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Agent runner**   | `src/agents/`                    | `.GITHUB-MODE/openclaw/agents/`                | Core execution engine — runs agent tasks, manages compaction, sandbox, tool invocation |
+| **Configuration**  | `src/config/`                    | `.GITHUB-MODE/openclaw/config/`                | Loads, validates, and merges config; every module depends on it                        |
+| **Plugin system**  | `src/plugins/`                   | `.GITHUB-MODE/openclaw/plugins/`               | Plugin loader, registry, manifest handling — GitHub Mode registers as a plugin         |
+| **Plugin SDK**     | `src/plugin-sdk/`                | `.GITHUB-MODE/openclaw/plugin-sdk/`            | Stable API surface for extensions; the contract between core and GitHub Mode           |
+| **Routing**        | `src/routing/`                   | `.GITHUB-MODE/openclaw/routing/`               | Agent route resolution — determines which agent handles a given session                |
+| **Hooks**          | `src/hooks/`                     | `.GITHUB-MODE/openclaw/hooks/`                 | Internal event system; plugins wire into lifecycle events through hooks                |
+| **Providers**      | `src/providers/`                 | `.GITHUB-MODE/openclaw/providers/`             | Model provider integrations (Anthropic, OpenAI, etc.) — agents need inference          |
+| **Security**       | `src/security/`                  | `.GITHUB-MODE/openclaw/security/`              | Audit, tool policy validation, skill scanning — policy gates depend on these           |
+| **Infrastructure** | `src/infra/` (subset)            | `.GITHUB-MODE/openclaw/infra/`                 | Networking utilities, file locking, environment handling, process management           |
+| **Utilities**      | `src/utils/`                     | `.GITHUB-MODE/openclaw/utils/`                 | Shared helpers — delivery context, message normalization, timeouts                     |
+| **Logging**        | `src/logging/`, `src/logger.ts`  | `.GITHUB-MODE/openclaw/logging/`, `logger.ts`  | Structured logging used across all modules                                             |
+| **Sessions**       | `src/sessions/`                  | `.GITHUB-MODE/openclaw/sessions/`              | Session state management for agent conversations                                       |
+| **Memory**         | `src/memory/`                    | `.GITHUB-MODE/openclaw/memory/`                | Conversation memory — agent runs need context history                                  |
+| **Skills**         | `src/skills/`                    | `.GITHUB-MODE/openclaw/skills/`                | Skill loading and execution — agents invoke skills as tools                            |
+| **Shared types**   | `src/types/`, `src/shared/`      | `.GITHUB-MODE/openclaw/types/`, `shared/`      | TypeScript declarations and shared interfaces                                          |
+| **Entry/index**    | `src/index.ts`, `src/runtime.ts` | `.GITHUB-MODE/openclaw/index.ts`, `runtime.ts` | Module export surface and runtime bootstrap                                            |
 
 ### 2.3 Excluded Modules (Not Copied)
 
 These modules are not needed by GitHub Mode and would **not** be copied:
 
-| Module | Path | Why excluded |
-|--------|------|-------------|
-| **CLI** | `src/cli/` | GitHub Mode does not expose a terminal CLI; commands arrive via workflow dispatch |
-| **Gateway server** | `src/gateway/` | WebSocket/HTTP server for local mode; GitHub Mode uses Actions as compute |
-| **Channel implementations** | `src/telegram/`, `src/discord/`, `src/slack/`, `src/signal/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/irc/`, `src/web/` | Channel-specific adapters for local message delivery; not applicable on runners |
-| **Channel registry** | `src/channels/` | Enumerates local channels; GitHub Mode routes through workflow events, not channel sockets |
-| **TUI** | `src/tui/`, `src/terminal/` | Terminal UI rendering; no terminal on CI runners |
-| **Media pipeline** | `src/media-understanding/`, `src/link-understanding/` | Content understanding for incoming media; not in scope |
-| **Text-to-speech** | `src/tts/` | Audio generation; no audio output on runners |
-| **Browser** | `src/browser/` | Headless browser automation; out of scope for adapter workflows |
-| **Canvas host** | `src/canvas-host/` | A2UI canvas rendering; local-mode feature |
-| **Daemon** | `src/daemon/` | Background process management for local installations |
-| **Pairing** | `src/pairing/` | Device pairing for mobile/desktop apps |
-| **macOS** | `src/macos/` | macOS-specific integrations |
-| **Docker setup** | `src/docker-setup/` | Local Docker environment configuration |
-| **Auto-reply** | `src/auto-reply/` | Automatic message reply logic for always-on local channels |
-| **Polls/cron** | `src/polls/`, `src/cron/` | Polling and scheduled jobs for local runtime |
-| **Native apps** | `apps/` | iOS, macOS, Android applications |
-| **Most extensions** | `extensions/` (except `extensions/github/`) | Channel-specific plugins; only the GitHub Mode extension is needed |
+| Module                      | Path                                                                                                                                | Why excluded                                                                               |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **CLI**                     | `src/cli/`                                                                                                                          | GitHub Mode does not expose a terminal CLI; commands arrive via workflow dispatch          |
+| **Gateway server**          | `src/gateway/`                                                                                                                      | WebSocket/HTTP server for local mode; GitHub Mode uses Actions as compute                  |
+| **Channel implementations** | `src/telegram/`, `src/discord/`, `src/slack/`, `src/signal/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/irc/`, `src/web/` | Channel-specific adapters for local message delivery; not applicable on runners            |
+| **Channel registry**        | `src/channels/`                                                                                                                     | Enumerates local channels; GitHub Mode routes through workflow events, not channel sockets |
+| **TUI**                     | `src/tui/`, `src/terminal/`                                                                                                         | Terminal UI rendering; no terminal on CI runners                                           |
+| **Media pipeline**          | `src/media-understanding/`, `src/link-understanding/`                                                                               | Content understanding for incoming media; not in scope                                     |
+| **Text-to-speech**          | `src/tts/`                                                                                                                          | Audio generation; no audio output on runners                                               |
+| **Browser**                 | `src/browser/`                                                                                                                      | Headless browser automation; out of scope for adapter workflows                            |
+| **Canvas host**             | `src/canvas-host/`                                                                                                                  | A2UI canvas rendering; local-mode feature                                                  |
+| **Daemon**                  | `src/daemon/`                                                                                                                       | Background process management for local installations                                      |
+| **Pairing**                 | `src/pairing/`                                                                                                                      | Device pairing for mobile/desktop apps                                                     |
+| **macOS**                   | `src/macos/`                                                                                                                        | macOS-specific integrations                                                                |
+| **Docker setup**            | `src/docker-setup/`                                                                                                                 | Local Docker environment configuration                                                     |
+| **Auto-reply**              | `src/auto-reply/`                                                                                                                   | Automatic message reply logic for always-on local channels                                 |
+| **Polls/cron**              | `src/polls/`, `src/cron/`                                                                                                           | Polling and scheduled jobs for local runtime                                               |
+| **Native apps**             | `apps/`                                                                                                                             | iOS, macOS, Android applications                                                           |
+| **Most extensions**         | `extensions/` (except `extensions/github/`)                                                                                         | Channel-specific plugins; only the GitHub Mode extension is needed                         |
 
 ### 2.4 Infrastructure Subset
 
 `src/infra/` is the largest utility module (~90 files). GitHub Mode needs only a subset:
 
 **Include:**
+
 - Environment loading and normalization (`env.ts`, `env-vars.ts`)
 - File locking (`file-lock.ts`, `lockfile.ts`)
 - JSON file I/O (`json-file.ts`)
@@ -98,6 +99,7 @@ These modules are not needed by GitHub Mode and would **not** be copied:
 - Version checking (`version.ts`)
 
 **Exclude:**
+
 - Bonjour/mDNS discovery
 - SSH tunnel management
 - TLS certificate handling
@@ -222,9 +224,9 @@ With modules copied to `.GITHUB-MODE/openclaw/`, GitHub Mode binding code and wo
 
 ```typescript
 // .GITHUB-MODE/scripts/some-github-mode-tool.ts
-import { runAgent } from '../openclaw/agents/index.js'
-import { loadConfig } from '../openclaw/config/index.js'
-import { resolveRoute } from '../openclaw/routing/index.js'
+import { runAgent } from "../openclaw/agents/index.js";
+import { loadConfig } from "../openclaw/config/index.js";
+import { resolveRoute } from "../openclaw/routing/index.js";
 ```
 
 This replaces the contract-only interaction model. GitHub Mode code can call OpenClaw functions directly, with full TypeScript type checking against the copied sources.
@@ -242,7 +244,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
       - run: |
           # Install only the dependencies the copied modules need
           cd .GITHUB-MODE
@@ -258,16 +260,16 @@ Tests under `.GITHUB-MODE/test/` can import from `.GITHUB-MODE/openclaw/` and ru
 
 ```typescript
 // .GITHUB-MODE/test/agent-integration.test.ts
-import { describe, it, expect } from 'vitest'
-import { runAgent } from '../openclaw/agents/index.js'
+import { describe, it, expect } from "vitest";
+import { runAgent } from "../openclaw/agents/index.js";
 
-describe('GitHub Mode agent integration', () => {
-  it('executes a command via the copied agent runner', async () => {
+describe("GitHub Mode agent integration", () => {
+  it("executes a command via the copied agent runner", async () => {
     // Test against the copied modules
-    const result = await runAgent({ command: 'echo hello' })
-    expect(result).toBeDefined()
-  })
-})
+    const result = await runAgent({ command: "echo hello" });
+    expect(result).toBeDefined();
+  });
+});
 ```
 
 ## 6. Sync Strategy
@@ -292,25 +294,25 @@ on:
   push:
     branches: [main]
     paths:
-      - 'src/agents/**'
-      - 'src/config/**'
-      - 'src/plugins/**'
-      - 'src/plugin-sdk/**'
-      - 'src/routing/**'
-      - 'src/hooks/**'
-      - 'src/providers/**'
-      - 'src/security/**'
-      - 'src/infra/**'
-      - 'src/utils/**'
-      - 'src/logging/**'
-      - 'src/sessions/**'
-      - 'src/memory/**'
-      - 'src/skills/**'
-      - 'src/shared/**'
-      - 'src/types/**'
-      - 'src/index.ts'
-      - 'src/runtime.ts'
-      - 'src/logger.ts'
+      - "src/agents/**"
+      - "src/config/**"
+      - "src/plugins/**"
+      - "src/plugin-sdk/**"
+      - "src/routing/**"
+      - "src/hooks/**"
+      - "src/providers/**"
+      - "src/security/**"
+      - "src/infra/**"
+      - "src/utils/**"
+      - "src/logging/**"
+      - "src/sessions/**"
+      - "src/memory/**"
+      - "src/skills/**"
+      - "src/shared/**"
+      - "src/types/**"
+      - "src/index.ts"
+      - "src/runtime.ts"
+      - "src/logger.ts"
 
 jobs:
   sync:
@@ -362,6 +364,7 @@ This works because the copied `.ts` files have the same import specifiers as the
 For optimized CI runs that skip the full project install, `.GITHUB-MODE/` can include a minimal `package.json` listing only the dependencies the copied modules require:
 
 **Kept:**
+
 - AI/LLM: `@anthropic-ai/sdk`, `openai`, `@aws-sdk/client-bedrock-runtime`
 - Schema validation: `zod`, `@sinclair/typebox`
 - Config: `yaml`, `dotenv`
@@ -370,6 +373,7 @@ For optimized CI runs that skip the full project install, `.GITHUB-MODE/` can in
 - GitHub: `@actions/core`, `@actions/artifact`, `@actions/github`, `@octokit/rest`
 
 **Not needed:**
+
 - Messaging SDKs: `grammy`, `@slack/bolt`, `discord.js`, `whatsapp-web.js`
 - Native addons: `node-pty`, platform binaries
 - Media: `sharp`, `ffmpeg`, `pdfjs-dist`
@@ -399,59 +403,62 @@ After an upstream sync that changes modules in `src/`, the copy may become stale
 
 ## 9. Comparison: Copy vs. Scrape vs. Overlay
 
-| Dimension | Overlay (current) | Copy (this doc) | Scrape (separate repo) |
-|-----------|-------------------|------------------|----------------------|
-| **Where code lives** | `src/` only; GitHub Mode references via contracts | `src/` + `.GITHUB-MODE/openclaw/` (copy) | Separate repo with extracted `openclaw-core/` |
-| **Import model** | Contract/SDK only — no direct `src/` imports | Direct imports from `.GITHUB-MODE/openclaw/` | Direct imports from `openclaw-core/` |
-| **Repository count** | 1 | 1 | 2 |
-| **Sync mechanism** | N/A (uses live `src/`) | In-repo copy script | Cross-repo sync workflow |
-| **Sync frequency** | Continuous (always current) | On-demand or automated per push | Periodic (weekly/manual) |
-| **CI optimization** | Must build/install full project | Can install minimal deps for `.GITHUB-MODE/` only | Minimal deps from standalone `package.json` |
-| **Overlay removability** | Delete `.GITHUB-MODE/` | Delete `.GITHUB-MODE/` (includes copy) | N/A (separate repo) |
-| **Code duplication** | None | Yes — copied modules exist in `src/` and `.GITHUB-MODE/openclaw/` | Yes — across repositories |
-| **Divergence risk** | None | Medium — copy can drift from `src/` | High — separate repo can diverge |
-| **New binding code** | None needed | Optional — can import directly | Required (~840 LOC) |
-| **Repo size impact** | None | Moderate — ~16 modules duplicated | None (separate repo) |
+| Dimension                | Overlay (current)                                 | Copy (this doc)                                                   | Scrape (separate repo)                        |
+| ------------------------ | ------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| **Where code lives**     | `src/` only; GitHub Mode references via contracts | `src/` + `.GITHUB-MODE/openclaw/` (copy)                          | Separate repo with extracted `openclaw-core/` |
+| **Import model**         | Contract/SDK only — no direct `src/` imports      | Direct imports from `.GITHUB-MODE/openclaw/`                      | Direct imports from `openclaw-core/`          |
+| **Repository count**     | 1                                                 | 1                                                                 | 2                                             |
+| **Sync mechanism**       | N/A (uses live `src/`)                            | In-repo copy script                                               | Cross-repo sync workflow                      |
+| **Sync frequency**       | Continuous (always current)                       | On-demand or automated per push                                   | Periodic (weekly/manual)                      |
+| **CI optimization**      | Must build/install full project                   | Can install minimal deps for `.GITHUB-MODE/` only                 | Minimal deps from standalone `package.json`   |
+| **Overlay removability** | Delete `.GITHUB-MODE/`                            | Delete `.GITHUB-MODE/` (includes copy)                            | N/A (separate repo)                           |
+| **Code duplication**     | None                                              | Yes — copied modules exist in `src/` and `.GITHUB-MODE/openclaw/` | Yes — across repositories                     |
+| **Divergence risk**      | None                                              | Medium — copy can drift from `src/`                               | High — separate repo can diverge              |
+| **New binding code**     | None needed                                       | Optional — can import directly                                    | Required (~840 LOC)                           |
+| **Repo size impact**     | None                                              | Moderate — ~16 modules duplicated                                 | None (separate repo)                          |
 
 ## 10. Trade-offs
 
 ### 10.1 Benefits
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Self-contained overlay** | `.GITHUB-MODE/` contains everything GitHub Mode needs — docs, contracts, scripts, tests, AND executable source code |
-| **No separate repo** | Avoids cross-repo sync tooling, separate CI pipelines, separate issue trackers, and split contribution workflows |
-| **Direct type checking** | GitHub Mode scripts can import from `.GITHUB-MODE/openclaw/` with full TypeScript types — no SDK indirection |
-| **Faster CI (optional)** | Workflows that need only the copied modules can use a minimal dependency install, skipping channel SDKs and native addons |
-| **Simple copy mechanism** | A shell script copies files — no AST transforms, no import rewriting, no build step |
-| **Overlay contract preserved** | The copy lives within `.GITHUB-MODE/`, maintaining the additive-only, conflict-free overlay architecture |
-| **Gradual adoption** | Can start with a few modules and expand the copy set as GitHub Mode matures |
+| Benefit                        | Explanation                                                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| **Self-contained overlay**     | `.GITHUB-MODE/` contains everything GitHub Mode needs — docs, contracts, scripts, tests, AND executable source code       |
+| **No separate repo**           | Avoids cross-repo sync tooling, separate CI pipelines, separate issue trackers, and split contribution workflows          |
+| **Direct type checking**       | GitHub Mode scripts can import from `.GITHUB-MODE/openclaw/` with full TypeScript types — no SDK indirection              |
+| **Faster CI (optional)**       | Workflows that need only the copied modules can use a minimal dependency install, skipping channel SDKs and native addons |
+| **Simple copy mechanism**      | A shell script copies files — no AST transforms, no import rewriting, no build step                                       |
+| **Overlay contract preserved** | The copy lives within `.GITHUB-MODE/`, maintaining the additive-only, conflict-free overlay architecture                  |
+| **Gradual adoption**           | Can start with a few modules and expand the copy set as GitHub Mode matures                                               |
 
 ### 10.2 Costs
 
-| Cost | Explanation |
-|------|-------------|
-| **Code duplication** | The same TypeScript files exist in two locations within the same repo. Repo size increases proportionally. |
-| **Staleness risk** | The copy can fall behind `src/`. Without automated sync, stale code can cause subtle bugs. |
-| **Confusion for contributors** | Two copies of the same code can cause confusion about which to edit. Clear documentation and CI guards are needed. |
-| **Import path divergence** | Imports within copied modules reference sibling modules at relative paths. If module internal import paths change in `src/`, the copy script must re-run. |
-| **Test duplication** | Colocated `*.test.ts` files are copied with their modules. Deciding which tests to run and where becomes a governance question. |
-| **Git history fragmentation** | Changes to a module show up twice in `git log` — once in `src/` and once in `.GITHUB-MODE/openclaw/` — making blame and history harder to follow. |
+| Cost                           | Explanation                                                                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Code duplication**           | The same TypeScript files exist in two locations within the same repo. Repo size increases proportionally.                                                |
+| **Staleness risk**             | The copy can fall behind `src/`. Without automated sync, stale code can cause subtle bugs.                                                                |
+| **Confusion for contributors** | Two copies of the same code can cause confusion about which to edit. Clear documentation and CI guards are needed.                                        |
+| **Import path divergence**     | Imports within copied modules reference sibling modules at relative paths. If module internal import paths change in `src/`, the copy script must re-run. |
+| **Test duplication**           | Colocated `*.test.ts` files are copied with their modules. Deciding which tests to run and where becomes a governance question.                           |
+| **Git history fragmentation**  | Changes to a module show up twice in `git log` — once in `src/` and once in `.GITHUB-MODE/openclaw/` — making blame and history harder to follow.         |
 
 ### 10.3 When This Approach Is Preferable
 
 The **copy** approach is better than the **overlay** when:
+
 - GitHub Mode needs to execute OpenClaw code directly, not just reference it through contracts.
 - The team wants direct import access for type safety and IDE navigation.
 - A separate repository (scrape approach) is too much operational overhead.
 
 The **copy** approach is better than the **scrape** when:
+
 - The team prefers a single repository.
 - Cross-repo sync and separate CI are not justified yet.
 - GitHub Mode is still evolving and needs tight coupling to upstream changes.
 - Contributors work on both `src/` and GitHub Mode in the same PRs.
 
 The **overlay** (current approach) remains better when:
+
 - GitHub Mode does not need to execute OpenClaw internals — only validate contracts and run workflows.
 - Minimizing duplication is a priority.
 - The plugin SDK provides sufficient runtime access.
@@ -479,6 +486,7 @@ The 16 copied modules add approximately 2–5 MB of TypeScript source (no `node_
 The copied modules contain relative imports that reference each other (e.g., `agents/` imports from `config/`, `infra/`, `utils/`). Because the copy preserves the same directory structure relative to the modules, these internal imports resolve correctly without modification.
 
 The only import paths that may need attention are:
+
 - Absolute imports referencing `src/` prefixes (rare in the codebase; most imports are relative or package-level).
 - Imports referencing excluded modules (e.g., `src/telegram/`). These must be stubbed or guarded with conditional imports.
 

@@ -36,12 +36,12 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Native event-driven trigger | One-way fire-and-forget; no built-in response channel |
-| Structured payload via `client_payload` | 10 top-level key limit (workaround: nest under one key) |
-| Workflow filtering by `event_type` | Requires elevated token for cross-repo access |
-| Can carry correlation IDs, trust metadata | No delivery guarantee beyond HTTP 204 acknowledgment |
+| Strength                                  | Limitation                                              |
+| ----------------------------------------- | ------------------------------------------------------- |
+| Native event-driven trigger               | One-way fire-and-forget; no built-in response channel   |
+| Structured payload via `client_payload`   | 10 top-level key limit (workaround: nest under one key) |
+| Workflow filtering by `event_type`        | Requires elevated token for cross-repo access           |
+| Can carry correlation IDs, trust metadata | No delivery guarantee beyond HTTP 204 acknowledgment    |
 
 **OpenClaw mapping:** This is the primary candidate for the **collaboration envelope delivery** mechanism. The `client_payload` maps directly to the envelope schema (sourceEntityId, targetEntityId, intent, correlationId, trustLevel, etc.). The envelope schema's fields fit within the payload limits when nested under a single root key.
 
@@ -57,12 +57,12 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Explicit workflow targeting | Tight coupling: caller must know workflow filename |
-| Typed inputs with validation | 10-input limit; all string at API level |
-| Ref-pinning (run specific branch) | Still one-way; no built-in response |
-| Shows in "manually triggered" UI | Less suitable for automated agent-to-agent messaging |
+| Strength                          | Limitation                                           |
+| --------------------------------- | ---------------------------------------------------- |
+| Explicit workflow targeting       | Tight coupling: caller must know workflow filename   |
+| Typed inputs with validation      | 10-input limit; all string at API level              |
+| Ref-pinning (run specific branch) | Still one-way; no built-in response                  |
+| Shows in "manually triggered" UI  | Less suitable for automated agent-to-agent messaging |
 
 **OpenClaw mapping:** Better suited for **operator-initiated cross-repo commands** (e.g., "tell Repo B to run its promotion workflow on branch X") than for automated agent-to-agent messaging. Could serve as a fallback or explicit command channel.
 
@@ -78,12 +78,12 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Structured inputs/outputs | Runs in caller's context, not callee's |
-| Typed parameters | Does not trigger a run in Repo B |
+| Strength                                      | Limitation                                                    |
+| --------------------------------------------- | ------------------------------------------------------------- |
+| Structured inputs/outputs                     | Runs in caller's context, not callee's                        |
+| Typed parameters                              | Does not trigger a run in Repo B                              |
 | Composable: chain multiple reusable workflows | Callee cannot access its own secrets unless explicitly passed |
-| No additional tokens needed (same org) | Max 4 levels of nesting |
+| No additional tokens needed (same org)        | Max 4 levels of nesting                                       |
 
 **OpenClaw mapping:** Ideal for **shared capability reuse** — common validation steps, contract checking, or security scanning that multiple entity repos want to run identically. Less suitable for independent agent execution because the work runs in the caller's context, not the target entity's.
 
@@ -99,12 +99,12 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Large payload capacity | Requires knowing the run ID to locate artifacts |
-| Immutable, auditable | Not a real-time communication channel |
-| Rich content (files, binaries, reports) | Retention is finite |
-| Cross-repo readable with proper tokens | Upload is local to the producing workflow only |
+| Strength                                | Limitation                                      |
+| --------------------------------------- | ----------------------------------------------- |
+| Large payload capacity                  | Requires knowing the run ID to locate artifacts |
+| Immutable, auditable                    | Not a real-time communication channel           |
+| Rich content (files, binaries, reports) | Retention is finite                             |
+| Cross-repo readable with proper tokens  | Upload is local to the producing workflow only  |
 
 **OpenClaw mapping:** Best for **result exchange** — Repo A dispatches a task to Repo B, Repo B produces artifacts, and Repo A polls or is notified to download them. Artifacts can carry signed attestations, evaluation outputs, or structured reports.
 
@@ -124,12 +124,12 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Human-readable audit trail | Not designed for machine-to-machine messaging |
-| Rich formatting (Markdown, task lists) | Parsing structured data from Markdown is fragile |
-| Native notification/subscription system | Rate-limited (especially for creation: 250/hr) |
-| Can trigger `issue_comment` / `issues` workflows | Higher latency than dispatch |
+| Strength                                         | Limitation                                       |
+| ------------------------------------------------ | ------------------------------------------------ |
+| Human-readable audit trail                       | Not designed for machine-to-machine messaging    |
+| Rich formatting (Markdown, task lists)           | Parsing structured data from Markdown is fragile |
+| Native notification/subscription system          | Rate-limited (especially for creation: 250/hr)   |
+| Can trigger `issue_comment` / `issues` workflows | Higher latency than dispatch                     |
 
 **OpenClaw mapping:** Suited for **long-running task coordination** where human visibility is valuable — opening a tracking issue in Repo B for a multi-step task, posting progress updates as comments, and closing when complete. The existing subagent announce pattern maps naturally to issue comment threads.
 
@@ -141,11 +141,11 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
+| Strength                               | Limitation                                                         |
+| -------------------------------------- | ------------------------------------------------------------------ |
 | Native integration with PR merge gates | Limited payload (status description: 140 chars; check run: richer) |
-| Visible in PR UI | Signals only, not general-purpose messaging |
-| Can block or unblock merges | Requires knowing the target commit SHA |
+| Visible in PR UI                       | Signals only, not general-purpose messaging                        |
+| Can block or unblock merges            | Requires knowing the target commit SHA                             |
 
 **OpenClaw mapping:** Useful for **cross-repo validation gates** — Repo A's agent validates something and signals pass/fail on Repo B's PR. Maps to the bot-PR workflow's provenance and policy attestation checks.
 
@@ -165,11 +165,11 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Built-in state machine with named environments | Semantically tied to "deployment" concept |
-| Can trigger `deployment` and `deployment_status` workflows | Limited custom metadata |
-| Environment protection rules apply | Not designed for general messaging |
+| Strength                                                   | Limitation                                |
+| ---------------------------------------------------------- | ----------------------------------------- |
+| Built-in state machine with named environments             | Semantically tied to "deployment" concept |
+| Can trigger `deployment` and `deployment_status` workflows | Limited custom metadata                   |
+| Environment protection rules apply                         | Not designed for general messaging        |
 
 **OpenClaw mapping:** Could model **promotion workflows** — Agent A "deploys" a change to Agent B's environment, triggering approval gates. However, overloading the deployment concept for general orchestration creates semantic confusion.
 
@@ -181,11 +181,11 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Cross-repo by design | Organization-level only (not user accounts) |
-| Custom fields for structured metadata | GraphQL-only API (more complex) |
-| Kanban/status tracking built in | Not an event trigger (no project change → workflow trigger) |
+| Strength                              | Limitation                                                  |
+| ------------------------------------- | ----------------------------------------------------------- |
+| Cross-repo by design                  | Organization-level only (not user accounts)                 |
+| Custom fields for structured metadata | GraphQL-only API (more complex)                             |
+| Kanban/status tracking built in       | Not an event trigger (no project change → workflow trigger) |
 
 **OpenClaw mapping:** Potential **orchestration dashboard** — a shared project board showing all active cross-entity tasks, their status, and provenance. However, the lack of event triggers means it cannot directly initiate workflows.
 
@@ -197,11 +197,11 @@ The key questions are:
 
 **Suitability for orchestration:**
 
-| Strength | Limitation |
-|---|---|
-| Cryptographically verifiable source identity | Designed for external IdP federation, not repo-to-repo |
-| Contains repo, ref, actor, run_id claims | Target must validate JWT (requires JWKS endpoint knowledge) |
-| No shared secrets needed for identity proof | Does not trigger anything by itself |
+| Strength                                     | Limitation                                                  |
+| -------------------------------------------- | ----------------------------------------------------------- |
+| Cryptographically verifiable source identity | Designed for external IdP federation, not repo-to-repo      |
+| Contains repo, ref, actor, run_id claims     | Target must validate JWT (requires JWKS endpoint knowledge) |
+| No shared secrets needed for identity proof  | Does not trigger anything by itself                         |
 
 **OpenClaw mapping:** **Trust verification layer.** When Repo A dispatches an envelope to Repo B, Repo A can include an OIDC token. Repo B validates the token to cryptographically confirm the message came from the claimed source repository, run, and ref. This maps directly to the collaboration envelope's `trustLevel` and `sourceCommitSha` fields.
 
@@ -334,12 +334,12 @@ Repo A (Orchestrator)                    Repo B (Worker)
 
 ### 4.1 Token Scoping and Least Privilege
 
-| Token Type | Cross-Repo Capable | Scope Control | Rotation | Recommendation |
-|---|---|---|---|---|
-| Default `GITHUB_TOKEN` | No (current repo only) | Workflow-level `permissions` | Per-run (automatic) | Use for intra-repo only |
-| Fine-Grained PAT | Yes | Per-repo, per-permission | Manual (expiry) | Acceptable for dev/testing |
-| Classic PAT | Yes | Broad (`repo` scope) | Manual | Avoid for production |
-| GitHub App Installation Token | Yes | Per-installation, per-permission | Automatic (1 hour) | **Recommended for production** |
+| Token Type                    | Cross-Repo Capable     | Scope Control                    | Rotation            | Recommendation                 |
+| ----------------------------- | ---------------------- | -------------------------------- | ------------------- | ------------------------------ |
+| Default `GITHUB_TOKEN`        | No (current repo only) | Workflow-level `permissions`     | Per-run (automatic) | Use for intra-repo only        |
+| Fine-Grained PAT              | Yes                    | Per-repo, per-permission         | Manual (expiry)     | Acceptable for dev/testing     |
+| Classic PAT                   | Yes                    | Broad (`repo` scope)             | Manual              | Avoid for production           |
+| GitHub App Installation Token | Yes                    | Per-installation, per-permission | Automatic (1 hour)  | **Recommended for production** |
 
 ### 4.2 Trust Verification
 
@@ -355,13 +355,13 @@ Cross-repo messages should be verified at multiple levels:
 
 ### 4.3 Threat Model for Cross-Repo Dispatch
 
-| Threat | Mitigation |
-|---|---|
-| Compromised token dispatches malicious payload | OIDC verification + policy allowlist + payload schema validation |
-| Replay attack (old envelope re-sent) | `correlationId` deduplication + `ttlSeconds` expiry + `createdAt` freshness check |
-| Privilege escalation via dispatch | Receiver runs with its own permissions, not caller's. Dispatch payload is data only. |
-| Secrets exfiltration via callback | Callback payloads are validated against envelope schema. No secret forwarding in payloads. |
-| Denial of service via dispatch flooding | GitHub API rate limits (5000 req/hr per token). Receiver workflow concurrency controls. |
+| Threat                                         | Mitigation                                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Compromised token dispatches malicious payload | OIDC verification + policy allowlist + payload schema validation                           |
+| Replay attack (old envelope re-sent)           | `correlationId` deduplication + `ttlSeconds` expiry + `createdAt` freshness check          |
+| Privilege escalation via dispatch              | Receiver runs with its own permissions, not caller's. Dispatch payload is data only.       |
+| Secrets exfiltration via callback              | Callback payloads are validated against envelope schema. No secret forwarding in payloads. |
+| Denial of service via dispatch flooding        | GitHub API rate limits (5000 req/hr per token). Receiver workflow concurrency controls.    |
 
 ### 4.4 Fail-Closed Principle
 
@@ -375,32 +375,32 @@ OpenClaw's existing `collaboration-policy.json` defaults to `"defaultAction": "d
 
 Cross-repo dispatch creates workflow runs in the target repo, consuming that repo's Actions minutes allocation. For same-org repos, minutes are pooled at the organization level.
 
-| Plan | Included Minutes/Month | Cost Per Extra Minute (Linux) |
-|---|---|---|
-| Free | 2,000 | N/A (hard limit) |
-| Team | 3,000 | $0.008 |
-| Enterprise | 50,000 | $0.008 |
+| Plan       | Included Minutes/Month | Cost Per Extra Minute (Linux) |
+| ---------- | ---------------------- | ----------------------------- |
+| Free       | 2,000                  | N/A (hard limit)              |
+| Team       | 3,000                  | $0.008                        |
+| Enterprise | 50,000                 | $0.008                        |
 
 **Implication:** High-frequency agent-to-agent dispatch can consume significant minutes. Design orchestration patterns with workflow consolidation in mind — batch multiple small tasks into single workflow runs where possible.
 
 ### 5.2 API Rate Limits
 
-| Endpoint | Rate Limit | Notes |
-|---|---|---|
-| REST API (authenticated) | 5,000 req/hr per token | Shared across all API calls |
-| `repository_dispatch` | Part of REST limit | No separate limit |
-| Issue creation | 250/hr globally | Stricter sub-limit |
-| GraphQL API | 5,000 points/hr | Point cost varies by query complexity |
+| Endpoint                 | Rate Limit             | Notes                                 |
+| ------------------------ | ---------------------- | ------------------------------------- |
+| REST API (authenticated) | 5,000 req/hr per token | Shared across all API calls           |
+| `repository_dispatch`    | Part of REST limit     | No separate limit                     |
+| Issue creation           | 250/hr globally        | Stricter sub-limit                    |
+| GraphQL API              | 5,000 points/hr        | Point cost varies by query complexity |
 
 **Implication:** Polling-based patterns (3.2) consume rate limit continuously. Dispatch-based patterns (3.1) consume rate limit only at trigger and callback time. For high-frequency orchestration, dispatch-based patterns are more rate-limit-efficient.
 
 ### 5.3 Artifact Storage
 
-| Plan | Included Storage | Retention |
-|---|---|---|
-| Free | 500 MB | 90 days (default) |
-| Team | 2 GB | 90 days (configurable) |
-| Enterprise | 50 GB | 400 days (configurable) |
+| Plan       | Included Storage | Retention               |
+| ---------- | ---------------- | ----------------------- |
+| Free       | 500 MB           | 90 days (default)       |
+| Team       | 2 GB             | 90 days (configurable)  |
+| Enterprise | 50 GB            | 400 days (configurable) |
 
 **Implication:** Using artifacts as an inter-repo data exchange channel is viable for moderate volumes but requires attention to retention and cleanup policies.
 
@@ -506,30 +506,30 @@ Based on this analysis, the recommended architecture composes mechanisms as foll
 
 Given the current state of GitHub Mode (pre-MVVP), the recommended implementation order is:
 
-| Priority | Mechanism | Rationale |
-|---|---|---|
-| P0 | GitHub App token infrastructure | Foundation for all cross-repo auth |
-| P0 | `repository_dispatch` sender/receiver | Core messaging channel |
-| P0 | Envelope validation workflow | Policy enforcement on receipt |
-| P1 | OIDC token embedding and verification | Trust verification |
-| P1 | Artifact-based result exchange | Rich data sharing |
-| P1 | Reusable workflow library | DRY shared capabilities |
-| P2 | Issue-based long-running coordination | Human-visible task tracking |
-| P2 | Cross-repo commit status / check runs | Validation gates |
-| P3 | Organization Projects integration | Orchestration dashboard |
-| P3 | Deployments API for promotion | Environment-gated promotions |
+| Priority | Mechanism                             | Rationale                          |
+| -------- | ------------------------------------- | ---------------------------------- |
+| P0       | GitHub App token infrastructure       | Foundation for all cross-repo auth |
+| P0       | `repository_dispatch` sender/receiver | Core messaging channel             |
+| P0       | Envelope validation workflow          | Policy enforcement on receipt      |
+| P1       | OIDC token embedding and verification | Trust verification                 |
+| P1       | Artifact-based result exchange        | Rich data sharing                  |
+| P1       | Reusable workflow library             | DRY shared capabilities            |
+| P2       | Issue-based long-running coordination | Human-visible task tracking        |
+| P2       | Cross-repo commit status / check runs | Validation gates                   |
+| P3       | Organization Projects integration     | Orchestration dashboard            |
+| P3       | Deployments API for promotion         | Environment-gated promotions       |
 
 ---
 
 ## 9. Mechanisms Evaluated and Excluded
 
-| Mechanism | Why Excluded |
-|---|---|
-| Actions Cache | Repo-scoped; no cross-repo sharing |
-| GitHub Discussions | No workflow trigger; poor machine-to-machine interface |
-| GitHub Wiki | No API for structured updates; no workflow triggers |
-| Git submodules | Static dependency, not a communication channel |
-| GitHub Pages | Publishing-only; no bidirectional communication |
+| Mechanism           | Why Excluded                                                |
+| ------------------- | ----------------------------------------------------------- |
+| Actions Cache       | Repo-scoped; no cross-repo sharing                          |
+| GitHub Discussions  | No workflow trigger; poor machine-to-machine interface      |
+| GitHub Wiki         | No API for structured updates; no workflow triggers         |
+| Git submodules      | Static dependency, not a communication channel              |
+| GitHub Pages        | Publishing-only; no bidirectional communication             |
 | Webhooks (external) | Requires external endpoint; breaks GitHub-native constraint |
 
 ---

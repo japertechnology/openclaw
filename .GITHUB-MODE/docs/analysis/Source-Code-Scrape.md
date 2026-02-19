@@ -25,11 +25,11 @@ The motivations are:
 
 From the parity matrix (`.GITHUB-MODE/runtime/parity-matrix.json`), GitHub Mode workflows fall into three execution categories:
 
-| Category | Workflows | OpenClaw dependency |
-|----------|-----------|-------------------|
-| **Native** | build-test, policy-validation, drift-detection, security-scan | None — pure GitHub Actions |
-| **Adapter** | command, agent-run, route-simulation, eval, cost-check, bot-pr, promotions, incident-response, entity-bootstrap, collaboration | Requires OpenClaw runtime modules |
-| **Installed-only** | release-publish, channel-sessions, device-actions, local-tunnel | Not applicable — stays in full OpenClaw |
+| Category           | Workflows                                                                                                                      | OpenClaw dependency                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| **Native**         | build-test, policy-validation, drift-detection, security-scan                                                                  | None — pure GitHub Actions              |
+| **Adapter**        | command, agent-run, route-simulation, eval, cost-check, bot-pr, promotions, incident-response, entity-bootstrap, collaboration | Requires OpenClaw runtime modules       |
+| **Installed-only** | release-publish, channel-sessions, device-actions, local-tunnel                                                                | Not applicable — stays in full OpenClaw |
 
 The **native** workflows need zero OpenClaw source code. They validate JSON schemas, run policy checks, and produce artifacts using standard CI tooling.
 
@@ -39,54 +39,55 @@ The **adapter** workflows are the extraction target. They need OpenClaw's agent 
 
 These `src/` modules would be copied into the standalone repository:
 
-| Module | Path | Why needed |
-|--------|------|------------|
-| **Agent runner** | `src/agents/` | Core execution engine — runs agent tasks, manages compaction, sandbox, tool invocation |
-| **Configuration** | `src/config/` | Loads, validates, and merges config; every module depends on it |
-| **Plugin system** | `src/plugins/` | Plugin loader, registry, manifest handling — GitHub Mode registers as a plugin |
-| **Plugin SDK** | `src/plugin-sdk/` | Stable API surface for extensions; the contract between core and GitHub Mode |
-| **Routing** | `src/routing/` | Agent route resolution — determines which agent handles a given session |
-| **Hooks** | `src/hooks/` | Internal event system; plugins wire into lifecycle events through hooks |
-| **Providers** | `src/providers/` | Model provider integrations (Anthropic, OpenAI, etc.) — agents need inference |
-| **Security** | `src/security/` | Audit, tool policy validation, skill scanning — policy gates depend on these |
-| **Infrastructure** | `src/infra/` (subset) | Networking utilities, file locking, environment handling, process management |
-| **Utilities** | `src/utils/` | Shared helpers — delivery context, message normalization, timeouts |
-| **Logging** | `src/logging/`, `src/logger.ts` | Structured logging used across all modules |
-| **Sessions** | `src/sessions/` | Session state management for agent conversations |
-| **Memory** | `src/memory/` | Conversation memory — agent runs need context history |
-| **Skills** | `src/skills/` | Skill loading and execution — agents invoke skills as tools |
-| **Shared types** | `src/types/`, `src/shared/` | TypeScript declarations and shared interfaces |
-| **Entry/index** | `src/index.ts`, `src/runtime.ts` | Module export surface and runtime bootstrap |
+| Module             | Path                             | Why needed                                                                             |
+| ------------------ | -------------------------------- | -------------------------------------------------------------------------------------- |
+| **Agent runner**   | `src/agents/`                    | Core execution engine — runs agent tasks, manages compaction, sandbox, tool invocation |
+| **Configuration**  | `src/config/`                    | Loads, validates, and merges config; every module depends on it                        |
+| **Plugin system**  | `src/plugins/`                   | Plugin loader, registry, manifest handling — GitHub Mode registers as a plugin         |
+| **Plugin SDK**     | `src/plugin-sdk/`                | Stable API surface for extensions; the contract between core and GitHub Mode           |
+| **Routing**        | `src/routing/`                   | Agent route resolution — determines which agent handles a given session                |
+| **Hooks**          | `src/hooks/`                     | Internal event system; plugins wire into lifecycle events through hooks                |
+| **Providers**      | `src/providers/`                 | Model provider integrations (Anthropic, OpenAI, etc.) — agents need inference          |
+| **Security**       | `src/security/`                  | Audit, tool policy validation, skill scanning — policy gates depend on these           |
+| **Infrastructure** | `src/infra/` (subset)            | Networking utilities, file locking, environment handling, process management           |
+| **Utilities**      | `src/utils/`                     | Shared helpers — delivery context, message normalization, timeouts                     |
+| **Logging**        | `src/logging/`, `src/logger.ts`  | Structured logging used across all modules                                             |
+| **Sessions**       | `src/sessions/`                  | Session state management for agent conversations                                       |
+| **Memory**         | `src/memory/`                    | Conversation memory — agent runs need context history                                  |
+| **Skills**         | `src/skills/`                    | Skill loading and execution — agents invoke skills as tools                            |
+| **Shared types**   | `src/types/`, `src/shared/`      | TypeScript declarations and shared interfaces                                          |
+| **Entry/index**    | `src/index.ts`, `src/runtime.ts` | Module export surface and runtime bootstrap                                            |
 
 ### 2.3 Excluded Modules (Left Behind)
 
 These modules are not needed by GitHub Mode and would **not** be copied:
 
-| Module | Path | Why excluded |
-|--------|------|-------------|
-| **CLI** | `src/cli/` | GitHub Mode does not expose a terminal CLI; commands arrive via workflow dispatch |
-| **Gateway server** | `src/gateway/` | WebSocket/HTTP server for local mode; GitHub Mode uses Actions as compute |
-| **Channel implementations** | `src/telegram/`, `src/discord/`, `src/slack/`, `src/signal/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/irc/`, `src/web/` | Channel-specific adapters for local message delivery; not applicable on runners |
-| **Channel registry** | `src/channels/` | Enumerates local channels; GitHub Mode routes through workflow events, not channel sockets |
-| **TUI** | `src/tui/`, `src/terminal/` | Terminal UI rendering; no terminal on CI runners |
-| **Media pipeline** | `src/media-understanding/`, `src/link-understanding/` | Content understanding for incoming media; not in MVP scope |
-| **Text-to-speech** | `src/tts/` | Audio generation; no audio output on runners |
-| **Browser** | `src/browser/` | Headless browser automation; out of scope for adapter workflows |
-| **Canvas host** | `src/canvas-host/` | A2UI canvas rendering; local-mode feature |
-| **Daemon** | `src/daemon/` | Background process management for local installations |
-| **Pairing** | `src/pairing/` | Device pairing for mobile/desktop apps |
-| **macOS** | `src/macos/` | macOS-specific integrations |
-| **Docker setup** | `src/docker-setup/` | Local Docker environment configuration |
-| **Auto-reply** | `src/auto-reply/` | Automatic message reply logic for always-on local channels |
-| **Polls/cron** | `src/polls/`, `src/cron/` | Polling and scheduled jobs for local runtime |
-| **Native apps** | `apps/` | iOS, macOS, Android applications |
-| **Most extensions** | `extensions/` (except `extensions/github/`) | Channel-specific plugins; only the GitHub Mode extension is needed |
+| Module                      | Path                                                                                                                                | Why excluded                                                                               |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **CLI**                     | `src/cli/`                                                                                                                          | GitHub Mode does not expose a terminal CLI; commands arrive via workflow dispatch          |
+| **Gateway server**          | `src/gateway/`                                                                                                                      | WebSocket/HTTP server for local mode; GitHub Mode uses Actions as compute                  |
+| **Channel implementations** | `src/telegram/`, `src/discord/`, `src/slack/`, `src/signal/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/irc/`, `src/web/` | Channel-specific adapters for local message delivery; not applicable on runners            |
+| **Channel registry**        | `src/channels/`                                                                                                                     | Enumerates local channels; GitHub Mode routes through workflow events, not channel sockets |
+| **TUI**                     | `src/tui/`, `src/terminal/`                                                                                                         | Terminal UI rendering; no terminal on CI runners                                           |
+| **Media pipeline**          | `src/media-understanding/`, `src/link-understanding/`                                                                               | Content understanding for incoming media; not in MVP scope                                 |
+| **Text-to-speech**          | `src/tts/`                                                                                                                          | Audio generation; no audio output on runners                                               |
+| **Browser**                 | `src/browser/`                                                                                                                      | Headless browser automation; out of scope for adapter workflows                            |
+| **Canvas host**             | `src/canvas-host/`                                                                                                                  | A2UI canvas rendering; local-mode feature                                                  |
+| **Daemon**                  | `src/daemon/`                                                                                                                       | Background process management for local installations                                      |
+| **Pairing**                 | `src/pairing/`                                                                                                                      | Device pairing for mobile/desktop apps                                                     |
+| **macOS**                   | `src/macos/`                                                                                                                        | macOS-specific integrations                                                                |
+| **Docker setup**            | `src/docker-setup/`                                                                                                                 | Local Docker environment configuration                                                     |
+| **Auto-reply**              | `src/auto-reply/`                                                                                                                   | Automatic message reply logic for always-on local channels                                 |
+| **Polls/cron**              | `src/polls/`, `src/cron/`                                                                                                           | Polling and scheduled jobs for local runtime                                               |
+| **Native apps**             | `apps/`                                                                                                                             | iOS, macOS, Android applications                                                           |
+| **Most extensions**         | `extensions/` (except `extensions/github/`)                                                                                         | Channel-specific plugins; only the GitHub Mode extension is needed                         |
 
 ### 2.4 Infrastructure Subset
 
 `src/infra/` is the largest utility module (~90 files). GitHub Mode needs only a subset:
 
 **Include:**
+
 - Environment loading and normalization (`env.ts`, `env-vars.ts`)
 - File locking (`file-lock.ts`, `lockfile.ts`)
 - JSON file I/O (`json-file.ts`)
@@ -97,6 +98,7 @@ These modules are not needed by GitHub Mode and would **not** be copied:
 - Version checking (`version.ts`)
 
 **Exclude:**
+
 - Bonjour/mDNS discovery
 - SSH tunnel management
 - TLS certificate handling
@@ -186,12 +188,12 @@ Manages the lifecycle of an agent execution within a GitHub Actions job:
 
 Translates GitHub event payloads into OpenClaw command invocations:
 
-| GitHub event | Translated to |
-|-------------|---------------|
-| `workflow_dispatch` with `command` input | Direct agent command execution |
-| `issue_comment` with `/openclaw` prefix | Slash-command parsing → agent task |
-| `pull_request` (opened/synchronized) | PR validation agent run |
-| `schedule` | Cron-equivalent maintenance task |
+| GitHub event                             | Translated to                      |
+| ---------------------------------------- | ---------------------------------- |
+| `workflow_dispatch` with `command` input | Direct agent command execution     |
+| `issue_comment` with `/openclaw` prefix  | Slash-command parsing → agent task |
+| `pull_request` (opened/synchronized)     | PR validation agent run            |
+| `schedule`                               | Cron-equivalent maintenance task   |
 
 The bridge validates the event against `command-policy.json` and `trust-levels.json` before dispatching to the agent runner.
 
@@ -207,12 +209,12 @@ GitHub Actions runners are ephemeral. This module solves state continuity:
 
 Maps GitHub-native credential surfaces to OpenClaw provider configuration:
 
-| GitHub surface | OpenClaw config target |
-|---------------|----------------------|
-| `secrets.ANTHROPIC_API_KEY` | `providers.anthropic.apiKey` |
-| `secrets.OPENAI_API_KEY` | `providers.openai.apiKey` |
-| OIDC token exchange | `providers.*.oidcToken` (where supported) |
-| `vars.OPENCLAW_CONFIG` | Base config overlay (JSON) |
+| GitHub surface              | OpenClaw config target                    |
+| --------------------------- | ----------------------------------------- |
+| `secrets.ANTHROPIC_API_KEY` | `providers.anthropic.apiKey`              |
+| `secrets.OPENAI_API_KEY`    | `providers.openai.apiKey`                 |
+| OIDC token exchange         | `providers.*.oidcToken` (where supported) |
+| `vars.OPENCLAW_CONFIG`      | Base config overlay (JSON)                |
 
 This replaces the local `~/.openclaw/config.yaml` with environment-injected configuration that never touches disk on the runner.
 
@@ -297,6 +299,7 @@ After the initial copy, unused imports must be resolved:
 The full OpenClaw `package.json` lists 80+ dependencies spanning messaging SDKs, native addons, and platform-specific packages. The standalone repo's dependency set is dramatically smaller:
 
 **Kept:**
+
 - AI/LLM: `@anthropic-ai/sdk`, `openai`, `@aws-sdk/client-bedrock-runtime` (provider access)
 - Schema validation: `zod`, `@sinclair/typebox`
 - Config: `yaml`, `dotenv`
@@ -305,6 +308,7 @@ The full OpenClaw `package.json` lists 80+ dependencies spanning messaging SDKs,
 - GitHub: `@actions/core`, `@actions/artifact`, `@actions/github`, `@octokit/rest`
 
 **Removed:**
+
 - Messaging SDKs: `grammy`, `@slack/bolt`, `discord.js`, `whatsapp-web.js`, `signal-cli`
 - Native addons: `node-pty`, `@aspect-build/rules_js`, platform binaries
 - Media: `sharp`, `ffmpeg`, `pdfjs-dist`
@@ -323,7 +327,7 @@ The standalone repo consumes OpenClaw as an upstream source, not a runtime depen
 # .github/workflows/github-mode-upstream-sync.yml
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Weekly
+    - cron: "0 6 * * 1" # Weekly
   workflow_dispatch: {}
 
 jobs:
@@ -361,22 +365,22 @@ A CI job compares the extracted module's public API surface (exported types and 
 
 ### 8.1 Benefits
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Reduced attack surface** | No messaging SDK code, no native addons, no device-coupled modules on CI runners |
-| **Faster CI** | 60-70% smaller `node_modules`; install + build in under 60 seconds |
-| **Clear ownership** | `openclaw-core/` is consumed code; `binding/` and `.GITHUB-MODE/` are authored code |
-| **Independent versioning** | GitHub Mode can release binding updates without coordinating with OpenClaw core releases |
-| **Simpler auditing** | Security reviewers audit a smaller, purpose-built codebase rather than the full OpenClaw monorepo |
+| Benefit                    | Explanation                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Reduced attack surface** | No messaging SDK code, no native addons, no device-coupled modules on CI runners                  |
+| **Faster CI**              | 60-70% smaller `node_modules`; install + build in under 60 seconds                                |
+| **Clear ownership**        | `openclaw-core/` is consumed code; `binding/` and `.GITHUB-MODE/` are authored code               |
+| **Independent versioning** | GitHub Mode can release binding updates without coordinating with OpenClaw core releases          |
+| **Simpler auditing**       | Security reviewers audit a smaller, purpose-built codebase rather than the full OpenClaw monorepo |
 
 ### 8.2 Costs
 
-| Cost | Explanation |
-|------|-------------|
-| **Sync burden** | Upstream changes to extracted modules must be pulled and reconciled periodically |
-| **Divergence risk** | Local patches to `openclaw-core/` that are not upstreamed create drift |
-| **Duplicate testing** | Tests for extracted modules run in both the standalone repo and upstream |
-| **Plugin SDK coupling** | If the plugin SDK makes a breaking change, the binding layer must adapt |
+| Cost                      | Explanation                                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------- |
+| **Sync burden**           | Upstream changes to extracted modules must be pulled and reconciled periodically       |
+| **Divergence risk**       | Local patches to `openclaw-core/` that are not upstreamed create drift                 |
+| **Duplicate testing**     | Tests for extracted modules run in both the standalone repo and upstream               |
+| **Plugin SDK coupling**   | If the plugin SDK makes a breaking change, the binding layer must adapt                |
 | **Incomplete extraction** | Transitive dependencies between modules may pull in more code than initially estimated |
 
 ### 8.3 When This Approach Is Preferable to the Overlay
@@ -394,15 +398,15 @@ The standalone scrape is better when:
 
 The binding layer is the only code authored specifically for the standalone repo. Estimated scope:
 
-| File | Purpose | Estimated size |
-|------|---------|---------------|
-| `binding/github-runner.ts` | Runner lifecycle orchestration | ~200 LOC |
-| `binding/workflow-bridge.ts` | Event-to-command translation | ~150 LOC |
-| `binding/artifact-io.ts` | Checkpoint persistence via artifacts API | ~180 LOC |
-| `binding/secret-resolver.ts` | GitHub Secrets → provider config mapping | ~120 LOC |
-| `binding/pr-bot.ts` | PR creation from agent output | ~160 LOC |
-| `binding/index.ts` | Public API surface | ~30 LOC |
-| **Total** | | **~840 LOC** |
+| File                         | Purpose                                  | Estimated size |
+| ---------------------------- | ---------------------------------------- | -------------- |
+| `binding/github-runner.ts`   | Runner lifecycle orchestration           | ~200 LOC       |
+| `binding/workflow-bridge.ts` | Event-to-command translation             | ~150 LOC       |
+| `binding/artifact-io.ts`     | Checkpoint persistence via artifacts API | ~180 LOC       |
+| `binding/secret-resolver.ts` | GitHub Secrets → provider config mapping | ~120 LOC       |
+| `binding/pr-bot.ts`          | PR creation from agent output            | ~160 LOC       |
+| `binding/index.ts`           | Public API surface                       | ~30 LOC        |
+| **Total**                    |                                          | **~840 LOC**   |
 
 This is a deliberately small surface. The binding layer's only job is to translate between GitHub's event/artifact/secret model and OpenClaw's config/agent/session model. All substantive logic lives in the extracted `openclaw-core/` modules.
 

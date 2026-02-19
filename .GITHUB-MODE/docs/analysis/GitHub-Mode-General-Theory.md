@@ -12,15 +12,15 @@ Most software repositories are passive. They store code, accept contributions, a
 
 GitHub's infrastructure, however, offers a rich set of capabilities beyond storage:
 
-| Capability | Traditional Use | Wrapper Use |
-|---|---|---|
-| Actions | Build/test/deploy | Runtime execution plane |
-| Pull requests | Code review | Policy enforcement, attestation, promotion gates |
-| Issues/Discussions | Bug tracking | Structured task intake, async conversations |
-| Secrets management | CI credentials | Runtime configuration |
-| CODEOWNERS | Review routing | Ownership and governance boundaries |
-| Branch protection | Merge gates | Runtime safety controls |
-| Audit log | Compliance | Execution traceability |
+| Capability         | Traditional Use   | Wrapper Use                                      |
+| ------------------ | ----------------- | ------------------------------------------------ |
+| Actions            | Build/test/deploy | Runtime execution plane                          |
+| Pull requests      | Code review       | Policy enforcement, attestation, promotion gates |
+| Issues/Discussions | Bug tracking      | Structured task intake, async conversations      |
+| Secrets management | CI credentials    | Runtime configuration                            |
+| CODEOWNERS         | Review routing    | Ownership and governance boundaries              |
+| Branch protection  | Merge gates       | Runtime safety controls                          |
+| Audit log          | Compliance        | Execution traceability                           |
 
 The gap between what GitHub offers and what most repositories use is enormous. The wrapper pattern closes that gap.
 
@@ -75,7 +75,7 @@ The pattern works specifically because GitHub provides properties that are diffi
 
 ### 4.1 Identity and Authentication
 
-GitHub Actions runners inherit repository permissions. There is no separate identity system to maintain, no API keys to rotate for internal operations, no user management layer to build. The repository's collaborator model *is* the access control model.
+GitHub Actions runners inherit repository permissions. There is no separate identity system to maintain, no API keys to rotate for internal operations, no user management layer to build. The repository's collaborator model _is_ the access control model.
 
 ### 4.2 Auditability
 
@@ -146,13 +146,13 @@ In each case, the wrapper follows the same five-layer structure: feature flag, c
 
 The wrapper pattern is not without costs:
 
-| Trade-off | Description |
-|---|---|
-| **Latency** | GitHub Actions cold start (30-120s) makes the wrapper unsuitable for real-time interactive use. The wrapper is best for async, batch, and review-driven workflows. |
-| **State management** | Ephemeral runners have no persistent memory between runs. State must be explicitly serialized to artifacts, caches, or external stores. |
-| **Debugging** | Workflow debugging is harder than local debugging. Log inspection replaces breakpoints. Iteration cycles are longer. |
+| Trade-off             | Description                                                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Latency**           | GitHub Actions cold start (30-120s) makes the wrapper unsuitable for real-time interactive use. The wrapper is best for async, batch, and review-driven workflows.             |
+| **State management**  | Ephemeral runners have no persistent memory between runs. State must be explicitly serialized to artifacts, caches, or external stores.                                        |
+| **Debugging**         | Workflow debugging is harder than local debugging. Log inspection replaces breakpoints. Iteration cycles are longer.                                                           |
 | **Platform coupling** | The wrapper depends on GitHub's infrastructure. Migration to another platform requires rewriting the orchestration layer (though contracts and documentation remain portable). |
-| **Cost** | GitHub Actions minutes have limits and costs. Compute-intensive or high-frequency workloads may be expensive relative to local execution. |
+| **Cost**              | GitHub Actions minutes have limits and costs. Compute-intensive or high-frequency workloads may be expensive relative to local execution.                                      |
 
 These trade-offs are acceptable when the benefits (auditability, governance, team collaboration, security isolation) outweigh the costs. The wrapper pattern complements local execution rather than replacing it.
 

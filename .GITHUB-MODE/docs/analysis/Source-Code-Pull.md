@@ -7,6 +7,7 @@
 **Scope:** Define how to create and maintain "GitClaw" — the smallest possible repository derived from OpenClaw that contains only the files required for GitHub Mode operation — using a subtractive fork kept in sync via `git pull` from upstream.
 
 **Related:**
+
 - [Source-Code-Copy.md](Source-Code-Copy.md) — copies needed modules into `.GITHUB-MODE/openclaw/` within the same repository (additive, in-repo duplication).
 - [Source-Code-Scrape.md](Source-Code-Scrape.md) — extracts needed modules into a new standalone repository (additive, cross-repo extraction).
 - This document describes the **subtractive** variant: fork the full repo, delete what is not needed, keep pulling from upstream.
@@ -23,7 +24,7 @@ The motivations are:
 
 1. **Working from day one** — A fork with deletions is a subset of a working codebase. Every retained file already has correct import paths, valid build configuration, and passing tests. Nothing is relocated.
 2. **No import rewriting** — Files stay at their original `src/` paths. Internal imports between retained modules resolve exactly as they do in the full OpenClaw repo. No AST transforms, no path aliases, no binding layers.
-3. **Simpler dependency analysis** — Instead of enumerating every file GitHub Mode needs (and missing transitive edges), enumerate what it clearly does *not* need. The exclusion set is smaller and easier to verify: if it builds and tests pass after deletion, the cut was safe.
+3. **Simpler dependency analysis** — Instead of enumerating every file GitHub Mode needs (and missing transitive edges), enumerate what it clearly does _not_ need. The exclusion set is smaller and easier to verify: if it builds and tests pass after deletion, the cut was safe.
 4. **`git pull` as the sync mechanism** — The fork maintains a standard git upstream relationship. `git pull upstream main` brings in all upstream changes. A deletion pass after the pull removes any newly added files that fall outside the kept set. This is a well-understood git workflow, not a custom sync pipeline.
 5. **Smallest possible repo** — Unlike Copy (which duplicates modules inside the same repo, increasing size) or Scrape (which requires authoring ~840 LOC of binding code), the Pull approach produces a repo that is strictly a subset of OpenClaw — no added files, no duplicated code, just fewer files.
 
@@ -52,14 +53,14 @@ The deletion script is the only custom tooling. It reads a **keep manifest** (li
 
 ### 2.2 Why Subtractive Beats Additive for This Use Case
 
-| Concern | Additive (Copy/Scrape) | Subtractive (Pull) |
-|---------|----------------------|-------------------|
-| **Transitive dependencies** | Must trace every import chain; missing one breaks the build | Already resolved — the full codebase compiles; deletions that break the build are caught immediately |
-| **Import paths** | Must rewrite or relocate to match new directory structure | Unchanged — files stay at original paths |
-| **Build configuration** | Must create new `tsconfig.json`, `package.json`, Vitest config | Modify existing configs (remove entries, not create from scratch) |
-| **Tests** | Must migrate tests and fix import paths; some tests may not run without excluded modules | Tests for retained modules run as-is; tests for deleted modules are deleted with them |
-| **Initial effort** | High — must identify, copy, wire up, and verify every needed module | Low — fork, delete, verify the build passes |
-| **Ongoing sync** | Custom sync script or cross-repo workflow | Standard `git pull` + deletion re-run |
+| Concern                     | Additive (Copy/Scrape)                                                                   | Subtractive (Pull)                                                                                   |
+| --------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Transitive dependencies** | Must trace every import chain; missing one breaks the build                              | Already resolved — the full codebase compiles; deletions that break the build are caught immediately |
+| **Import paths**            | Must rewrite or relocate to match new directory structure                                | Unchanged — files stay at original paths                                                             |
+| **Build configuration**     | Must create new `tsconfig.json`, `package.json`, Vitest config                           | Modify existing configs (remove entries, not create from scratch)                                    |
+| **Tests**                   | Must migrate tests and fix import paths; some tests may not run without excluded modules | Tests for retained modules run as-is; tests for deleted modules are deleted with them                |
+| **Initial effort**          | High — must identify, copy, wire up, and verify every needed module                      | Low — fork, delete, verify the build passes                                                          |
+| **Ongoing sync**            | Custom sync script or cross-repo workflow                                                | Standard `git pull` + deletion re-run                                                                |
 
 ## 3. The Keep Manifest
 
@@ -129,28 +130,28 @@ CHANGELOG.md
 
 Everything **not** in the keep manifest is removed. By referencing the exclusion lists from Source-Code-Copy.md §2.3 and Source-Code-Scrape.md §2.3, the deleted set includes:
 
-| Deleted path | Reason |
-|-------------|--------|
-| `src/cli/` | GitHub Mode does not expose a terminal CLI |
-| `src/gateway/` | WebSocket/HTTP server for local mode |
-| `src/telegram/`, `src/discord/`, `src/slack/`, `src/signal/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/web/` | Channel-specific adapters for local message delivery |
-| `src/channels/` | Channel registry — GitHub Mode routes through workflow events |
-| `src/tui/`, `src/terminal/` | Terminal UI rendering — no terminal on CI runners |
-| `src/media-understanding/`, `src/link-understanding/` | Content understanding for incoming media |
-| `src/tts/` | Audio generation — no audio output on runners |
-| `src/browser/` | Headless browser automation |
-| `src/canvas-host/` | A2UI canvas rendering — local-mode feature |
-| `src/daemon/` | Background process management for local installations |
-| `src/pairing/` | Device pairing for mobile/desktop apps |
-| `src/macos/` | macOS-specific integrations |
-| `src/docker-setup*` | Local Docker environment configuration |
-| `src/auto-reply/` | Automatic message reply logic for local channels |
-| `src/polls*`, `src/cron/` | Polling and scheduled jobs for local runtime |
-| `src/wizard/` | Setup wizard for local installations |
-| `apps/` | iOS, macOS, Android native applications |
-| `extensions/` (except `extensions/github/`) | Channel-specific plugins |
-| `docs/` | Full OpenClaw documentation (replaced by `.GITHUB-MODE/docs/`) |
-| `scripts/` (most) | Build/release scripts for full OpenClaw |
+| Deleted path                                                                                                            | Reason                                                         |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `src/cli/`                                                                                                              | GitHub Mode does not expose a terminal CLI                     |
+| `src/gateway/`                                                                                                          | WebSocket/HTTP server for local mode                           |
+| `src/telegram/`, `src/discord/`, `src/slack/`, `src/signal/`, `src/whatsapp/`, `src/imessage/`, `src/line/`, `src/web/` | Channel-specific adapters for local message delivery           |
+| `src/channels/`                                                                                                         | Channel registry — GitHub Mode routes through workflow events  |
+| `src/tui/`, `src/terminal/`                                                                                             | Terminal UI rendering — no terminal on CI runners              |
+| `src/media-understanding/`, `src/link-understanding/`                                                                   | Content understanding for incoming media                       |
+| `src/tts/`                                                                                                              | Audio generation — no audio output on runners                  |
+| `src/browser/`                                                                                                          | Headless browser automation                                    |
+| `src/canvas-host/`                                                                                                      | A2UI canvas rendering — local-mode feature                     |
+| `src/daemon/`                                                                                                           | Background process management for local installations          |
+| `src/pairing/`                                                                                                          | Device pairing for mobile/desktop apps                         |
+| `src/macos/`                                                                                                            | macOS-specific integrations                                    |
+| `src/docker-setup*`                                                                                                     | Local Docker environment configuration                         |
+| `src/auto-reply/`                                                                                                       | Automatic message reply logic for local channels               |
+| `src/polls*`, `src/cron/`                                                                                               | Polling and scheduled jobs for local runtime                   |
+| `src/wizard/`                                                                                                           | Setup wizard for local installations                           |
+| `apps/`                                                                                                                 | iOS, macOS, Android native applications                        |
+| `extensions/` (except `extensions/github/`)                                                                             | Channel-specific plugins                                       |
+| `docs/`                                                                                                                 | Full OpenClaw documentation (replaced by `.GITHUB-MODE/docs/`) |
+| `scripts/` (most)                                                                                                       | Build/release scripts for full OpenClaw                        |
 
 ### 3.2 Why a Keep Manifest, Not an Exclude Manifest
 
@@ -345,6 +346,7 @@ rm -f "$IMPORTS"
 Based on the module analysis from Source-Code-Scrape.md §6.3:
 
 **Retained** (needed by kept modules):
+
 - AI/LLM: `@anthropic-ai/sdk`, `openai`, `@aws-sdk/client-bedrock-runtime`
 - Schema: `zod`, `@sinclair/typebox`
 - Config: `yaml`, `dotenv`
@@ -353,6 +355,7 @@ Based on the module analysis from Source-Code-Scrape.md §6.3:
 - GitHub: `@actions/core`, `@actions/artifact`, `@actions/github`, `@octokit/rest`
 
 **Removed** (only imported by deleted modules):
+
 - Messaging SDKs: `grammy`, `@slack/bolt`, `discord.js`, `whatsapp-web.js`
 - Native addons: `node-pty`, platform binaries
 - Media: `sharp`, `ffmpeg`, `pdfjs-dist`
@@ -385,6 +388,7 @@ pnpm test
 ```
 
 The `git merge upstream/main` will:
+
 - **Auto-merge** changes to retained files (no conflicts — the files are unmodified from upstream).
 - **Add** new files from upstream that are outside the keep manifest. The trim script removes them.
 - **Conflict** only if upstream modifies a file that GitClaw has also modified (e.g., `package.json` after dependency trimming). These are standard merge conflicts resolved in the normal way.
@@ -396,7 +400,7 @@ The `git merge upstream/main` will:
 name: gitclaw-upstream-sync
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Weekly
+    - cron: "0 6 * * 1" # Weekly
   workflow_dispatch: {}
 
 jobs:
@@ -419,7 +423,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - run: pnpm install
       - run: pnpm tsgo
@@ -438,13 +442,13 @@ jobs:
 
 The only files GitClaw modifies relative to upstream are:
 
-| File | GitClaw modification | Conflict likelihood |
-|------|---------------------|-------------------|
-| `package.json` | Removed unused dependencies | **Medium** — upstream dependency changes will conflict |
-| `pnpm-lock.yaml` | Reflects trimmed deps | **Medium** — regenerate after merge |
-| `tsconfig.json` | Removed references to deleted modules | **Low** — upstream additions, not modifications |
-| `README.md` | Replaced with GitClaw-specific README | **Low** — one-time replacement |
-| `.gitignore` | Possibly extended | **Low** |
+| File             | GitClaw modification                  | Conflict likelihood                                    |
+| ---------------- | ------------------------------------- | ------------------------------------------------------ |
+| `package.json`   | Removed unused dependencies           | **Medium** — upstream dependency changes will conflict |
+| `pnpm-lock.yaml` | Reflects trimmed deps                 | **Medium** — regenerate after merge                    |
+| `tsconfig.json`  | Removed references to deleted modules | **Low** — upstream additions, not modifications        |
+| `README.md`      | Replaced with GitClaw-specific README | **Low** — one-time replacement                         |
+| `.gitignore`     | Possibly extended                     | **Low**                                                |
 
 All retained `src/` files are **unmodified** from upstream. They have zero conflict surface. This is the core advantage of the subtractive approach: the code you keep is identical to upstream, so `git merge` handles it automatically.
 
@@ -454,12 +458,12 @@ When the deletion script removes a module, any retained module that imports from
 
 ### 8.1 Resolution Strategies
 
-| Situation | Resolution |
-|-----------|-----------|
-| **Retained module has a hard import from deleted module** | The deleted module is actually needed — add it to the keep manifest |
-| **Retained module has an optional/conditional import** | Guard the import with a try/catch or feature flag; stub the missing module |
-| **Retained module re-exports a deleted module's types** | Remove the re-export from the retained module's `index.ts` |
-| **Test file imports from deleted module** | Delete the test (it tests functionality GitClaw does not include) |
+| Situation                                                 | Resolution                                                                 |
+| --------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Retained module has a hard import from deleted module** | The deleted module is actually needed — add it to the keep manifest        |
+| **Retained module has an optional/conditional import**    | Guard the import with a try/catch or feature flag; stub the missing module |
+| **Retained module re-exports a deleted module's types**   | Remove the re-export from the retained module's `index.ts`                 |
+| **Test file imports from deleted module**                 | Delete the test (it tests functionality GitClaw does not include)          |
 
 ### 8.2 The Iterative Trim Loop
 
@@ -479,6 +483,7 @@ The first time the deletion script runs, expect an iterative process:
 ```
 
 This loop converges quickly because:
+
 - TypeScript's static analysis catches every broken import.
 - The compiler error messages name the exact file and import path.
 - Each iteration either adds a module to the keep manifest or removes a non-essential import.
@@ -487,57 +492,57 @@ In practice, the Copy/Scrape analyses already identified the ~16 core modules th
 
 ## 9. Comparison: Pull vs. Copy vs. Scrape
 
-| Dimension | Copy (in-repo) | Scrape (standalone) | Pull (subtractive fork) |
-|-----------|----------------|-------------------|------------------------|
-| **Starting point** | Empty `.GITHUB-MODE/openclaw/` — add files | Empty `github-mode-openclaw/` repo — add files | Full OpenClaw fork — remove files |
-| **File paths** | Relocated to `.GITHUB-MODE/openclaw/` | Relocated to `openclaw-core/` | **Unchanged** — original `src/` paths |
-| **Import rewriting** | Not needed (same relative structure) but path prefix changes | Required for cross-module and external references | **Not needed** — imports are identical to upstream |
-| **Build config** | New `tsconfig.json` under `.GITHUB-MODE/` | New `tsconfig.json`, `package.json`, `vitest.config.ts` | **Modified existing** — remove entries only |
-| **Code duplication** | Yes — modules exist in both `src/` and `.GITHUB-MODE/openclaw/` | No duplication (separate repo) | **No duplication** — single copy of each file |
-| **New code required** | None | ~840 LOC binding layer | **None** — only a keep manifest + trim script (~80 LOC) |
-| **Sync mechanism** | In-repo copy script | Cross-repo sync workflow | **`git pull upstream`** + trim re-run |
-| **Sync complexity** | Low (same repo, file copy) | High (cross-repo, breaking change detection) | **Low** (standard git merge + idempotent trim) |
-| **Repository count** | 1 (same repo) | 2 (separate repos) | **1** (fork of upstream) |
-| **Git history** | Lost for copied files | Lost for extracted files | **Preserved** — full blame/log for retained files |
-| **Day-one buildability** | Requires wiring up build/test for copied modules | Requires new build config + binding layer | **Immediate** — fork builds as-is before any deletion |
-| **Divergence risk** | Medium (copy drifts from src/) | High (separate repo diverges) | **Low** (retained files are byte-identical to upstream) |
-| **Repo size** | Larger (duplication) | Smaller (extracted only) | **Smaller** (deletion, no duplication) |
+| Dimension                | Copy (in-repo)                                                  | Scrape (standalone)                                     | Pull (subtractive fork)                                 |
+| ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- |
+| **Starting point**       | Empty `.GITHUB-MODE/openclaw/` — add files                      | Empty `github-mode-openclaw/` repo — add files          | Full OpenClaw fork — remove files                       |
+| **File paths**           | Relocated to `.GITHUB-MODE/openclaw/`                           | Relocated to `openclaw-core/`                           | **Unchanged** — original `src/` paths                   |
+| **Import rewriting**     | Not needed (same relative structure) but path prefix changes    | Required for cross-module and external references       | **Not needed** — imports are identical to upstream      |
+| **Build config**         | New `tsconfig.json` under `.GITHUB-MODE/`                       | New `tsconfig.json`, `package.json`, `vitest.config.ts` | **Modified existing** — remove entries only             |
+| **Code duplication**     | Yes — modules exist in both `src/` and `.GITHUB-MODE/openclaw/` | No duplication (separate repo)                          | **No duplication** — single copy of each file           |
+| **New code required**    | None                                                            | ~840 LOC binding layer                                  | **None** — only a keep manifest + trim script (~80 LOC) |
+| **Sync mechanism**       | In-repo copy script                                             | Cross-repo sync workflow                                | **`git pull upstream`** + trim re-run                   |
+| **Sync complexity**      | Low (same repo, file copy)                                      | High (cross-repo, breaking change detection)            | **Low** (standard git merge + idempotent trim)          |
+| **Repository count**     | 1 (same repo)                                                   | 2 (separate repos)                                      | **1** (fork of upstream)                                |
+| **Git history**          | Lost for copied files                                           | Lost for extracted files                                | **Preserved** — full blame/log for retained files       |
+| **Day-one buildability** | Requires wiring up build/test for copied modules                | Requires new build config + binding layer               | **Immediate** — fork builds as-is before any deletion   |
+| **Divergence risk**      | Medium (copy drifts from src/)                                  | High (separate repo diverges)                           | **Low** (retained files are byte-identical to upstream) |
+| **Repo size**            | Larger (duplication)                                            | Smaller (extracted only)                                | **Smaller** (deletion, no duplication)                  |
 
 ## 10. Trade-offs
 
 ### 10.1 Benefits
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Zero relocation** | Files stay at original paths — no import rewriting, no new directory structures, no binding layer |
-| **Preserved git history** | `git blame`, `git log`, and bisect work on every retained file because it was never moved or copied |
-| **Compiler-verified correctness** | If `pnpm tsgo` passes after deletion, every import in the retained code resolves. The TypeScript compiler is the verification tool, not manual dependency tracing |
-| **Minimal custom tooling** | One shell script (~80 LOC) + one manifest file. Compare to the Copy approach (copy script + sync workflow + staleness detection) or Scrape approach (extraction script + binding layer + sync workflow + breaking change detection) |
-| **Standard git sync** | `git pull upstream main` is a workflow every developer already knows. No custom sync pipelines or cross-repo automation |
-| **No code duplication** | Unlike Copy (which duplicates modules in the same repo), every file exists exactly once |
-| **Immediate buildability** | A fresh fork passes `pnpm install && pnpm build && pnpm test` before any trimming. Trimming only removes things — it cannot introduce new failures that the trim loop does not surface |
-| **Gradual trimming** | Start conservative (keep more), trim further as confidence grows. Each deletion is independently verifiable |
+| Benefit                           | Explanation                                                                                                                                                                                                                         |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zero relocation**               | Files stay at original paths — no import rewriting, no new directory structures, no binding layer                                                                                                                                   |
+| **Preserved git history**         | `git blame`, `git log`, and bisect work on every retained file because it was never moved or copied                                                                                                                                 |
+| **Compiler-verified correctness** | If `pnpm tsgo` passes after deletion, every import in the retained code resolves. The TypeScript compiler is the verification tool, not manual dependency tracing                                                                   |
+| **Minimal custom tooling**        | One shell script (~80 LOC) + one manifest file. Compare to the Copy approach (copy script + sync workflow + staleness detection) or Scrape approach (extraction script + binding layer + sync workflow + breaking change detection) |
+| **Standard git sync**             | `git pull upstream main` is a workflow every developer already knows. No custom sync pipelines or cross-repo automation                                                                                                             |
+| **No code duplication**           | Unlike Copy (which duplicates modules in the same repo), every file exists exactly once                                                                                                                                             |
+| **Immediate buildability**        | A fresh fork passes `pnpm install && pnpm build && pnpm test` before any trimming. Trimming only removes things — it cannot introduce new failures that the trim loop does not surface                                              |
+| **Gradual trimming**              | Start conservative (keep more), trim further as confidence grows. Each deletion is independently verifiable                                                                                                                         |
 
 ### 10.2 Costs
 
-| Cost | Explanation |
-|------|-------------|
-| **`package.json` merge conflicts** | Trimmed dependencies in `package.json` will conflict with upstream changes. This is the primary ongoing maintenance cost, but it is localized to one file |
-| **Deleted file re-addition on sync** | Every `git pull upstream main` may re-add files from upstream that are outside the keep manifest. The trim script handles this, but it must be run after every sync |
-| **`src/infra/` bloat** | Keeping `src/infra/` in full (to avoid subsetting complexity) retains ~70 files that GitHub Mode does not directly use. Cost is disk space only (~200 KB), not runtime impact |
-| **Test suite gaps** | Tests for deleted modules are gone. Tests for retained modules that exercise cross-module integration with deleted modules will fail and must be removed or stubbed |
-| **Not truly standalone** | GitClaw is still structurally an OpenClaw repo — it has `src/`, `package.json`, and build config that assume the full project. A contributor unfamiliar with the trimming may be confused by the mix of present and absent modules |
-| **Upstream path changes** | If upstream renames or moves a retained module's directory, the keep manifest must be updated. This is rare but requires attention during sync |
+| Cost                                 | Explanation                                                                                                                                                                                                                        |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`package.json` merge conflicts**   | Trimmed dependencies in `package.json` will conflict with upstream changes. This is the primary ongoing maintenance cost, but it is localized to one file                                                                          |
+| **Deleted file re-addition on sync** | Every `git pull upstream main` may re-add files from upstream that are outside the keep manifest. The trim script handles this, but it must be run after every sync                                                                |
+| **`src/infra/` bloat**               | Keeping `src/infra/` in full (to avoid subsetting complexity) retains ~70 files that GitHub Mode does not directly use. Cost is disk space only (~200 KB), not runtime impact                                                      |
+| **Test suite gaps**                  | Tests for deleted modules are gone. Tests for retained modules that exercise cross-module integration with deleted modules will fail and must be removed or stubbed                                                                |
+| **Not truly standalone**             | GitClaw is still structurally an OpenClaw repo — it has `src/`, `package.json`, and build config that assume the full project. A contributor unfamiliar with the trimming may be confused by the mix of present and absent modules |
+| **Upstream path changes**            | If upstream renames or moves a retained module's directory, the keep manifest must be updated. This is rare but requires attention during sync                                                                                     |
 
 ### 10.3 When to Choose Each Approach
 
-| Choose **Pull** when… | Choose **Copy** when… | Choose **Scrape** when… |
-|----------------------|---------------------|------------------------|
-| You want the smallest repo with no duplication | GitHub Mode must stay in the same repo as full OpenClaw | GitClaw must be independently deployable with its own CI/CD |
-| Preserving git history matters | Overlay architecture (ADR 0001) is a hard constraint | A separate team maintains GitHub Mode with its own release cadence |
-| You want standard `git pull` sync | Cross-repo sync is too much operational overhead | Regulatory or compliance requirements demand a bounded, inventoried codebase |
-| Minimal custom tooling is a priority | Direct import access is needed without a separate repo | The binding layer's ~840 LOC is acceptable upfront cost |
-| The fork is primarily consumed, not heavily modified | The team works on both `src/` and GitHub Mode in the same PRs | |
+| Choose **Pull** when…                                | Choose **Copy** when…                                         | Choose **Scrape** when…                                                      |
+| ---------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| You want the smallest repo with no duplication       | GitHub Mode must stay in the same repo as full OpenClaw       | GitClaw must be independently deployable with its own CI/CD                  |
+| Preserving git history matters                       | Overlay architecture (ADR 0001) is a hard constraint          | A separate team maintains GitHub Mode with its own release cadence           |
+| You want standard `git pull` sync                    | Cross-repo sync is too much operational overhead              | Regulatory or compliance requirements demand a bounded, inventoried codebase |
+| Minimal custom tooling is a priority                 | Direct import access is needed without a separate repo        | The binding layer's ~840 LOC is acceptable upfront cost                      |
+| The fork is primarily consumed, not heavily modified | The team works on both `src/` and GitHub Mode in the same PRs |                                                                              |
 
 ## 11. Step-by-Step: Creating GitClaw
 

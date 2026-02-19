@@ -63,6 +63,7 @@ The `extensions/github/` directory does not exist. No extension plugin has been 
 The three analysis documents exploring source-code extraction (`Source-Code-Scrape.md`, `Source-Code-Copy.md`, `Source-Code-Pull.md`) acknowledge this tension by proposing to copy `src/` modules into `.GITHUB-MODE/openclaw/`. But this directly contradicts the overlay's core value proposition: zero upstream mutation and clean install/uninstall. A copy of 16 modules duplicated inside `.GITHUB-MODE/` is not an overlay; it is a vendored fork.
 
 **Suggested fix:** Resolve the architectural contradiction before Phase 4. Either:
+
 - (a) Extend the plugin SDK to expose the agent runner, tool-policy, and routing APIs that GitHub Mode needs, maintaining the SDK as the only coupling point. This preserves the overlay boundary.
 - (b) Accept that GitHub Mode requires a build-time dependency on `src/` and update ADR 0001 to allow read-only imports from a defined allowlist of `src/` modules. This trades boundary purity for implementation simplicity.
 - (c) Adopt the source-copy approach, but reclassify the project from "overlay" to "vendored derivative" and update all documentation that claims conflict-free upstream sync.
