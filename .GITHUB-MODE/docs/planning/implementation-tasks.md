@@ -679,6 +679,8 @@ Status: ✅ Complete.
 
 ### Task 4.4 — Provenance Metadata Embedding
 
+Status: ✅ Complete.
+
 **Workstream:** WS-G
 
 **Scope:** Embed source command, commit SHA, run id, and policy version in outputs/PR artifacts.
@@ -688,6 +690,15 @@ Status: ✅ Complete.
 - Provenance fields present for all command outputs.
 - Metadata schema is standardized and machine-parseable.
 - Missing provenance fails validation.
+
+**Evidence References:**
+
+- `.GITHUB-MODE/scripts/validate-provenance-metadata.ts`
+- `.GITHUB-MODE/test/validate-provenance-metadata.test.ts`
+- `.GITHUB-MODE/runtime/provenance-metadata.schema.json`
+- `.GITHUB-MODE/runtime/command-policy.json`
+- `.github/workflows/github-mode-command.yml`
+- `.github/workflows/github-mode-agent-run.yml`
 
 ---
 

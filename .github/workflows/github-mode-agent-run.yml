@@ -167,6 +167,26 @@ jobs:
           path: ${{ runner.temp }}/github-mode-agent-policy-gate/
           retention-days: 90
 
+      - name: Validate provenance metadata (Task 4.4)
+        env:
+          GITHUB_MODE_COMMAND: ${{ inputs.command }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/github-mode-agent-provenance"
+          node --import tsx .GITHUB-MODE/scripts/validate-provenance-metadata.ts \
+            --json-out "$RUNNER_TEMP/github-mode-agent-provenance/provenance-validation.json" \
+            --summary-out "$RUNNER_TEMP/github-mode-agent-provenance/provenance-summary.md"
+
+      - name: Upload provenance validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: github-mode-agent-provenance-evidence
+          path: ${{ runner.temp }}/github-mode-agent-provenance/
+          retention-days: 90
+
       - name: Execute agent
         env:
           GITHUB_MODE_COMMAND: ${{ inputs.command }}

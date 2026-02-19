@@ -173,6 +173,19 @@
       ]
     },
     {
+      "id": "phase4-provenance-metadata-embedding",
+      "description": "Provenance metadata embedding validates source command, commit SHA, run ID, and policy version in all command outputs using a standardized machine-parseable schema. Missing provenance fails validation.",
+      "state": "operational",
+      "evidence": [
+        ".GITHUB-MODE/scripts/validate-provenance-metadata.ts",
+        ".GITHUB-MODE/test/validate-provenance-metadata.test.ts",
+        ".GITHUB-MODE/runtime/provenance-metadata.schema.json",
+        ".GITHUB-MODE/runtime/command-policy.json",
+        ".github/workflows/github-mode-command.yml",
+        ".github/workflows/github-mode-agent-run.yml"
+      ]
+    },
+    {
       "id": "parity-snapshot-visibility",
       "description": "Parity matrix artifacts are generated and visible to reviewers in CI summaries.",
       "state": "scaffold",

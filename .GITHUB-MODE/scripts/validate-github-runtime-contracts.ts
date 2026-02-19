@@ -463,6 +463,29 @@ function validateEmergencyRevocations(): void {
   }
 }
 
+function validateProvenanceMetadataSchema(): void {
+  const schemaPath = ".GITHUB-MODE/runtime/provenance-metadata.schema.json";
+  const schema = readJson(schemaPath);
+
+  const ajv = new Ajv({ allErrors: true, strict: false, logger: false });
+  const validate = ajv.compile(schema);
+  if (!validate) {
+    throw new Error(`${schemaPath}: schema compilation failed`);
+  }
+
+  const requiredFields = schema.required;
+  if (!Array.isArray(requiredFields) || requiredFields.length === 0) {
+    throw new Error(`${schemaPath}: must declare at least one required field`);
+  }
+
+  const expectedFields = ["source_command", "commit_sha", "run_id", "policy_version"];
+  for (const field of expectedFields) {
+    if (!requiredFields.includes(field)) {
+      throw new Error(`${schemaPath}: missing required provenance field "${field}"`);
+    }
+  }
+}
+
 function validateTaskReadinessMarker(): void {
   const tasksPath = ".GITHUB-MODE/docs/planning/implementation-tasks.md";
   const tasksDoc = readFileSync(path.join(ROOT, tasksPath), "utf8");
@@ -491,6 +514,7 @@ function main(): void {
   validateTrustedAllowlist();
   validateTrustedCommandGate();
   validateEmergencyRevocations();
+  validateProvenanceMetadataSchema();
   validateTaskReadinessMarker();
 
   console.log("GitHub runtime contracts: validation passed.");
