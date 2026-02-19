@@ -774,9 +774,12 @@ Status: ✅ Complete.
 
 **Scope:** Implement the durable persistent-memory layer defined in `.GITHUB-MODE/docs/planning/implementation-plan.md` §2.1 so agent context survives runner teardown. Runner filesystem is never a source of truth. This builds on the existing memory system in `src/memory/` and session management in `src/sessions/`, adapting them for the stateless GitHub Actions environment with external persistence.
 
+Start with a git-backed Tier-0 adapter (issue pointer + session transcript files) inspired by `.GITHUB-MODE/docs/design/gitclaw-a-simple-example.md`, then expand to external object/KV storage adapters without breaking deterministic resume semantics.
+
 **Acceptance Criteria:**
 
-- System of record defined: primary object storage for checkpoint/event blobs, index/query database for metadata and coordination, optional projection stores as derived views.
+- Tier-0 persistence implemented for issue-native runs: `state/issues/<issueNumber>.json` pointer + `state/sessions/*.jsonl` transcript files, with explicit resume fallback when pointers/sessions are missing.
+- System of record defined for post-MVP scale: primary object storage for checkpoint/event blobs, index/query database for metadata and coordination, optional projection stores as derived views.
 - Read/write lifecycle implemented: hydrate at run start (latest snapshot + unapplied deltas), periodic checkpoints at deterministic boundaries with monotonic sequence IDs, finalize at run end (compact deltas into snapshot, record status/evidence), crash-safe fallback from previously persisted checkpoints.
 - Consistency model enforced: read-your-writes within run scope, eventual consistency across concurrent runs, `baseVersion`/`newVersion` compare-and-swap on writes, reject stale writes on version mismatch, append-only event log with periodic snapshot compaction (no silent last-write-wins).
 - Idempotency: all writes include idempotency keys (`runId` + `stepId` + `sequence`).

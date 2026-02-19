@@ -187,6 +187,17 @@
       ]
     },
     {
+      "id": "issue-thread-loop-mvp",
+      "description": "Issue and issue_comment conversational loop with reaction lifecycle and git-backed issue-to-session resume mapping is specified for Phase 4 implementation.",
+      "state": "spec-only",
+      "evidence": [
+        ".GITHUB-MODE/docs/design/gitclaw-a-simple-example.md",
+        ".GITHUB-MODE/docs/design/github-mode-issue-loop-mvp.md",
+        ".GITHUB-MODE/docs/planning/implementation-plan.md",
+        ".GITHUB-MODE/docs/planning/implementation-tasks.md"
+      ]
+    },
+    {
       "id": "parity-snapshot-visibility",
       "description": "Parity matrix artifacts are generated and visible to reviewers in CI summaries.",
       "state": "scaffold",

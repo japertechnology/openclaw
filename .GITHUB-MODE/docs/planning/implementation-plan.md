@@ -314,6 +314,7 @@ Workflows run `pnpm install && pnpm build` to produce the openclaw runtime, then
    - Completion handoff: outcome statement, evidence bundle, operator action, ownership continuity.
    - Fallback when telemetry is unavailable: show last confirmed checkpoint, mark unknown, emit degraded-telemetry note.
 9. **Failure-mode contract** for all checkpointed runs (see §4.3 above).
+10. **Issue-thread loop MVP (gitclaw-inspired):** add `issues`/`issue_comment` trigger path with reaction-based in-progress signaling, guaranteed reaction cleanup, and git-backed issue→session pointer mapping for deterministic resume (see [design note](../design/github-mode-issue-loop-mvp.md)).
 
 **Exit criteria:**
 
