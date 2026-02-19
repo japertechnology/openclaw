@@ -625,6 +625,8 @@ Status: ✅ Complete.
 
 ### Task 4.2 — Trust-Aware Authorization Layer
 
+Status: ✅ Complete.
+
 **Workstream:** WS-D
 
 **Scope:** Enforce trust-level-based command authorization and privileged adapter restrictions.
@@ -636,6 +638,16 @@ Status: ✅ Complete.
 - Denials are explicit and auditable.
 
 **Security Check:** Must enforce guardrail “no privileged execution from untrusted contexts.”
+
+**Evidence References:**
+
+- `.GITHUB-MODE/scripts/enforce-trust-authorization.ts`
+- `.GITHUB-MODE/test/enforce-trust-authorization.test.ts`
+- `.GITHUB-MODE/runtime/trust-levels.json`
+- `.GITHUB-MODE/runtime/adapter-contracts.json`
+- `.GITHUB-MODE/runtime/command-policy.json`
+- `.github/workflows/github-mode-command.yml`
+- `.github/workflows/github-mode-agent-run.yml`
 
 ---
 
