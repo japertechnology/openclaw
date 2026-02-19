@@ -199,11 +199,11 @@ Status: ✅ Complete.
 
 ## Phase 2 — Security Foundation (GitHub-native)
 
-Phase 2 status: 🟡 Designed/Scaffolded (Tasks 2.1–2.6 have schema/workflow scaffolding; operational evidence is required before promotion to ✅ Complete).
+Phase 2 status: 🟢 Code-complete (Tasks 2.1–2.6 have full code implementations, scripts, tests, workflows, and runtime contracts; operational evidence from real CI runs is required before promotion to ✅ Complete).
 
 ### Task 2.1 — Secrets Inventory and Rotation Standard
 
-Status: 🟡 Designed/Scaffolded.
+Status: 🟢 Code-complete.
 
 **Workstream:** WS-B
 
@@ -234,7 +234,7 @@ Status: 🟡 Designed/Scaffolded.
 
 ### Task 2.2 — Environment Protection Configuration
 
-Status: 🟡 Designed/Scaffolded.
+Status: 🟢 Code-complete.
 
 **Workstream:** WS-B
 
@@ -266,7 +266,7 @@ Status: 🟡 Designed/Scaffolded.
 
 ### Task 2.3 — Workflow Permission Hardening
 
-Status: 🟡 Designed/Scaffolded.
+Status: 🟢 Code-complete.
 
 **Workstream:** WS-B
 
@@ -296,7 +296,7 @@ Status: 🟡 Designed/Scaffolded.
 
 ### Task 2.4 — OIDC Adoption for Cloud Access
 
-Status: 🟡 Designed/Scaffolded.
+Status: 🟢 Code-complete.
 
 **Workstream:** WS-B
 
@@ -335,7 +335,7 @@ Status: 🟡 Designed/Scaffolded.
 
 ### Task 2.5 — Security Lint and Simulation Harness
 
-Status: 🟡 Designed/Scaffolded.
+Status: 🟢 Code-complete.
 
 **Workstream:** WS-B
 
@@ -367,7 +367,7 @@ Status: 🟡 Designed/Scaffolded.
 
 ### Task 2.6 — Skills Quarantine Pipeline
 
-Status: 🟡 Designed/Scaffolded.
+Status: 🟢 Code-complete.
 
 **Workstream:** WS-B
 
