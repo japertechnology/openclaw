@@ -93,7 +93,11 @@ export function validateApprovalFile(
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const relativePath = path.relative(REPO_ROOT, filePath);
-  const requiredRoles = REQUIRED_ROLES[relativePath] ?? [];
+  const lookupKey =
+    REQUIRED_ROLES[relativePath] !== undefined
+      ? relativePath
+      : (Object.keys(REQUIRED_ROLES).find((key) => filePath.endsWith(key)) ?? relativePath);
+  const requiredRoles = REQUIRED_ROLES[lookupKey] ?? [];
 
   let signoffs: Signoff[];
   try {
